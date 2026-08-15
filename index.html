@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Text Express</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="te-page">
+  <main class="te-demo-page" aria-label="Página demonstrativa do Text Express">
+    <section class="te-demo-card">
+      <span class="te-demo-eyebrow">Demonstração local</span>
+      <h1>Text Express</h1>
+      <p>Use o campo abaixo para testar os atalhos. Por exemplo, digite <strong>/sky</strong> e pressione Espaço.</p>
+      <label for="te-demo-message">Mensagem de atendimento</label>
+      <textarea id="te-demo-message" rows="8" placeholder="Digite uma mensagem ou um atalho..."></textarea>
+      <label for="te-demo-protocol">Registro do protocolo</label>
+      <textarea id="te-demo-protocol" rows="8" placeholder="Digite um protocolo ou use o painel..."></textarea>
+    </section>
+  </main>
+
+  <div id="text-express-app" class="te-app" data-version="28.0.3">
+    <svg class="te-icon-sprite" aria-hidden="true" focusable="false">
+      <symbol id="te-i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></symbol>
+      <symbol id="te-i-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.9L3 21l1.6-4.2A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></symbol>
+      <symbol id="te-i-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></symbol>
+      <symbol id="te-i-star" viewBox="0 0 24 24"><path d="m12 2 3 6.1 6.7 1-4.9 4.7 1.2 6.7-6-3.2-6 3.2 1.2-6.7-4.9-4.7 6.7-1Z"/></symbol>
+      <symbol id="te-i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></symbol>
+      <symbol id="te-i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+      <symbol id="te-i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+      <symbol id="te-i-maximize-2" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></symbol>
+      <symbol id="te-i-minimize-2" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4M10 14l-7 7M14 10l7-7"/></symbol>
+      <symbol id="te-i-x" viewBox="0 0 24 24"><path d="m18 6-12 12M6 6l12 12"/></symbol>
+      <symbol id="te-i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+      <symbol id="te-i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="te-i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1H21v4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></symbol>
+      <symbol id="te-i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></symbol>
+      <symbol id="te-i-download" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M5 20h14"/></symbol>
+      <symbol id="te-i-rotate-ccw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></symbol>
+      <symbol id="te-i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></symbol>
+      <symbol id="te-i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6"/></symbol>
+      <symbol id="te-i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+      <symbol id="te-i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+      <symbol id="te-i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+      <symbol id="te-i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+      <symbol id="te-i-folder" viewBox="0 0 24 24"><path d="M3 5h7l2 2h9v12H3Z"/></symbol>
+      <symbol id="te-i-wifi" viewBox="0 0 24 24"><path d="M5 12.6a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14 14 0 0 1 20 0"/><circle cx="12" cy="20" r="1"/></symbol>
+      <symbol id="te-i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+      <symbol id="te-i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z"/></symbol>
+      <symbol id="te-i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+      <symbol id="te-i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5L20 16.4a2.1 2.1 0 0 1-3 3l-7.7-7.7"/></symbol>
+      <symbol id="te-i-server" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6h.01M7 17h.01"/></symbol>
+      <symbol id="te-i-wallet" viewBox="0 0 24 24"><path d="M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h16v10H5a3 3 0 0 1-3-3V6"/><path d="M16 13h2"/></symbol>
+      <symbol id="te-i-radio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4M19 5a10 10 0 0 1 0 14M5 19A10 10 0 0 1 5 5"/></symbol>
+      <symbol id="te-i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+      <symbol id="te-i-network" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="16" y="16" width="6" height="6" rx="1"/><path d="M12 8v4M5 16v-4h14v4"/></symbol>
+      <symbol id="te-i-layout-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+      <symbol id="te-i-reply" viewBox="0 0 24 24"><path d="m9 17-5-5 5-5M4 12h10a6 6 0 0 1 6 6v1"/></symbol>
+      <symbol id="te-i-clipboard-list" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4V2h6v2M9 10h6M9 14h6M9 18h4"/></symbol>
+      <symbol id="te-i-alert-triangle" viewBox="0 0 24 24"><path d="M10.3 3.7 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+      <symbol id="te-i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2.5 5.5L8 16l2.5-5.5Z"/></symbol>
+      <symbol id="te-i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+      <symbol id="te-i-play-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4Z"/></symbol>
+      <symbol id="te-i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="te-i-tag" viewBox="0 0 24 24"><path d="M20 13 13 20l-9-9V4h7Z"/><circle cx="8.5" cy="8.5" r="1"/></symbol>
+      <symbol id="te-i-headphones" viewBox="0 0 24 24"><path d="M4 14a8 8 0 0 1 16 0M4 14v5h4v-6H4M20 14v5h-4v-6h4"/></symbol>
+      <symbol id="te-i-shield-check" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></symbol>
+      <symbol id="te-i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></symbol>
+      <symbol id="te-i-smartphone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 18h4"/></symbol>
+      <symbol id="te-i-package" viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5Z"/><path d="m3 7 9 5 9-5v10l-9 5-9-5Z"/></symbol>
+      <symbol id="te-i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></symbol>
+      <symbol id="te-i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
+      <symbol id="te-i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 0-4H12a2 2 0 0 1 0-4h3a6 6 0 0 0 0-12Z"/><circle cx="7" cy="10" r="1"/><circle cx="9" cy="6" r="1"/><circle cx="14" cy="6" r="1"/></symbol>
+      <symbol id="te-i-save" viewBox="0 0 24 24"><path d="M5 3h12l2 2v16H5Z"/><path d="M8 3v6h8V3M8 21v-7h8v7"/></symbol>
+      <symbol id="te-i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+      <symbol id="te-i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+      <symbol id="te-i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+      <symbol id="te-i-more-horizontal" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+    </svg>
+    <section class="te-panel te-hidden" role="dialog" aria-label="Text Express" aria-modal="false">
+      <header class="te-header" data-te-drag-handle>
+        <div class="te-brand">
+          <span class="te-brand-icon" aria-hidden="true"><svg class="te-icon " aria-hidden="true"><use href="#te-i-zap"></use></svg></span>
+          <div>
+            <strong>Text Express</strong>
+            <span class="te-subtitle">Atendimento e protocolos</span>
+          </div>
+        </div>
+
+        <div class="te-header-actions">
+          <span class="te-count-badge" id="te-count-badge" aria-live="polite">0 modelos</span>
+          <button class="te-icon-button" type="button" data-te-action="theme" title="Alternar tema" aria-label="Alternar tema">
+            <span class="te-theme-icon" aria-hidden="true"><svg class="te-icon " aria-hidden="true"><use href="#te-i-moon"></use></svg></span>
+          </button>
+          <button class="te-icon-button" type="button" data-te-action="minimize" title="Recolher para o ícone" aria-label="Recolher para o ícone">
+            <svg class="te-icon " aria-hidden="true"><use href="#te-i-minus"></use></svg>
+          </button>
+          <button class="te-icon-button te-fullscreen-button" type="button" data-te-action="fullscreen" title="Preencher toda a tela" aria-label="Preencher toda a tela" aria-pressed="false">
+            <svg class="te-icon" aria-hidden="true"><use href="#te-i-maximize-2"></use></svg>
+          </button>
+          <button class="te-icon-button" type="button" data-te-action="close" title="Fechar painel e manter o ícone" aria-label="Fechar painel e manter o ícone">
+            <svg class="te-icon " aria-hidden="true"><use href="#te-i-x"></use></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="te-expandable">
+        <nav class="te-main-tabs" aria-label="Tipos de modelo">
+          <button class="te-main-tab te-active" type="button" data-te-type="atendimento">
+            <svg class="te-icon " aria-hidden="true"><use href="#te-i-message-circle"></use></svg> Atendimento
+          </button>
+          <button class="te-main-tab" type="button" data-te-type="protocolo">
+            <svg class="te-icon " aria-hidden="true"><use href="#te-i-file-text"></use></svg> Protocolo
+          </button>
+          <button class="te-main-tab" type="button" data-te-type="favoritos">
+            <svg class="te-icon " aria-hidden="true"><use href="#te-i-star"></use></svg> Favoritos
+          </button>
+        </nav>
+
+        <section class="te-toolbar" aria-label="Busca e criação">
+          <label class="te-search-box">
+            <svg class="te-icon " aria-hidden="true"><use href="#te-i-search"></use></svg>
+            <input id="te-search-input" type="search" autocomplete="off" placeholder="Buscar por nome, atalho ou conteúdo..." aria-label="Buscar modelos">
+          </label>
+          <button class="te-primary-button" type="button" data-te-action="new">
+            <svg class="te-icon " aria-hidden="true"><use href="#te-i-plus"></use></svg> Novo
+          </button>
+        </section>
+
+        <nav class="te-category-bar" id="te-category-bar" aria-label="Categorias. Arraste horizontalmente para visualizar mais opções." tabindex="0"></nav>
+
+        <section class="te-content-area">
+          <div class="te-list-pane">
+            <div class="te-list" id="te-snippet-list" aria-live="polite"></div>
+            <div class="te-empty-state te-hidden" id="te-empty-state">
+              <svg class="te-icon" aria-hidden="true"><use href="#te-i-search"></use></svg>
+              <strong>Nenhum modelo encontrado</strong>
+              <p>Altere os filtros ou crie um novo modelo.</p>
+            </div>
+          </div>
+
+          <aside class="te-detail-pane" id="te-detail-pane" aria-label="Detalhes do modelo">
+            <div class="te-detail-empty">
+              <svg class="te-icon " aria-hidden="true"><use href="#te-i-zap"></use></svg>
+              <strong>Selecione um modelo</strong>
+              <p>Veja o conteúdo completo, as variáveis e o atalho de ativação.</p>
+            </div>
+          </aside>
+        </section>
+
+        <footer class="te-footer">
+          <div class="te-status" id="te-status-counts">Atendimento: 0 · Protocolo: 0 · Total: 0</div>
+          <div class="te-footer-actions">
+            <button class="te-secondary-button" type="button" data-te-action="settings" title="Configurações">
+              <svg class="te-icon " aria-hidden="true"><use href="#te-i-settings"></use></svg> Configurações
+            </button>
+            <button class="te-secondary-button" type="button" data-te-action="import"><svg class="te-icon " aria-hidden="true"><use href="#te-i-upload"></use></svg> Importar</button>
+            <button class="te-secondary-button" type="button" data-te-action="export"><svg class="te-icon " aria-hidden="true"><use href="#te-i-download"></use></svg> Exportar</button>
+            <button class="te-danger-button" type="button" data-te-action="reset"><svg class="te-icon " aria-hidden="true"><use href="#te-i-rotate-ccw"></use></svg> Restaurar padrões</button>
+          </div>
+        </footer>
+      </div>
+    </section>
+
+    <button class="te-reopen-button" type="button" data-te-action="reopen" title="Clique para abrir ou arraste para mover" aria-label="Abrir ou mover o Text Express"><span class="te-launcher-label">Abrir Text Express</span>
+      <svg class="te-icon " aria-hidden="true"><use href="#te-i-zap"></use></svg>
+    </button>
+
+    <input class="te-hidden" id="te-import-input" type="file" accept="application/json,.json">
+
+    <div class="te-modal-backdrop te-hidden" id="te-snippet-modal" role="presentation">
+      <section class="te-modal" role="dialog" aria-modal="true" aria-labelledby="te-modal-title">
+        <header class="te-modal-header">
+          <div>
+            <span class="te-modal-kicker te-hidden" id="te-modal-kicker" aria-hidden="true"></span>
+            <h2 id="te-modal-title">Criar modelo</h2>
+          </div>
+          <button class="te-icon-button" type="button" data-te-action="modal-close" aria-label="Fechar modal"><svg class="te-icon " aria-hidden="true"><use href="#te-i-x"></use></svg></button>
+        </header>
+
+        <form id="te-snippet-form" novalidate>
+          <input id="te-form-id" type="hidden">
+
+          <fieldset class="te-type-selector">
+            <legend>Tipo</legend>
+            <label>
+              <input type="radio" name="te-type" value="atendimento" checked>
+              <span><svg class="te-icon " aria-hidden="true"><use href="#te-i-message-circle"></use></svg> Atendimento</span>
+            </label>
+            <label>
+              <input type="radio" name="te-type" value="protocolo">
+              <span><svg class="te-icon " aria-hidden="true"><use href="#te-i-file-text"></use></svg> Protocolo</span>
+            </label>
+          </fieldset>
+
+          <fieldset class="te-model-kind-selector te-hidden" id="te-model-kind-selector">
+            <legend id="te-model-kind-legend">Formato do atendimento</legend>
+            <label>
+              <input type="radio" name="te-model-kind" value="unico" checked>
+              <span><svg class="te-icon" aria-hidden="true"><use href="#te-i-message-circle"></use></svg> <span data-te-kind-label="unico">Fala única</span></span>
+            </label>
+            <label>
+              <input type="radio" name="te-model-kind" value="fluxo">
+              <span><svg class="te-icon" aria-hidden="true"><use href="#te-i-clipboard-list"></use></svg> <span data-te-kind-label="fluxo">Sequência de falas</span></span>
+            </label>
+          </fieldset>
+
+          <div class="te-form-grid">
+            <label class="te-field te-field-wide">
+              <span>Nome do modelo</span>
+              <input id="te-form-name" type="text" maxlength="100" required placeholder="Ex.: Solicitar reinício dos equipamentos">
+              <small class="te-field-error" data-te-error="name"></small>
+            </label>
+
+            <label class="te-field te-field-wide">
+              <span>Atalho de ativação</span>
+              <div class="te-input-with-action">
+                <input id="te-form-shortcut" type="text" maxlength="60" required spellcheck="false" placeholder="/reiniciar">
+                <button type="button" class="te-inline-button" data-te-action="suggest-shortcut"><svg class="te-icon" aria-hidden="true"><use href="#te-i-zap"></use></svg> Sugerir</button>
+              </div>
+              <small>Você escolhe o comando. Ele sempre começará com “/”.</small>
+              <small class="te-field-error" data-te-error="shortcut"></small>
+            </label>
+
+            <label class="te-field">
+              <span>Expandir ao pressionar</span>
+              <select id="te-form-trigger">
+                <option value="space">Espaço</option>
+                <option value="tab">Tab</option>
+                <option value="enter">Enter</option>
+              </select>
+            </label>
+
+            <div class="te-field">
+              <span>Categoria</span>
+              <div class="te-input-with-action te-category-select-row">
+                <select id="te-form-category" aria-label="Categoria do modelo"></select>
+                <button type="button" class="te-inline-icon-button" data-te-action="category-add-from-form" title="Criar categoria" aria-label="Criar categoria"><svg class="te-icon " aria-hidden="true"><use href="#te-i-plus"></use></svg></button>
+              </div>
+            </div>
+
+            <label class="te-field te-field-wide te-hidden" id="te-protocol-label-field">
+              <span>Etiqueta automática do protocolo</span>
+              <input id="te-form-system-label" type="text" maxlength="180" list="te-system-label-options" autocomplete="off" spellcheck="false" placeholder="Pesquise uma etiqueta ou digite uma nova">
+              <datalist id="te-system-label-options"></datalist>
+              <small>Opcional. Vale para o cartão inteiro e, em cartões com sequência, é usada uma única vez mesmo ao trocar de opção.</small>
+            </label>
+
+            <div class="te-field te-field-wide" id="te-single-content-wrap">
+              <label>
+                <span>Conteúdo do modelo</span>
+                <textarea id="te-form-content" rows="7" placeholder="Digite o texto que será inserido..."></textarea>
+              </label>
+              <small class="te-field-error" data-te-error="content"></small>
+            </div>
+
+            <section class="te-flow-editor te-field-wide te-hidden" id="te-flow-editor" aria-label="Editor da sequência de falas">
+              <div class="te-flow-editor-heading">
+                <div>
+                  <strong id="te-flow-editor-title">Falas da sequência</strong>
+                  <small id="te-flow-editor-help">O atalho principal abre a sequência. Os atalhos numerados inserem uma fala diretamente.</small>
+                </div>
+                <button class="te-secondary-button te-compact-button" type="button" data-te-action="flow-step-add">
+                  <svg class="te-icon" aria-hidden="true"><use href="#te-i-plus"></use></svg> <span id="te-flow-add-label">Adicionar fala</span>
+                </button>
+              </div>
+              <div class="te-flow-editor-steps" id="te-flow-editor-steps"></div>
+              <small class="te-field-error" id="te-flow-error"></small>
+            </section>
+
+            <div class="te-field te-field-wide">
+              <span>Variáveis detectadas</span>
+              <div class="te-variable-tags" id="te-variable-preview">
+                <span class="te-muted">Nenhuma variável encontrada.</span>
+              </div>
+              <small>Use o formato <code>[nome]</code>, <code>[prazo]</code> ou qualquer outro campo entre colchetes.</small>
+            </div>
+
+            <label class="te-check-field te-field-wide">
+              <input id="te-form-favorite" type="checkbox">
+              <span>Adicionar aos favoritos</span>
+            </label>
+          </div>
+
+          <footer class="te-modal-footer te-model-modal-footer">
+            <span class="te-model-save-status" id="te-model-save-status" role="status" aria-live="polite"></span>
+            <span class="te-modal-footer-spacer"></span>
+            <button class="te-secondary-button" type="button" data-te-action="modal-close"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg> Fechar</button>
+            <button class="te-primary-button" type="submit"><svg class="te-icon" aria-hidden="true"><use href="#te-i-save"></use></svg> Salvar e concluir</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+
+
+    <div class="te-modal-backdrop te-hidden" id="te-category-modal" role="presentation">
+      <section class="te-modal te-category-modal" role="dialog" aria-modal="true" aria-labelledby="te-category-modal-title">
+        <header class="te-modal-header">
+          <div class="te-modal-heading-with-icon"><span class="te-modal-heading-icon"><svg class="te-icon " aria-hidden="true"><use href="#te-i-palette"></use></svg></span><div>
+            <span class="te-modal-kicker" id="te-category-modal-kicker">Nova categoria</span>
+            <h2 id="te-category-modal-title">Criar categoria</h2>
+          </div></div>
+          <button class="te-icon-button" type="button" data-te-action="category-close" aria-label="Fechar"><svg class="te-icon " aria-hidden="true"><use href="#te-i-x"></use></svg></button>
+        </header>
+        <form id="te-category-form" novalidate>
+          <input id="te-category-form-id" type="hidden">
+          <input id="te-category-form-icon" type="hidden" value="folder">
+          <fieldset class="te-type-selector te-category-type-selector">
+            <legend>Exibir em</legend>
+            <label><input type="radio" name="te-category-type" value="atendimento" checked><span><svg class="te-icon " aria-hidden="true"><use href="#te-i-message-circle"></use></svg> Atendimento</span></label>
+            <label><input type="radio" name="te-category-type" value="protocolo"><span><svg class="te-icon " aria-hidden="true"><use href="#te-i-file-text"></use></svg> Protocolo</span></label>
+          </fieldset>
+          <div class="te-form-grid">
+            <label class="te-field te-field-wide"><span>Nome da categoria</span><input id="te-category-form-name" maxlength="48" placeholder="Ex.: Cobranças e pagamentos" required><small class="te-field-error" id="te-category-name-error"></small></label>
+            <div class="te-field te-field-wide"><span>Ícone</span><div class="te-icon-choice-grid" id="te-category-icon-grid"></div></div>
+            <div class="te-field"><span>Cor da categoria</span><div class="te-color-picker-row"><input id="te-category-form-color" type="color" value="#4f7cff"><div class="te-color-choice-grid" id="te-category-color-grid"></div></div></div>
+            <div class="te-field"><span>Pré-visualização</span><div class="te-category-preview" id="te-category-preview"></div><small id="te-category-usage">A categoria será salva no navegador.</small></div>
+          </div>
+          <div class="te-category-order-actions">
+            <button id="te-category-move-left" class="te-secondary-button te-hidden" type="button" data-te-action="category-move-left"><svg class="te-icon " aria-hidden="true"><use href="#te-i-chevron-left"></use></svg> Mover à esquerda</button>
+            <button id="te-category-move-right" class="te-secondary-button te-hidden" type="button" data-te-action="category-move-right">Mover à direita <svg class="te-icon " aria-hidden="true"><use href="#te-i-chevron-right"></use></svg></button>
+          </div>
+          <footer class="te-modal-footer te-category-modal-footer">
+            <button id="te-category-delete-button" class="te-danger-button te-hidden" type="button" data-te-action="category-delete"><svg class="te-icon " aria-hidden="true"><use href="#te-i-trash"></use></svg> Excluir categoria</button>
+            <span class="te-modal-footer-spacer"></span>
+            <button class="te-secondary-button" type="button" data-te-action="category-close">Cancelar</button>
+            <button class="te-primary-button" type="submit"><svg class="te-icon " aria-hidden="true"><use href="#te-i-save"></use></svg> Salvar categoria</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+
+    <div class="te-modal-backdrop te-hidden" id="te-variable-modal" role="presentation">
+      <section class="te-modal te-variable-modal" role="dialog" aria-modal="true" aria-labelledby="te-variable-title">
+        <header class="te-modal-header">
+          <div>
+            <span class="te-modal-kicker">Preencher modelo</span>
+            <h2 id="te-variable-title">Informe as variáveis</h2>
+          </div>
+          <button class="te-icon-button" type="button" data-te-action="variable-cancel" aria-label="Cancelar preenchimento"><svg class="te-icon " aria-hidden="true"><use href="#te-i-x"></use></svg></button>
+        </header>
+        <form id="te-variable-form">
+          <p class="te-variable-help">Os valores abaixo serão substituídos no texto antes da inserção. O nome informado em <code>[atendente]</code> será lembrado automaticamente neste navegador.</p>
+          <div class="te-variable-fields" id="te-variable-fields"></div>
+          <footer class="te-modal-footer">
+            <button class="te-secondary-button" type="button" data-te-action="variable-cancel"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg> Cancelar</button>
+            <button class="te-primary-button" type="submit"><svg class="te-icon" aria-hidden="true"><use href="#te-i-check"></use></svg> Aplicar e inserir</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+
+    <div class="te-modal-backdrop te-hidden" id="te-settings-modal" role="presentation">
+      <section class="te-modal te-settings-modal" role="dialog" aria-modal="true" aria-labelledby="te-settings-title">
+        <header class="te-modal-header">
+          <div>
+            <span class="te-modal-kicker">Preferências</span>
+            <h2 id="te-settings-title">Configurações</h2>
+          </div>
+          <button class="te-icon-button" type="button" data-te-action="settings-close" aria-label="Fechar configurações"><svg class="te-icon " aria-hidden="true"><use href="#te-i-x"></use></svg></button>
+        </header>
+        <form id="te-settings-form">
+          <div class="te-settings-list">
+            <div class="te-setting-profile">
+              <label for="te-setting-attendant-name">
+                <span>
+                  <strong>Nome do atendente</strong>
+                  <small>Preenchido automaticamente sempre que um modelo usar <code>[atendente]</code>.</small>
+                </span>
+                <input id="te-setting-attendant-name" type="text" maxlength="80" autocomplete="name" placeholder="Digite seu nome">
+              </label>
+              <button class="te-secondary-button te-setting-clear-button" type="button" data-te-action="clear-attendant">Limpar nome lembrado</button>
+            </div>
+            <label class="te-setting-row">
+              <span>
+                <strong>Expansão automática</strong>
+                <small>Substituir atalhos digitados nos campos de texto.</small>
+              </span>
+              <input id="te-setting-auto-expand" type="checkbox" checked>
+            </label>
+            <label class="te-setting-row">
+              <span>
+                <strong>Manter painel aberto após inserir</strong>
+                <small>Útil para inserir vários textos durante o mesmo atendimento.</small>
+              </span>
+              <input id="te-setting-keep-open" type="checkbox" checked>
+            </label>
+            <label class="te-setting-row">
+              <span>
+                <strong>Confirmar antes de excluir</strong>
+                <small>Evita remoções acidentais.</small>
+              </span>
+              <input id="te-setting-confirm-delete" type="checkbox" checked>
+            </label>
+          </div>
+          <div class="te-keyboard-help">
+            <strong>Atalho global</strong>
+            <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> abre ou reabre o painel.</span>
+          </div>
+          <footer class="te-modal-footer">
+            <button class="te-primary-button" type="submit"><svg class="te-icon" aria-hidden="true"><use href="#te-i-save"></use></svg> Salvar configurações</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+
+    <div class="te-toast-stack" id="te-toast-stack" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

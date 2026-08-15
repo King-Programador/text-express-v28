@@ -1,0 +1,4382 @@
+/* Text Express — estilos isolados por prefixo te- */
+.te-page {
+  margin: 0;
+  min-height: 100vh;
+  background: #eef3f8;
+  color: #172033;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.te-demo-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 48px;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(37, 99, 235, 0.12), transparent 34%),
+    linear-gradient(145deg, #f7f9fc, #e9eff7);
+}
+
+.te-demo-card {
+  width: min(640px, calc(100vw - 96px));
+  padding: 30px;
+  border: 1px solid #dce4ef;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 24px 60px rgba(31, 45, 70, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.te-demo-eyebrow {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e8f0ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.te-demo-card h1 {
+  margin: 16px 0 8px;
+  font-size: 38px;
+}
+
+.te-demo-card p {
+  margin: 0 0 22px;
+  color: #536079;
+  line-height: 1.6;
+}
+
+.te-demo-card label {
+  display: block;
+  margin: 18px 0 7px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.te-demo-card textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: 14px;
+  border: 1px solid #cbd6e5;
+  border-radius: 12px;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+  line-height: 1.5;
+  outline: none;
+}
+
+.te-demo-card textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13);
+}
+
+#text-express-app,
+#text-express-app * {
+  box-sizing: border-box;
+}
+
+#text-express-app {
+  --te-primary: #2563eb;
+  --te-primary-strong: #174bc4;
+  --te-primary-soft: #eaf1ff;
+  --te-protocol: #7c3aed;
+  --te-protocol-soft: #f1eafe;
+  --te-favorite: #d99000;
+  --te-favorite-soft: #fff5d9;
+  --te-success: #16803d;
+  --te-danger: #d52b2b;
+  --te-danger-soft: #fff0f0;
+  --te-text: #172033;
+  --te-muted: #65728a;
+  --te-border: #dce3ed;
+  --te-surface: #ffffff;
+  --te-surface-2: #f7f9fc;
+  --te-surface-3: #eef3f8;
+  --te-header: #102443;
+  --te-shadow: 0 28px 75px rgba(15, 32, 61, 0.28);
+  --te-radius: 16px;
+  position: fixed;
+  z-index: 2147483000;
+  inset: 0;
+  pointer-events: none;
+  color: var(--te-text);
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.te-dark #text-express-app,
+#text-express-app.te-dark {
+  --te-primary: #5b8cff;
+  --te-primary-strong: #7aa2ff;
+  --te-primary-soft: #172b52;
+  --te-protocol: #aa7cff;
+  --te-protocol-soft: #2b2046;
+  --te-favorite: #ffc340;
+  --te-favorite-soft: #3e3318;
+  --te-success: #48c977;
+  --te-danger: #ff6b6b;
+  --te-danger-soft: #3f2025;
+  --te-text: #edf3ff;
+  --te-muted: #a8b4c9;
+  --te-border: #33405a;
+  --te-surface: #192339;
+  --te-surface-2: #141d30;
+  --te-surface-3: #22304b;
+  --te-header: #0a162b;
+  --te-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
+}
+
+#text-express-app button,
+#text-express-app input,
+#text-express-app textarea,
+#text-express-app select {
+  font: inherit;
+}
+
+#text-express-app button {
+  cursor: pointer;
+}
+
+#text-express-app .te-hidden {
+  display: none !important;
+}
+
+#text-express-app .te-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  width: min(920px, calc(100vw - 32px));
+  height: min(690px, calc(100vh - 32px));
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--te-border) 82%, transparent);
+  border-radius: var(--te-radius);
+  background: var(--te-surface);
+  box-shadow: var(--te-shadow);
+  pointer-events: auto;
+}
+
+#text-express-app .te-panel.te-minimized {
+  width: min(520px, calc(100vw - 32px));
+  height: auto;
+}
+
+#text-express-app .te-panel.te-minimized .te-expandable {
+  display: none;
+}
+
+#text-express-app .te-header {
+  min-height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 16px 0 18px;
+  background: linear-gradient(135deg, var(--te-header), #15345f);
+  color: #fff;
+  user-select: none;
+  touch-action: none;
+}
+
+#text-express-app .te-header[data-te-drag-handle] {
+  cursor: move;
+}
+
+#text-express-app .te-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+#text-express-app .te-brand-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 5px rgba(255, 193, 7, 0.35));
+}
+
+#text-express-app .te-brand strong {
+  display: block;
+  font-size: 19px;
+  letter-spacing: -0.02em;
+}
+
+#text-express-app .te-subtitle {
+  display: block;
+  margin-top: 1px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 11px;
+}
+
+#text-express-app .te-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#text-express-app .te-count-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  margin-right: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#text-express-app .te-icon-button {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  font-size: 22px;
+}
+
+#text-express-app .te-icon-button:hover,
+#text-express-app .te-icon-button:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+#text-express-app .te-expandable {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#text-express-app .te-main-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--te-border);
+  background: var(--te-surface);
+}
+
+#text-express-app .te-main-tab {
+  min-height: 40px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--te-surface-2);
+  color: var(--te-muted);
+  font-weight: 750;
+  transition: 150ms ease;
+}
+
+#text-express-app .te-main-tab:hover {
+  background: var(--te-surface-3);
+  color: var(--te-text);
+}
+
+#text-express-app .te-main-tab.te-active[data-te-type="atendimento"] {
+  background: linear-gradient(135deg, var(--te-primary), var(--te-primary-strong));
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.22);
+}
+
+#text-express-app .te-main-tab.te-active[data-te-type="protocolo"] {
+  background: linear-gradient(135deg, var(--te-protocol), #5b21b6);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(124, 58, 237, 0.22);
+}
+
+#text-express-app .te-main-tab.te-active[data-te-type="favoritos"] {
+  background: linear-gradient(135deg, #f5b400, #d88800);
+  color: #fff;
+  box-shadow: 0 6px 14px rgba(217, 144, 0, 0.22);
+}
+
+#text-express-app .te-toolbar {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px 8px;
+  background: var(--te-surface);
+}
+
+#text-express-app .te-search-box {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--te-border);
+  border-radius: 10px;
+  background: var(--te-surface-2);
+  color: var(--te-muted);
+}
+
+#text-express-app .te-search-box:focus-within {
+  border-color: var(--te-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--te-primary) 16%, transparent);
+}
+
+#text-express-app .te-search-box input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--te-text);
+}
+
+#text-express-app .te-search-box input::placeholder,
+#text-express-app input::placeholder,
+#text-express-app textarea::placeholder {
+  color: color-mix(in srgb, var(--te-muted) 78%, transparent);
+}
+
+#text-express-app .te-primary-button,
+#text-express-app .te-secondary-button,
+#text-express-app .te-danger-button,
+#text-express-app .te-inline-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 9px;
+  font-weight: 750;
+  white-space: nowrap;
+  transition: 140ms ease;
+}
+
+#text-express-app .te-primary-button {
+  border: 1px solid var(--te-primary);
+  background: var(--te-primary);
+  color: #fff;
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--te-primary) 25%, transparent);
+}
+
+#text-express-app .te-primary-button:hover {
+  background: var(--te-primary-strong);
+  border-color: var(--te-primary-strong);
+  transform: translateY(-1px);
+}
+
+#text-express-app .te-secondary-button {
+  border: 1px solid var(--te-border);
+  background: var(--te-surface);
+  color: var(--te-text);
+}
+
+#text-express-app .te-secondary-button:hover {
+  border-color: color-mix(in srgb, var(--te-primary) 45%, var(--te-border));
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+}
+
+#text-express-app .te-danger-button {
+  border: 1px solid color-mix(in srgb, var(--te-danger) 38%, var(--te-border));
+  background: var(--te-danger-soft);
+  color: var(--te-danger);
+}
+
+#text-express-app .te-danger-button:hover {
+  border-color: var(--te-danger);
+}
+
+#text-express-app .te-inline-button {
+  min-height: 34px;
+  padding: 6px 10px;
+  border: 1px solid var(--te-border);
+  background: var(--te-surface-2);
+  color: var(--te-primary);
+  font-size: 12px;
+}
+
+#text-express-app .te-category-bar {
+  display: flex;
+  gap: 7px;
+  padding: 0 12px 9px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  border-bottom: 1px solid var(--te-border);
+  background: var(--te-surface);
+}
+
+#text-express-app .te-category-button {
+  min-height: 31px;
+  padding: 5px 11px;
+  border: 1px solid var(--te-border);
+  border-radius: 999px;
+  background: var(--te-surface);
+  color: var(--te-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+#text-express-app .te-category-button:hover,
+#text-express-app .te-category-button.te-active {
+  border-color: var(--te-primary);
+  background: var(--te-primary);
+  color: #fff;
+}
+
+#text-express-app .te-content-area {
+  min-height: 0;
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(330px, 43%) 1fr;
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-list-pane {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid var(--te-border);
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-list {
+  height: 100%;
+  overflow-y: auto;
+  padding: 8px;
+  scrollbar-width: thin;
+}
+
+#text-express-app .te-snippet-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 9px;
+  padding: 12px 10px;
+  margin-bottom: 7px;
+  border: 1px solid var(--te-border);
+  border-radius: 11px;
+  background: var(--te-surface);
+  transition: 140ms ease;
+}
+
+#text-express-app .te-snippet-card:hover,
+#text-express-app .te-snippet-card.te-selected {
+  border-color: color-mix(in srgb, var(--te-primary) 70%, var(--te-border));
+  box-shadow: 0 7px 18px rgba(19, 39, 73, 0.09);
+}
+
+#text-express-app .te-snippet-card.te-selected {
+  background: color-mix(in srgb, var(--te-primary-soft) 65%, var(--te-surface));
+}
+
+#text-express-app .te-card-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+  font-size: 16px;
+}
+
+#text-express-app .te-snippet-card[data-te-snippet-type="protocolo"] .te-card-icon {
+  background: var(--te-protocol-soft);
+  color: var(--te-protocol);
+}
+
+#text-express-app .te-card-main {
+  min-width: 0;
+}
+
+#text-express-app .te-card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+#text-express-app .te-card-title {
+  overflow: hidden;
+  color: var(--te-text);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#text-express-app .te-category-tag {
+  display: inline-flex;
+  max-width: 145px;
+  padding: 3px 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+  font-size: 10px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#text-express-app [data-te-snippet-type="protocolo"] .te-category-tag,
+#text-express-app .te-detail-pane[data-te-snippet-type="protocolo"] .te-category-tag {
+  background: var(--te-protocol-soft);
+  color: var(--te-protocol);
+}
+
+#text-express-app .te-shortcut-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 3px;
+  color: var(--te-muted);
+  font-size: 11px;
+}
+
+#text-express-app .te-shortcut-line code,
+#text-express-app .te-detail-shortcut,
+#text-express-app code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+#text-express-app .te-card-excerpt {
+  display: -webkit-box;
+  margin: 7px 0 8px;
+  overflow: hidden;
+  color: var(--te-text);
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+#text-express-app .te-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#text-express-app .te-text-button {
+  min-height: 28px;
+  padding: 4px 7px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--te-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+#text-express-app .te-text-button:hover {
+  background: var(--te-surface-3);
+  color: var(--te-text);
+}
+
+#text-express-app .te-text-button.te-delete:hover {
+  background: var(--te-danger-soft);
+  color: var(--te-danger);
+}
+
+#text-express-app .te-card-insert {
+  margin-left: auto;
+  border: 1px solid color-mix(in srgb, var(--te-primary) 45%, var(--te-border));
+  color: var(--te-primary);
+}
+
+#text-express-app .te-favorite-button {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #aab4c4;
+  font-size: 18px;
+}
+
+#text-express-app .te-favorite-button:hover,
+#text-express-app .te-favorite-button.te-active {
+  background: var(--te-favorite-soft);
+  color: var(--te-favorite);
+}
+
+#text-express-app .te-detail-pane {
+  min-width: 0;
+  overflow-y: auto;
+  padding: 18px;
+  background: var(--te-surface);
+  scrollbar-width: thin;
+}
+
+#text-express-app .te-detail-empty,
+#text-express-app .te-empty-state {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px;
+  color: var(--te-muted);
+  text-align: center;
+}
+
+#text-express-app .te-detail-empty > span,
+#text-express-app .te-empty-state > span {
+  font-size: 34px;
+}
+
+#text-express-app .te-detail-empty strong,
+#text-express-app .te-empty-state strong {
+  color: var(--te-text);
+  font-size: 16px;
+}
+
+#text-express-app .te-detail-empty p,
+#text-express-app .te-empty-state p {
+  max-width: 310px;
+  margin: 0;
+}
+
+#text-express-app .te-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--te-border);
+}
+
+#text-express-app .te-detail-header h2 {
+  margin: 0 0 7px;
+  color: var(--te-text);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+#text-express-app .te-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+#text-express-app .te-detail-shortcut {
+  padding: 3px 7px;
+  border-radius: 7px;
+  background: var(--te-surface-3);
+  color: var(--te-text);
+  font-size: 11px;
+}
+
+#text-express-app .te-detail-section {
+  margin-top: 17px;
+}
+
+#text-express-app .te-detail-section > strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--te-text);
+}
+
+#text-express-app .te-content-preview {
+  min-height: 130px;
+  padding: 14px;
+  border: 1px solid var(--te-border);
+  border-radius: 10px;
+  background: var(--te-surface-2);
+  color: var(--te-text);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+#text-express-app .te-variable-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 24px;
+  align-items: center;
+}
+
+#text-express-app .te-variable-tag {
+  display: inline-flex;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+#text-express-app .te-muted {
+  color: var(--te-muted);
+  font-size: 12px;
+}
+
+#text-express-app .te-how-to {
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--te-primary) 30%, var(--te-border));
+  border-radius: 10px;
+  background: var(--te-primary-soft);
+  color: var(--te-text);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+#text-express-app .te-how-to strong {
+  color: var(--te-primary);
+}
+
+#text-express-app .te-detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 17px;
+}
+
+#text-express-app .te-footer {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-top: 1px solid var(--te-border);
+  background: var(--te-surface);
+}
+
+#text-express-app .te-status {
+  color: var(--te-muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+#text-express-app .te-footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#text-express-app .te-footer-actions button {
+  min-height: 34px;
+  padding: 6px 9px;
+  font-size: 11px;
+}
+
+#text-express-app .te-reopen-button {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #2563eb, #7c3aed);
+  color: #fff;
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.42);
+  pointer-events: auto;
+  font-size: 26px;
+  transition: 160ms ease;
+}
+
+#text-express-app .te-reopen-button:hover {
+  transform: translateY(-3px) scale(1.03);
+}
+
+#text-express-app .te-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(7, 18, 35, 0.58);
+  backdrop-filter: blur(4px);
+  pointer-events: auto;
+}
+
+#text-express-app .te-modal {
+  width: min(620px, calc(100vw - 32px));
+  max-height: min(760px, calc(100vh - 32px));
+  overflow-y: auto;
+  border: 1px solid var(--te-border);
+  border-radius: 15px;
+  background: var(--te-surface);
+  color: var(--te-text);
+  box-shadow: 0 30px 85px rgba(0, 0, 0, 0.34);
+  scrollbar-width: thin;
+}
+
+#text-express-app .te-variable-modal {
+  width: min(520px, calc(100vw - 32px));
+}
+
+#text-express-app .te-settings-modal {
+  width: min(560px, calc(100vw - 32px));
+}
+
+#text-express-app .te-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--te-border);
+  background: color-mix(in srgb, var(--te-surface) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+#text-express-app .te-modal-header .te-icon-button:hover {
+  background: var(--te-surface-3);
+}
+
+#text-express-app .te-modal-kicker {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--te-primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+#text-express-app .te-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+#text-express-app .te-modal form {
+  padding: 18px;
+}
+
+#text-express-app .te-type-selector {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin: 0 0 17px;
+  padding: 0;
+  border: 0;
+}
+
+#text-express-app .te-type-selector legend {
+  grid-column: 1 / -1;
+  margin-bottom: 7px;
+  color: var(--te-text);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+#text-express-app .te-type-selector label {
+  position: relative;
+}
+
+#text-express-app .te-type-selector input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#text-express-app .te-type-selector span {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--te-border);
+  border-radius: 9px;
+  background: var(--te-surface-2);
+  color: var(--te-muted);
+  font-weight: 750;
+  cursor: pointer;
+}
+
+#text-express-app .te-type-selector input[value="atendimento"]:checked + span {
+  border-color: var(--te-primary);
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+}
+
+#text-express-app .te-type-selector input[value="protocolo"]:checked + span {
+  border-color: var(--te-protocol);
+  background: var(--te-protocol-soft);
+  color: var(--te-protocol);
+}
+
+#text-express-app .te-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+#text-express-app .te-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#text-express-app .te-field-wide {
+  grid-column: 1 / -1;
+}
+
+#text-express-app .te-field > span,
+#text-express-app .te-field > label {
+  color: var(--te-text);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+#text-express-app .te-field input,
+#text-express-app .te-field select,
+#text-express-app .te-field textarea,
+#text-express-app .te-variable-fields input {
+  width: 100%;
+  border: 1px solid var(--te-border);
+  border-radius: 9px;
+  background: var(--te-surface-2);
+  color: var(--te-text);
+  outline: none;
+}
+
+#text-express-app .te-field input,
+#text-express-app .te-field select,
+#text-express-app .te-variable-fields input {
+  height: 40px;
+  padding: 0 11px;
+}
+
+#text-express-app .te-field textarea {
+  min-height: 150px;
+  padding: 11px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+#text-express-app .te-field input:focus,
+#text-express-app .te-field select:focus,
+#text-express-app .te-field textarea:focus,
+#text-express-app .te-variable-fields input:focus {
+  border-color: var(--te-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--te-primary) 15%, transparent);
+}
+
+#text-express-app .te-field small {
+  color: var(--te-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+#text-express-app .te-field-error {
+  min-height: 0;
+  color: var(--te-danger) !important;
+  font-weight: 700;
+}
+
+#text-express-app .te-input-with-action {
+  display: flex;
+  gap: 7px;
+}
+
+#text-express-app .te-input-with-action input {
+  min-width: 0;
+  flex: 1;
+}
+
+#text-express-app .te-check-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--te-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#text-express-app .te-check-field input,
+#text-express-app .te-setting-row input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--te-primary);
+}
+
+#text-express-app .te-modal-footer {
+  position: sticky;
+  bottom: -18px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 20px -18px -18px;
+  padding: 13px 18px;
+  border-top: 1px solid var(--te-border);
+  background: color-mix(in srgb, var(--te-surface) 95%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+#text-express-app .te-variable-help {
+  margin: 0 0 14px;
+  color: var(--te-muted);
+  font-size: 12px;
+}
+
+#text-express-app .te-variable-fields {
+  display: grid;
+  gap: 11px;
+}
+
+#text-express-app .te-variable-fields label {
+  display: grid;
+  gap: 6px;
+  color: var(--te-text);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+#text-express-app .te-settings-list {
+  display: grid;
+  gap: 4px;
+}
+
+#text-express-app .te-setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--te-border);
+}
+
+#text-express-app .te-setting-row span {
+  display: grid;
+  gap: 3px;
+}
+
+#text-express-app .te-setting-row strong {
+  font-size: 13px;
+}
+
+#text-express-app .te-setting-row small {
+  color: var(--te-muted);
+  font-size: 11px;
+}
+
+#text-express-app .te-keyboard-help {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--te-surface-2);
+  color: var(--te-muted);
+  font-size: 11px;
+}
+
+#text-express-app .te-keyboard-help strong {
+  color: var(--te-text);
+}
+
+#text-express-app kbd {
+  display: inline-flex;
+  min-width: 24px;
+  min-height: 22px;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 6px;
+  border: 1px solid var(--te-border);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  background: var(--te-surface);
+  color: var(--te-text);
+  font: 700 10px "SFMono-Regular", Consolas, monospace;
+}
+
+#text-express-app .te-toast-stack {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  z-index: 2147483646;
+  display: grid;
+  gap: 8px;
+  width: min(430px, calc(100vw - 32px));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+#text-express-app .te-toast {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 14px;
+  border: 1px solid var(--te-border);
+  border-left: 4px solid var(--te-primary);
+  border-radius: 10px;
+  background: var(--te-surface);
+  color: var(--te-text);
+  box-shadow: 0 15px 38px rgba(9, 23, 47, 0.2);
+  animation: te-toast-in 180ms ease-out both;
+}
+
+#text-express-app .te-toast.te-success {
+  border-left-color: var(--te-success);
+}
+
+#text-express-app .te-toast.te-error {
+  border-left-color: var(--te-danger);
+}
+
+#text-express-app .te-toast.te-leaving {
+  animation: te-toast-out 180ms ease-in both;
+}
+
+@keyframes te-toast-in {
+  from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes te-toast-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
+}
+
+@media (max-width: 820px) {
+  #text-express-app .te-panel {
+    right: 8px;
+    bottom: 8px;
+    width: calc(100vw - 16px);
+    height: calc(100vh - 16px);
+  }
+
+  #text-express-app .te-content-area {
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app .te-detail-pane {
+    display: none;
+  }
+
+  #text-express-app .te-list-pane {
+    border-right: 0;
+  }
+
+  #text-express-app .te-status {
+    display: none;
+  }
+
+  #text-express-app .te-footer {
+    justify-content: center;
+  }
+
+  #text-express-app .te-footer-actions {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .te-demo-page {
+    padding: 20px;
+  }
+
+  .te-demo-card {
+    width: 100%;
+    padding: 20px;
+  }
+
+  #text-express-app .te-subtitle,
+  #text-express-app .te-count-badge {
+    display: none;
+  }
+
+  #text-express-app .te-main-tabs {
+    gap: 4px;
+    padding: 7px;
+  }
+
+  #text-express-app .te-main-tab {
+    font-size: 11px;
+  }
+
+  #text-express-app .te-toolbar {
+    padding: 8px;
+  }
+
+  #text-express-app .te-primary-button {
+    padding-inline: 10px;
+  }
+
+  #text-express-app .te-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app .te-field-wide {
+    grid-column: auto;
+  }
+
+  #text-express-app .te-modal-backdrop {
+    padding: 8px;
+  }
+
+  #text-express-app .te-modal {
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #text-express-app *,
+  #text-express-app *::before,
+  #text-express-app *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+
+/* ===== Text Express 2.0 — interface com ícones e categorias personalizáveis ===== */
+#text-express-app .te-icon-sprite { position:absolute; width:0; height:0; overflow:hidden; pointer-events:none; }
+#text-express-app .te-icon { width:1.05em; height:1.05em; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; vertical-align:-0.15em; }
+#text-express-app { --te-ring:0 0 0 3px color-mix(in srgb,var(--te-primary) 18%,transparent); --te-card-shadow:0 8px 26px rgba(15,32,61,.08); }
+#text-express-app .te-panel { border-radius:22px; border-color:color-mix(in srgb,var(--te-border) 78%,transparent); box-shadow:0 34px 100px rgba(15,32,61,.34); }
+#text-express-app .te-header { min-height:66px; padding-inline:20px 14px; background:linear-gradient(120deg,#08172c 0%,#102d55 58%,#17447a 100%); }
+#text-express-app .te-brand-icon { display:grid; place-items:center; width:38px; height:38px; border-radius:12px; color:#ffe047; background:rgba(255,255,255,.09); box-shadow:inset 0 0 0 1px rgba(255,255,255,.1); }
+#text-express-app .te-brand-icon .te-icon { width:23px; height:23px; stroke-width:2.2; }
+#text-express-app .te-icon-button { display:grid; place-items:center; }
+#text-express-app .te-icon-button .te-icon { width:18px; height:18px; }
+#text-express-app .te-main-tabs { padding:10px 12px 8px; gap:8px; background:linear-gradient(180deg,var(--te-surface),var(--te-surface-2)); }
+#text-express-app .te-main-tab { min-height:42px; border-radius:12px; gap:8px; font-weight:760; }
+#text-express-app .te-main-tab .te-icon { width:18px; height:18px; }
+#text-express-app .te-toolbar { padding:10px 12px 8px; gap:10px; }
+#text-express-app .te-search-box { height:43px; border-radius:13px; padding-inline:13px; box-shadow:inset 0 1px 0 rgba(255,255,255,.35); }
+#text-express-app .te-search-box .te-icon { color:var(--te-muted); width:18px; height:18px; }
+#text-express-app .te-search-box:focus-within { box-shadow:var(--te-ring); }
+#text-express-app .te-primary-button,#text-express-app .te-secondary-button,#text-express-app .te-danger-button,#text-express-app .te-text-button { display:inline-flex; align-items:center; justify-content:center; gap:7px; }
+#text-express-app .te-primary-button { box-shadow:0 8px 18px color-mix(in srgb,var(--te-primary) 25%,transparent); }
+#text-express-app .te-primary-button:hover { transform:translateY(-1px); }
+#text-express-app .te-category-bar { display:flex; align-items:center; gap:7px; min-height:48px; padding:5px 12px 9px; overflow-x:auto; overflow-y:hidden; scrollbar-width:thin; border-bottom:1px solid var(--te-border); background:var(--te-surface); }
+#text-express-app .te-category-chip { --te-category-color:var(--te-primary); display:flex; align-items:center; flex:0 0 auto; border:1px solid color-mix(in srgb,var(--te-category-color) 28%,var(--te-border)); border-radius:999px; background:color-mix(in srgb,var(--te-category-color) 5%,var(--te-surface)); overflow:hidden; transition:.18s ease; }
+#text-express-app .te-category-chip:hover { transform:translateY(-1px); border-color:color-mix(in srgb,var(--te-category-color) 60%,var(--te-border)); box-shadow:0 5px 13px color-mix(in srgb,var(--te-category-color) 14%,transparent); }
+#text-express-app .te-category-chip.te-active { color:#fff; border-color:var(--te-category-color); background:linear-gradient(135deg,var(--te-category-color),color-mix(in srgb,var(--te-category-color) 72%,#111827)); box-shadow:0 6px 16px color-mix(in srgb,var(--te-category-color) 27%,transparent); }
+#text-express-app .te-category-button { display:inline-flex; align-items:center; gap:7px; height:34px; padding:0 10px 0 11px; color:inherit; border:0; border-radius:999px; background:transparent; white-space:nowrap; font-size:12px; font-weight:730; }
+#text-express-app .te-category-button .te-icon { width:15px; height:15px; color:var(--te-category-color); }
+#text-express-app .te-category-chip.te-active .te-category-button .te-icon { color:#fff; }
+#text-express-app .te-category-count { display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 5px; border-radius:999px; color:color-mix(in srgb,var(--te-category-color) 80%,#111); background:color-mix(in srgb,var(--te-category-color) 13%,var(--te-surface)); font-size:10px; font-weight:800; }
+#text-express-app .te-category-chip.te-active .te-category-count { color:#fff; background:rgba(255,255,255,.18); }
+#text-express-app .te-category-edit { display:grid; place-items:center; width:0; height:28px; padding:0; opacity:0; border:0; color:inherit; background:transparent; transition:.18s ease; }
+#text-express-app .te-category-chip:hover .te-category-edit,#text-express-app .te-category-chip:focus-within .te-category-edit { width:28px; opacity:.72; margin-right:3px; }
+#text-express-app .te-category-edit:hover { opacity:1 !important; border-radius:50%; background:rgba(127,127,127,.13); }
+#text-express-app .te-category-edit .te-icon { width:13px; height:13px; }
+#text-express-app .te-category-add-button { display:inline-flex; align-items:center; gap:6px; flex:0 0 auto; height:34px; padding:0 12px; border:1px dashed color-mix(in srgb,var(--te-primary) 58%,var(--te-border)); border-radius:999px; color:var(--te-primary); background:var(--te-primary-soft); font-size:12px; font-weight:760; }
+#text-express-app .te-category-add-button:hover { border-style:solid; transform:translateY(-1px); }
+#text-express-app .te-snippet-card { border-radius:15px; border-left:3px solid color-mix(in srgb,var(--te-card-accent) 70%,transparent); box-shadow:0 1px 0 rgba(20,35,60,.03); transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
+#text-express-app .te-snippet-card:hover,#text-express-app .te-snippet-card.te-selected { transform:translateY(-1px); box-shadow:var(--te-card-shadow); }
+#text-express-app .te-card-icon { display:grid; place-items:center; width:36px; height:36px; border-radius:12px; color:var(--te-category-color); background:color-mix(in srgb,var(--te-category-color) 12%,var(--te-surface)); }
+#text-express-app .te-card-icon .te-icon { width:19px; height:19px; }
+#text-express-app .te-category-tag { display:inline-flex; align-items:center; gap:5px; color:var(--te-category-color); background:color-mix(in srgb,var(--te-category-color) 11%,var(--te-surface)); border:1px solid color-mix(in srgb,var(--te-category-color) 20%,transparent); }
+#text-express-app .te-category-tag .te-icon { width:12px; height:12px; }
+#text-express-app .te-shortcut-line span { display:inline-flex; align-items:center; gap:4px; }
+#text-express-app .te-shortcut-line .te-icon { width:12px; height:12px; }
+#text-express-app .te-text-button .te-icon { width:14px; height:14px; }
+#text-express-app .te-favorite-button { display:grid; place-items:center; }
+#text-express-app .te-favorite-button .te-icon { width:17px; height:17px; }
+#text-express-app .te-favorite-button.te-active .te-icon { fill:currentColor; }
+#text-express-app .te-detail-title-wrap { display:flex; align-items:flex-start; gap:12px; min-width:0; }
+#text-express-app .te-detail-category-icon { display:grid; place-items:center; flex:0 0 auto; width:42px; height:42px; border-radius:14px; color:var(--te-category-color); background:color-mix(in srgb,var(--te-category-color) 12%,var(--te-surface)); }
+#text-express-app .te-detail-category-icon .te-icon { width:22px; height:22px; }
+#text-express-app .te-detail-section>strong { display:inline-flex; align-items:center; gap:7px; }
+#text-express-app .te-detail-section>strong .te-icon { width:15px; height:15px; color:var(--te-detail-accent,var(--te-primary)); }
+#text-express-app .te-variable-tag { display:inline-flex; align-items:center; gap:5px; }
+#text-express-app .te-variable-tag .te-icon { width:12px; height:12px; }
+#text-express-app .te-footer { background:linear-gradient(180deg,var(--te-surface),var(--te-surface-2)); }
+#text-express-app .te-footer-actions .te-icon { width:14px; height:14px; }
+#text-express-app .te-inline-icon-button { display:grid; place-items:center; flex:0 0 auto; width:42px; border:1px solid var(--te-border); border-radius:10px; color:var(--te-primary); background:var(--te-primary-soft); }
+#text-express-app .te-inline-icon-button:hover { border-color:var(--te-primary); }
+#text-express-app .te-category-select-row select { min-width:0; flex:1; }
+#text-express-app .te-category-modal { width:min(650px,calc(100vw - 32px)); }
+#text-express-app .te-modal-heading-with-icon { display:flex; align-items:center; gap:11px; }
+#text-express-app .te-modal-heading-icon { display:grid; place-items:center; width:40px; height:40px; border-radius:13px; color:var(--te-primary); background:var(--te-primary-soft); }
+#text-express-app .te-modal-heading-icon .te-icon { width:21px; height:21px; }
+#text-express-app .te-category-type-selector span { display:inline-flex !important; align-items:center; gap:7px; }
+#text-express-app .te-icon-choice-grid { display:grid; grid-template-columns:repeat(11,minmax(34px,1fr)); gap:7px; }
+#text-express-app .te-icon-choice { display:grid; place-items:center; aspect-ratio:1; min-height:37px; padding:0; border:1px solid var(--te-border); border-radius:10px; color:var(--te-muted); background:var(--te-surface-2); }
+#text-express-app .te-icon-choice:hover,#text-express-app .te-icon-choice.te-active { color:var(--te-primary); border-color:var(--te-primary); background:var(--te-primary-soft); box-shadow:var(--te-ring); }
+#text-express-app .te-icon-choice .te-icon { width:18px; height:18px; }
+#text-express-app .te-color-picker-row { display:flex; align-items:center; gap:10px; }
+#text-express-app #te-category-form-color { width:46px; height:42px; padding:3px; border:1px solid var(--te-border); border-radius:10px; background:var(--te-surface); cursor:pointer; }
+#text-express-app .te-color-choice-grid { display:flex; flex-wrap:wrap; gap:6px; }
+#text-express-app .te-color-choice { display:grid; place-items:center; width:25px; height:25px; padding:0; border:2px solid transparent; border-radius:50%; background:transparent; }
+#text-express-app .te-color-choice span { width:17px; height:17px; border-radius:50%; background:var(--te-choice-color); box-shadow:inset 0 0 0 1px rgba(0,0,0,.1); }
+#text-express-app .te-color-choice:hover,#text-express-app .te-color-choice.te-active { border-color:var(--te-choice-color); transform:scale(1.08); }
+#text-express-app .te-category-preview { --te-category-color:var(--te-primary); display:inline-flex; align-items:center; gap:7px; min-height:36px; padding:0 11px; border:1px solid color-mix(in srgb,var(--te-category-color) 30%,var(--te-border)); border-radius:999px; color:var(--te-category-color); background:color-mix(in srgb,var(--te-category-color) 9%,var(--te-surface)); font-size:12px; font-weight:750; }
+#text-express-app .te-category-preview .te-icon { width:15px; height:15px; }
+#text-express-app .te-category-order-actions { display:flex; gap:8px; padding:0 22px 16px; }
+#text-express-app .te-category-modal-footer { flex-wrap:wrap; }
+#text-express-app .te-modal-footer-spacer { flex:1; }
+#text-express-app .te-toast { display:flex; align-items:center; gap:9px; }
+#text-express-app .te-toast .te-icon { width:18px; height:18px; }
+#text-express-app .te-detail-empty>.te-icon,#text-express-app .te-empty-state>.te-icon { width:30px; height:30px; color:var(--te-primary); }
+@media (max-width:760px) { #text-express-app .te-icon-choice-grid { grid-template-columns:repeat(7,1fr); } #text-express-app .te-category-edit { width:26px; opacity:.75; margin-right:3px; } }
+
+/* Ajustes finais de especificidade da interface 2.0 */
+#text-express-app .te-category-chip .te-category-button:hover { border-color:transparent; background:transparent; color:inherit; }
+#text-express-app .te-snippet-card[data-te-snippet-type="protocolo"] .te-card-icon { color:var(--te-category-color); background:color-mix(in srgb,var(--te-category-color) 12%,var(--te-surface)); }
+#text-express-app [data-te-snippet-type="protocolo"] .te-category-tag,
+#text-express-app .te-detail-pane[data-te-snippet-type="protocolo"] .te-category-tag { color:var(--te-category-color); background:color-mix(in srgb,var(--te-category-color) 11%,var(--te-surface)); }
+#text-express-app .te-inline-button .te-icon { width:13px; height:13px; }
+#text-express-app .te-modal-footer .te-icon { width:15px; height:15px; }
+
+/* ===== Text Express 3.0 — launcher compacto ===== */
+
+/* O estado minimizado antigo deixa de exibir uma faixa horizontal. */
+#text-express-app .te-panel.te-minimized {
+  display: none !important;
+}
+
+/* Launcher pequeno, discreto e sempre acima do sistema aberto. */
+#text-express-app .te-reopen-button {
+  right: 16px;
+  bottom: 16px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #1d4ed8, #6d28d9);
+  box-shadow:
+    0 10px 24px rgba(37, 99, 235, 0.3),
+    0 2px 6px rgba(15, 23, 42, 0.22);
+  font-size: 21px;
+  isolation: isolate;
+}
+
+#text-express-app .te-reopen-button .te-icon {
+  width: 23px;
+  height: 23px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+}
+
+#text-express-app .te-reopen-button:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow:
+    0 14px 30px rgba(37, 99, 235, 0.38),
+    0 3px 8px rgba(15, 23, 42, 0.24);
+}
+
+#text-express-app .te-reopen-button:active {
+  transform: translateY(0) scale(0.97);
+}
+
+#text-express-app .te-reopen-button:focus-visible {
+  outline: 3px solid color-mix(in srgb, #60a5fa 55%, transparent);
+  outline-offset: 3px;
+}
+
+/* Tooltip só aparece quando o usuário passa o mouse. */
+#text-express-app .te-launcher-label {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  z-index: -1;
+  width: max-content;
+  max-width: 180px;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--te-border) 78%, transparent);
+  border-radius: 9px;
+  background: var(--te-surface);
+  color: var(--te-text);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(8px, -50%);
+  transition: opacity 140ms ease, transform 140ms ease;
+  white-space: nowrap;
+}
+
+#text-express-app .te-reopen-button:hover .te-launcher-label,
+#text-express-app .te-reopen-button:focus-visible .te-launcher-label {
+  z-index: 1;
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+/* Cabeçalho do painel aberto mais compacto. */
+#text-express-app .te-header {
+  min-height: 54px;
+  padding: 0 11px 0 14px;
+  gap: 10px;
+}
+
+#text-express-app .te-brand {
+  gap: 8px;
+}
+
+#text-express-app .te-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.09);
+  font-size: 19px;
+}
+
+#text-express-app .te-brand strong {
+  font-size: 16px;
+}
+
+#text-express-app .te-subtitle {
+  display: none;
+}
+
+#text-express-app .te-count-badge {
+  min-height: 24px;
+  padding: 3px 8px;
+  margin-right: 1px;
+  font-size: 10px;
+}
+
+#text-express-app .te-header-actions {
+  gap: 3px;
+}
+
+#text-express-app .te-header .te-icon-button {
+  width: 33px;
+  height: 33px;
+}
+
+/* Em telas pequenas o launcher permanece discreto. */
+@media (max-width: 540px) {
+  #text-express-app .te-reopen-button {
+    right: 12px;
+    bottom: 12px;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+  }
+
+  #text-express-app .te-launcher-label {
+    display: none;
+  }
+
+  #text-express-app .te-count-badge {
+    display: none;
+  }
+}
+
+/* ===== Text Express 4.0 — launcher menor e arrastável ===== */
+
+#text-express-app .te-reopen-button {
+  right: 14px;
+  bottom: 14px;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0;
+  border-radius: 12px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: left, top, transform;
+}
+
+#text-express-app .te-reopen-button .te-icon {
+  width: 20px;
+  height: 20px;
+}
+
+#text-express-app .te-reopen-button.te-dragging {
+  cursor: grabbing;
+  transition: none !important;
+  transform: scale(1.03);
+  box-shadow:
+    0 16px 34px rgba(37, 99, 235, 0.42),
+    0 4px 12px rgba(15, 23, 42, 0.28);
+}
+
+#text-express-app .te-reopen-button.te-custom-position {
+  right: auto !important;
+  bottom: auto !important;
+}
+
+#text-express-app .te-reopen-button:hover:not(.te-dragging) {
+  transform: translateY(-1px) scale(1.03);
+}
+
+#text-express-app .te-launcher-label {
+  display: none;
+}
+
+@media (max-width: 540px) {
+  #text-express-app .te-reopen-button {
+    right: 10px;
+    bottom: 10px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 11px;
+  }
+
+  #text-express-app .te-reopen-button .te-icon {
+    width: 19px;
+    height: 19px;
+  }
+}
+
+/* ==========================================================
+   Text Express 5.0 — interface leve e fluxos de atendimento
+   ========================================================== */
+
+#text-express-app {
+  --te-shadow: 0 18px 48px rgba(15, 23, 42, .24);
+  --te-radius: 15px;
+}
+
+.te-dark #text-express-app,
+#text-express-app.te-dark {
+  --te-surface: #172033;
+  --te-surface-2: #111827;
+  --te-surface-3: #202b40;
+  --te-border: #2b3850;
+  --te-header: #0e1b30;
+  --te-muted: #9eabc0;
+}
+
+#text-express-app .te-panel {
+  width: min(820px, calc(100vw - 24px));
+  height: min(640px, calc(100vh - 24px));
+  border-radius: 15px;
+  box-shadow: var(--te-shadow);
+}
+
+#text-express-app .te-header {
+  min-height: 48px;
+  padding: 0 10px 0 13px;
+  border-bottom: 1px solid color-mix(in srgb, var(--te-border) 70%, transparent);
+  background: var(--te-header);
+}
+
+#text-express-app .te-brand-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+}
+
+#text-express-app .te-brand strong {
+  font-size: 14px;
+}
+
+#text-express-app .te-count-badge {
+  min-height: 21px;
+  padding: 2px 7px;
+  font-size: 9px;
+  background: rgba(255,255,255,.08);
+}
+
+#text-express-app .te-header .te-icon-button {
+  width: 29px;
+  height: 29px;
+}
+
+#text-express-app .te-main-tabs {
+  min-height: 45px;
+  padding: 6px 10px;
+  gap: 5px;
+  border-bottom: 1px solid var(--te-border);
+  background: var(--te-surface);
+}
+
+#text-express-app .te-main-tab {
+  min-height: 32px;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--te-muted);
+  font-size: 12px;
+}
+
+#text-express-app .te-main-tab.te-active {
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+  box-shadow: none;
+}
+
+#text-express-app .te-toolbar {
+  min-height: 48px;
+  padding: 7px 10px;
+  gap: 8px;
+  background: var(--te-surface);
+}
+
+#text-express-app .te-search-box {
+  min-height: 34px;
+  border-radius: 9px;
+  background: var(--te-surface-2);
+  border-color: transparent;
+}
+
+#text-express-app .te-primary-button,
+#text-express-app .te-secondary-button,
+#text-express-app .te-danger-button {
+  min-height: 32px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+#text-express-app .te-category-bar {
+  min-height: 38px;
+  padding: 3px 10px 6px;
+  gap: 5px;
+  background: var(--te-surface);
+  scrollbar-width: none;
+}
+
+#text-express-app .te-category-bar::-webkit-scrollbar {
+  display: none;
+}
+
+#text-express-app .te-category-chip,
+#text-express-app .te-category-new-button {
+  min-height: 27px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+#text-express-app .te-category-button {
+  min-height: 27px;
+  padding: 3px 8px;
+  font-size: 10px;
+}
+
+#text-express-app .te-category-count {
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  font-size: 8px;
+}
+
+#text-express-app .te-content-area {
+  grid-template-columns: minmax(260px, 38%) minmax(0, 1fr);
+  min-height: 0;
+  background: var(--te-surface);
+}
+
+#text-express-app .te-list-pane {
+  padding: 8px;
+  border-right: 1px solid var(--te-border);
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-list {
+  gap: 5px;
+}
+
+#text-express-app .te-snippet-card {
+  min-height: 0;
+  padding: 9px;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-left: 2px solid color-mix(in srgb, var(--te-card-accent) 55%, transparent);
+  border-radius: 10px;
+  background: var(--te-surface);
+  box-shadow: none;
+  transform: none;
+}
+
+#text-express-app .te-snippet-card:hover {
+  border-color: color-mix(in srgb, var(--te-border) 85%, transparent);
+  box-shadow: none;
+  transform: none;
+}
+
+#text-express-app .te-snippet-card.te-selected {
+  border-color: color-mix(in srgb, var(--te-primary) 42%, var(--te-border));
+  background: color-mix(in srgb, var(--te-primary) 6%, var(--te-surface));
+  box-shadow: none;
+}
+
+#text-express-app .te-card-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+}
+
+#text-express-app .te-card-title {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#text-express-app .te-card-excerpt {
+  max-height: 36px;
+  margin: 4px 0 5px;
+  font-size: 10.5px;
+  line-height: 1.45;
+  -webkit-line-clamp: 2;
+}
+
+#text-express-app .te-shortcut-line {
+  margin-top: 2px;
+  gap: 6px;
+  font-size: 9px;
+}
+
+#text-express-app .te-shortcut-line code,
+#text-express-app .te-flow-shortcuts code {
+  padding: 1px 5px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--te-surface-3);
+  color: var(--te-primary);
+  font-size: 9px;
+}
+
+#text-express-app .te-card-actions {
+  min-height: 25px;
+  margin-top: 2px;
+  gap: 4px;
+}
+
+#text-express-app .te-text-button {
+  min-height: 25px;
+  padding: 3px 7px;
+  font-size: 9.5px;
+}
+
+#text-express-app .te-icon-action {
+  display: inline-grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--te-muted);
+}
+
+#text-express-app .te-icon-action:hover {
+  background: var(--te-surface-3);
+  color: var(--te-text);
+}
+
+#text-express-app .te-icon-action.te-delete:hover {
+  color: var(--te-danger);
+  background: var(--te-danger-soft);
+}
+
+#text-express-app .te-icon-action .te-icon {
+  width: 13px;
+  height: 13px;
+}
+
+#text-express-app .te-favorite-button {
+  width: 27px;
+  height: 27px;
+}
+
+#text-express-app .te-detail-pane {
+  padding: 14px 16px;
+  background: var(--te-surface);
+}
+
+#text-express-app .te-detail-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--te-border);
+}
+
+#text-express-app .te-detail-title-wrap h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+#text-express-app .te-detail-category-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+#text-express-app .te-detail-meta {
+  margin-top: 4px;
+  gap: 6px;
+  font-size: 9.5px;
+}
+
+#text-express-app .te-detail-section {
+  margin-top: 11px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+#text-express-app .te-content-preview {
+  min-height: 90px;
+  max-height: 250px;
+  padding: 12px;
+  border: 1px solid var(--te-border);
+  border-radius: 10px;
+  background: var(--te-surface-2);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+#text-express-app .te-inline-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#text-express-app .te-detail-actions-light {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--te-border);
+}
+
+#text-express-app .te-footer {
+  min-height: 45px;
+  padding: 6px 10px;
+  background: var(--te-surface);
+  border-top: 1px solid var(--te-border);
+}
+
+#text-express-app .te-status {
+  font-size: 9px;
+}
+
+#text-express-app .te-footer-actions {
+  gap: 4px;
+}
+
+#text-express-app .te-footer-actions button {
+  min-height: 29px;
+  padding: 4px 7px;
+  font-size: 9px;
+}
+
+/* Fluxos na lista */
+#text-express-app .te-flow-card {
+  border-left-color: var(--te-primary);
+}
+
+#text-express-app .te-flow-count {
+  flex: none;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+#text-express-app .te-flow-shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 4px 0;
+}
+
+/* Visualização da sequência */
+#text-express-app .te-flow-detail-header {
+  align-items: flex-start;
+}
+
+#text-express-app .te-flow-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+#text-express-app .te-flow-section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+
+#text-express-app .te-flow-section-title strong {
+  font-size: 11px;
+}
+
+#text-express-app .te-flow-section-title small {
+  color: var(--te-muted);
+  font-size: 9px;
+}
+
+#text-express-app .te-flow-variable-section {
+  margin-top: 11px;
+  padding: 10px;
+  border: 1px solid var(--te-border);
+  border-radius: 10px;
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-flow-variable-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+#text-express-app .te-flow-variable-grid label {
+  display: grid;
+  gap: 3px;
+}
+
+#text-express-app .te-flow-variable-grid span {
+  font-size: 9px;
+  color: var(--te-muted);
+}
+
+#text-express-app .te-flow-variable-grid input {
+  min-height: 31px;
+  padding: 6px 8px;
+  border: 1px solid var(--te-border);
+  border-radius: 7px;
+  background: var(--te-surface);
+  color: var(--te-text);
+}
+
+#text-express-app .te-flow-steps-view {
+  margin-top: 12px;
+}
+
+#text-express-app .te-flow-step {
+  margin-bottom: 5px;
+  overflow: hidden;
+  border: 1px solid var(--te-border);
+  border-radius: 9px;
+  background: var(--te-surface);
+}
+
+#text-express-app .te-flow-step.te-active {
+  border-color: color-mix(in srgb, var(--te-primary) 48%, var(--te-border));
+}
+
+#text-express-app .te-flow-step.te-used {
+  border-left: 3px solid var(--te-success);
+}
+
+#text-express-app .te-flow-step-summary {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 38px;
+  padding: 6px 8px;
+  border: 0;
+  background: transparent;
+  color: var(--te-text);
+  text-align: left;
+}
+
+#text-express-app .te-flow-step-summary:hover {
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-flow-step-number {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  border-radius: 7px;
+  background: var(--te-surface-3);
+  color: var(--te-primary);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+#text-express-app .te-flow-step-number .te-icon {
+  width: 12px;
+  height: 12px;
+}
+
+#text-express-app .te-flow-step-name {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#text-express-app .te-flow-step-summary code {
+  font-size: 8.5px;
+  color: var(--te-primary);
+}
+
+#text-express-app .te-optional-badge {
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: var(--te-surface-3);
+  color: var(--te-muted);
+  font-size: 8px;
+}
+
+#text-express-app .te-flow-step-body {
+  padding: 0 9px 9px 39px;
+}
+
+#text-express-app .te-flow-step-body p {
+  margin: 0 0 8px;
+  color: var(--te-text);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+#text-express-app .te-flow-step-actions {
+  display: flex;
+  gap: 5px;
+}
+
+/* Seletor e editor de sequência no modal */
+#text-express-app .te-model-kind-selector {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+  margin: 0 20px 10px;
+  padding: 0;
+  border: 0;
+}
+
+#text-express-app .te-model-kind-selector legend {
+  grid-column: 1 / -1;
+  margin-bottom: 3px;
+  color: var(--te-muted);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+#text-express-app .te-model-kind-selector label {
+  position: relative;
+}
+
+#text-express-app .te-model-kind-selector input {
+  position: absolute;
+  opacity: 0;
+}
+
+#text-express-app .te-model-kind-selector label > span {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  min-height: 46px;
+  padding: 9px 13px;
+  border: 1px solid var(--te-border);
+  border-radius: 11px;
+  background: var(--te-surface);
+  color: var(--te-muted);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+#text-express-app .te-model-kind-selector label > span:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--te-primary) 55%, var(--te-border));
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-model-kind-selector label > span > .te-icon {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+}
+
+#text-express-app .te-model-kind-selector [data-te-kind-label] {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+
+#text-express-app .te-model-kind-selector input:focus-visible + span {
+  box-shadow: var(--te-ring);
+}
+
+#text-express-app .te-model-kind-selector input:checked + span {
+  border-color: var(--te-primary);
+  background: color-mix(in srgb, var(--te-primary) 13%, var(--te-surface));
+  color: var(--te-primary);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--te-primary) 12%, transparent);
+}
+
+#text-express-app .te-flow-editor {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--te-border);
+  border-radius: 10px;
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-flow-editor-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+#text-express-app .te-flow-editor-heading > div {
+  display: grid;
+  gap: 2px;
+}
+
+#text-express-app .te-flow-editor-heading strong {
+  font-size: 11px;
+}
+
+#text-express-app .te-flow-editor-heading small {
+  color: var(--te-muted);
+  font-size: 9px;
+}
+
+#text-express-app .te-compact-button {
+  flex: none;
+}
+
+#text-express-app .te-flow-editor-steps {
+  display: grid;
+  gap: 7px;
+}
+
+#text-express-app .te-flow-step-editor {
+  padding: 9px;
+  border: 1px solid var(--te-border);
+  border-radius: 9px;
+  background: var(--te-surface);
+}
+
+#text-express-app .te-flow-step-editor > header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
+#text-express-app .te-flow-step-editor-number {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+  font-size: 9px;
+  font-weight: 800;
+}
+
+#text-express-app .te-flow-step-editor > header strong {
+  flex: 1;
+  font-size: 10px;
+}
+
+#text-express-app .te-flow-editor-actions {
+  display: flex;
+  gap: 2px;
+}
+
+#text-express-app .te-flow-editor-actions button:disabled {
+  opacity: .3;
+  pointer-events: none;
+}
+
+#text-express-app .te-flow-step-editor-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr .7fr;
+  gap: 7px;
+}
+
+#text-express-app .te-flow-step-editor-grid label {
+  display: grid;
+  gap: 3px;
+}
+
+#text-express-app .te-flow-step-editor-grid label > span {
+  color: var(--te-muted);
+  font-size: 9px;
+}
+
+#text-express-app .te-flow-step-editor-grid input,
+#text-express-app .te-flow-step-editor-grid select,
+#text-express-app .te-flow-step-editor-grid textarea {
+  width: 100%;
+  padding: 7px 8px;
+  border: 1px solid var(--te-border);
+  border-radius: 7px;
+  background: var(--te-surface-2);
+  color: var(--te-text);
+  font-size: 10px;
+}
+
+#text-express-app .te-flow-step-content-field {
+  grid-column: 1 / -1;
+}
+
+#text-express-app .te-flow-step-content-field textarea {
+  resize: vertical;
+  line-height: 1.45;
+}
+
+#text-express-app .te-flow-optional-check {
+  display: flex !important;
+  align-items: center;
+  align-self: end;
+  min-height: 32px;
+}
+
+#text-express-app .te-flow-optional-check input {
+  width: auto;
+}
+
+/* Modal um pouco mais largo apenas quando necessário */
+#text-express-app #te-snippet-modal .te-modal {
+  width: min(720px, calc(100vw - 24px));
+  max-height: min(720px, calc(100vh - 24px));
+}
+
+#text-express-app #te-snippet-form {
+  overflow-y: auto;
+}
+
+@media (max-width: 760px) {
+  #text-express-app .te-panel {
+    width: calc(100vw - 12px);
+    height: calc(100vh - 12px);
+  }
+
+  #text-express-app .te-content-area {
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app .te-detail-pane {
+    display: none;
+  }
+
+  #text-express-app .te-flow-step-editor-grid,
+  #text-express-app .te-flow-variable-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app .te-model-kind-selector {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================
+   Text Express 6.0 — tela grande
+   ========================================================== */
+
+#text-express-app .te-panel.te-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  width: 100dvw !important;
+  max-width: none !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+#text-express-app .te-panel.te-fullscreen .te-header {
+  cursor: default;
+}
+
+#text-express-app .te-panel.te-fullscreen .te-expandable {
+  min-height: 0;
+}
+
+#text-express-app .te-panel.te-fullscreen .te-content-area {
+  min-height: 0;
+}
+
+#text-express-app .te-panel.te-fullscreen .te-list-pane,
+#text-express-app .te-panel.te-fullscreen .te-detail-pane {
+  min-height: 0;
+}
+
+#text-express-app .te-fullscreen-button[aria-pressed="true"] {
+  background: rgba(255, 255, 255, .11);
+  color: #fff;
+}
+
+#text-express-app .te-fullscreen-button[aria-pressed="true"]:hover {
+  background: rgba(255, 255, 255, .18);
+}
+
+@media (max-width: 760px) {
+  #text-express-app .te-panel.te-fullscreen {
+    width: 100vw !important;
+    width: 100dvw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+  }
+}
+
+/* ==========================================================
+   Text Express 7.0 — memória, salvamento e sincronização
+   ========================================================== */
+
+#text-express-app .te-variable-help code,
+#text-express-app .te-setting-profile code {
+  padding: 1px 4px;
+  border-radius: 5px;
+  background: var(--te-surface-3);
+  color: var(--te-primary);
+  font-size: .92em;
+}
+
+#text-express-app .te-setting-profile {
+  display: grid;
+  gap: 8px;
+  padding: 11px 12px;
+  border: 1px solid var(--te-border);
+  border-radius: 10px;
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-setting-profile label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 42%);
+  align-items: center;
+  gap: 12px;
+}
+
+#text-express-app .te-setting-profile label > span {
+  display: grid;
+  gap: 3px;
+}
+
+#text-express-app .te-setting-profile strong {
+  font-size: 11px;
+}
+
+#text-express-app .te-setting-profile small {
+  color: var(--te-muted);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+#text-express-app .te-setting-profile input {
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 9px;
+  border: 1px solid var(--te-border);
+  border-radius: 8px;
+  background: var(--te-surface);
+  color: var(--te-text);
+}
+
+#text-express-app .te-setting-clear-button {
+  justify-self: end;
+  min-height: 28px;
+  font-size: 9px;
+}
+
+#text-express-app .te-model-modal-footer {
+  min-height: 51px;
+}
+
+#text-express-app .te-model-save-status {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 26px;
+  color: var(--te-muted);
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+#text-express-app .te-model-save-status.te-saving {
+  color: var(--te-primary);
+}
+
+#text-express-app .te-model-save-status.te-saved {
+  color: var(--te-success);
+}
+
+#text-express-app .te-model-save-status.te-save-error {
+  color: var(--te-danger);
+}
+
+@media (max-width: 620px) {
+  #text-express-app .te-setting-profile label {
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app .te-setting-clear-button {
+    justify-self: stretch;
+  }
+
+  #text-express-app .te-model-save-status {
+    width: 100%;
+    order: -1;
+  }
+
+  #text-express-app .te-model-modal-footer {
+    flex-wrap: wrap;
+  }
+}
+
+/* ==========================================================
+   Text Express 8.0 — legibilidade completa em tela cheia
+   Aplica-se ao editor, variáveis, configurações e categorias.
+   ========================================================== */
+
+/* Fundo e posicionamento de todas as janelas internas. */
+#text-express-app.te-fullscreen-active .te-modal-backdrop {
+  padding: 24px;
+}
+
+/* Base comum para todas as janelas. */
+#text-express-app.te-fullscreen-active .te-modal {
+  width: min(900px, calc(100vw - 64px));
+  max-width: none;
+  max-height: calc(100vh - 48px);
+  border-radius: 15px;
+  font-size: 14px;
+}
+
+/* Largura apropriada para cada tipo de janela. */
+#text-express-app.te-fullscreen-active #te-snippet-modal .te-modal {
+  width: min(1180px, calc(100vw - 64px));
+}
+
+#text-express-app.te-fullscreen-active #te-category-modal .te-modal {
+  width: min(980px, calc(100vw - 64px));
+}
+
+#text-express-app.te-fullscreen-active #te-settings-modal .te-modal {
+  width: min(900px, calc(100vw - 64px));
+}
+
+#text-express-app.te-fullscreen-active #te-variable-modal .te-modal {
+  width: min(760px, calc(100vw - 64px));
+}
+
+/* Cabeçalho das janelas. */
+#text-express-app.te-fullscreen-active .te-modal-header {
+  min-height: 68px;
+  padding: 14px 20px;
+}
+
+#text-express-app.te-fullscreen-active .te-modal-kicker {
+  font-size: 11px;
+  line-height: 1.25;
+  letter-spacing: .045em;
+}
+
+#text-express-app.te-fullscreen-active .te-modal-header h2 {
+  margin-top: 3px;
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+#text-express-app.te-fullscreen-active .te-modal-header .te-icon-button {
+  width: 38px;
+  height: 38px;
+}
+
+/* Campos, rótulos e textos auxiliares em todos os formulários. */
+#text-express-app.te-fullscreen-active .te-modal form {
+  font-size: 14px;
+}
+
+#text-express-app.te-fullscreen-active .te-form-grid {
+  gap: 14px 16px;
+  padding: 16px 22px 18px;
+}
+
+#text-express-app.te-fullscreen-active .te-field > span,
+#text-express-app.te-fullscreen-active .te-field label > span,
+#text-express-app.te-fullscreen-active .te-modal label > span {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+#text-express-app.te-fullscreen-active .te-modal input[type="text"],
+#text-express-app.te-fullscreen-active .te-modal input:not([type]),
+#text-express-app.te-fullscreen-active .te-modal select {
+  min-height: 42px;
+  padding: 9px 11px;
+  font-size: 14px;
+}
+
+#text-express-app.te-fullscreen-active .te-modal textarea {
+  min-height: 130px;
+  padding: 11px 12px;
+  font-size: 14px;
+  line-height: 1.58;
+}
+
+#text-express-app.te-fullscreen-active .te-modal small,
+#text-express-app.te-fullscreen-active .te-field-help,
+#text-express-app.te-fullscreen-active .te-field-error {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/* Botões das janelas. */
+#text-express-app.te-fullscreen-active .te-modal .te-primary-button,
+#text-express-app.te-fullscreen-active .te-modal .te-secondary-button,
+#text-express-app.te-fullscreen-active .te-modal .te-danger-button {
+  min-height: 40px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+}
+
+#text-express-app.te-fullscreen-active .te-modal .te-inline-button {
+  min-height: 38px;
+  padding: 7px 12px;
+  font-size: 11px;
+}
+
+#text-express-app.te-fullscreen-active .te-modal .te-icon-action,
+#text-express-app.te-fullscreen-active .te-modal .te-inline-icon-button {
+  width: 36px;
+  height: 36px;
+}
+
+#text-express-app.te-fullscreen-active .te-modal-footer {
+  min-height: 64px;
+  padding: 11px 20px;
+}
+
+/* Seletor Atendimento/Protocolo e Fala/Sequência. */
+#text-express-app.te-fullscreen-active .te-type-selector,
+#text-express-app.te-fullscreen-active .te-model-kind-selector {
+  margin-left: 22px;
+  margin-right: 22px;
+  gap: 10px;
+}
+
+#text-express-app.te-fullscreen-active .te-type-selector legend,
+#text-express-app.te-fullscreen-active .te-model-kind-selector legend {
+  font-size: 11px;
+}
+
+#text-express-app.te-fullscreen-active .te-type-selector span,
+#text-express-app.te-fullscreen-active .te-model-kind-selector span {
+  min-height: 42px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+/* ==========================================================
+   Editor de modelos e sequências
+   ========================================================== */
+
+#text-express-app.te-fullscreen-active #te-snippet-form {
+  overflow-y: auto;
+  scrollbar-width: auto;
+  scrollbar-color:
+    color-mix(in srgb, var(--te-primary) 52%, var(--te-border))
+    var(--te-surface-2);
+}
+
+#text-express-app.te-fullscreen-active #te-snippet-form::-webkit-scrollbar {
+  width: 12px;
+}
+
+#text-express-app.te-fullscreen-active #te-snippet-form::-webkit-scrollbar-track {
+  background: var(--te-surface-2);
+}
+
+#text-express-app.te-fullscreen-active #te-snippet-form::-webkit-scrollbar-thumb {
+  border: 3px solid var(--te-surface-2);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--te-primary) 52%, var(--te-border));
+}
+
+#text-express-app.te-fullscreen-active .te-flow-editor {
+  gap: 12px;
+  padding: 14px;
+  border-radius: 12px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-editor-heading strong {
+  font-size: 14px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-editor-heading small {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-step-editor {
+  padding: 14px;
+  border-radius: 11px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-step-editor > header {
+  margin-bottom: 12px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-step-editor > header strong {
+  font-size: 13px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-step-editor-number {
+  width: 28px;
+  height: 28px;
+  font-size: 11px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-step-editor-grid {
+  grid-template-columns: 1.25fr 1fr .72fr;
+  gap: 12px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-step-editor-grid label > span {
+  font-size: 11px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-step-editor-grid input,
+#text-express-app.te-fullscreen-active .te-flow-step-editor-grid select {
+  min-height: 40px;
+  padding: 9px 10px;
+  font-size: 13px;
+}
+
+#text-express-app.te-fullscreen-active .te-flow-step-editor-grid textarea {
+  min-height: 125px;
+  padding: 11px;
+  font-size: 14px;
+  line-height: 1.58;
+}
+
+#text-express-app.te-fullscreen-active .te-model-save-status {
+  font-size: 11px;
+}
+
+/* ==========================================================
+   Janela de variáveis
+   ========================================================== */
+
+#text-express-app.te-fullscreen-active .te-variable-help {
+  margin: 0;
+  padding: 18px 22px 8px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+#text-express-app.te-fullscreen-active .te-variable-fields {
+  gap: 14px;
+  padding: 12px 22px 22px;
+}
+
+#text-express-app.te-fullscreen-active .te-variable-fields label {
+  gap: 7px;
+}
+
+#text-express-app.te-fullscreen-active .te-variable-fields label > span {
+  font-size: 12px;
+  font-weight: 750;
+}
+
+#text-express-app.te-fullscreen-active .te-variable-fields input {
+  min-height: 46px;
+  padding: 10px 12px;
+  font-size: 15px;
+}
+
+/* ==========================================================
+   Configurações
+   ========================================================== */
+
+#text-express-app.te-fullscreen-active .te-settings-list {
+  gap: 12px;
+  padding: 18px 22px;
+}
+
+#text-express-app.te-fullscreen-active .te-setting-profile {
+  gap: 12px;
+  padding: 15px 16px;
+}
+
+#text-express-app.te-fullscreen-active .te-setting-profile strong,
+#text-express-app.te-fullscreen-active .te-setting-row strong {
+  font-size: 14px;
+}
+
+#text-express-app.te-fullscreen-active .te-setting-profile small,
+#text-express-app.te-fullscreen-active .te-setting-row small {
+  font-size: 11.5px;
+  line-height: 1.45;
+}
+
+#text-express-app.te-fullscreen-active .te-setting-profile input {
+  min-height: 44px;
+  padding: 9px 11px;
+  font-size: 14px;
+}
+
+#text-express-app.te-fullscreen-active .te-setting-row {
+  min-height: 68px;
+  padding: 13px 15px;
+}
+
+#text-express-app.te-fullscreen-active .te-setting-row input[type="checkbox"] {
+  width: 21px;
+  height: 21px;
+}
+
+#text-express-app.te-fullscreen-active .te-keyboard-help {
+  margin: 0 22px 18px;
+  padding: 13px 15px;
+  font-size: 12px;
+}
+
+#text-express-app.te-fullscreen-active .te-keyboard-help strong {
+  font-size: 13px;
+}
+
+/* ==========================================================
+   Categorias
+   ========================================================== */
+
+#text-express-app.te-fullscreen-active .te-modal-heading-icon {
+  width: 48px;
+  height: 48px;
+}
+
+#text-express-app.te-fullscreen-active .te-modal-heading-icon .te-icon {
+  width: 24px;
+  height: 24px;
+}
+
+#text-express-app.te-fullscreen-active .te-icon-choice-grid {
+  grid-template-columns: repeat(11, minmax(46px, 1fr));
+  gap: 9px;
+}
+
+#text-express-app.te-fullscreen-active .te-icon-choice {
+  min-height: 48px;
+  border-radius: 11px;
+}
+
+#text-express-app.te-fullscreen-active .te-icon-choice .te-icon {
+  width: 22px;
+  height: 22px;
+}
+
+#text-express-app.te-fullscreen-active #te-category-form-color {
+  width: 58px;
+  height: 48px;
+}
+
+#text-express-app.te-fullscreen-active .te-color-choice {
+  width: 31px;
+  height: 31px;
+}
+
+#text-express-app.te-fullscreen-active .te-color-choice span {
+  width: 21px;
+  height: 21px;
+}
+
+#text-express-app.te-fullscreen-active .te-category-preview {
+  min-height: 42px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+#text-express-app.te-fullscreen-active .te-category-order-actions {
+  padding: 0 22px 18px;
+}
+
+/* ==========================================================
+   Adaptação para telas menores
+   ========================================================== */
+
+@media (max-width: 1100px) {
+  #text-express-app.te-fullscreen-active .te-modal-backdrop {
+    padding: 15px;
+  }
+
+  #text-express-app.te-fullscreen-active .te-modal,
+  #text-express-app.te-fullscreen-active #te-snippet-modal .te-modal,
+  #text-express-app.te-fullscreen-active #te-category-modal .te-modal,
+  #text-express-app.te-fullscreen-active #te-settings-modal .te-modal,
+  #text-express-app.te-fullscreen-active #te-variable-modal .te-modal {
+    width: calc(100vw - 30px);
+    max-height: calc(100vh - 30px);
+  }
+
+  #text-express-app.te-fullscreen-active .te-flow-step-editor-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  #text-express-app.te-fullscreen-active .te-icon-choice-grid {
+    grid-template-columns: repeat(8, minmax(44px, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  #text-express-app.te-fullscreen-active .te-modal-backdrop {
+    padding: 6px;
+  }
+
+  #text-express-app.te-fullscreen-active .te-modal,
+  #text-express-app.te-fullscreen-active #te-snippet-modal .te-modal,
+  #text-express-app.te-fullscreen-active #te-category-modal .te-modal,
+  #text-express-app.te-fullscreen-active #te-settings-modal .te-modal,
+  #text-express-app.te-fullscreen-active #te-variable-modal .te-modal {
+    width: calc(100vw - 12px);
+    max-height: calc(100vh - 12px);
+    border-radius: 10px;
+  }
+
+  #text-express-app.te-fullscreen-active .te-form-grid {
+    padding: 12px;
+  }
+
+  #text-express-app.te-fullscreen-active .te-type-selector,
+  #text-express-app.te-fullscreen-active .te-model-kind-selector {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  #text-express-app.te-fullscreen-active .te-flow-step-editor-grid,
+  #text-express-app.te-fullscreen-active .te-setting-profile label {
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app.te-fullscreen-active .te-icon-choice-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  #text-express-app.te-fullscreen-active .te-variable-help,
+  #text-express-app.te-fullscreen-active .te-variable-fields,
+  #text-express-app.te-fullscreen-active .te-settings-list {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+/* ==========================================================
+   Text Express 9.0 — categorias arrastáveis horizontalmente
+   ========================================================== */
+
+#text-express-app .te-category-bar {
+  overscroll-behavior-x: contain;
+  scroll-behavior: smooth;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
+}
+
+#text-express-app .te-category-bar.te-can-drag {
+  cursor: grab;
+}
+
+#text-express-app .te-category-bar.te-can-drag:active,
+#text-express-app .te-category-bar.te-dragging {
+  cursor: grabbing;
+}
+
+#text-express-app .te-category-bar.te-dragging {
+  scroll-behavior: auto;
+}
+
+#text-express-app .te-category-bar.te-dragging,
+#text-express-app .te-category-bar.te-dragging * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+#text-express-app .te-category-bar.te-dragging .te-category-chip,
+#text-express-app .te-category-bar.te-dragging .te-category-add-button {
+  pointer-events: none;
+}
+
+#text-express-app .te-category-bar:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--te-primary) 70%, transparent);
+  outline-offset: -2px;
+}
+
+/* Sombra discreta nas bordas para indicar conteúdo lateral. */
+#text-express-app .te-category-bar.te-can-drag {
+  background-image:
+    linear-gradient(to right, var(--te-surface), transparent 22px),
+    linear-gradient(to left, var(--te-surface), transparent 22px);
+  background-position: left center, right center;
+  background-repeat: no-repeat;
+  background-size: 28px 100%, 28px 100%;
+  background-attachment: local, local;
+}
+
+
+/* ==========================================================
+   Text Express 10.0 — tópicos clicáveis e editáveis
+   ========================================================== */
+
+#text-express-app .te-category-bar:not(.te-dragging) .te-category-button,
+#text-express-app .te-category-bar:not(.te-dragging) .te-category-edit {
+  pointer-events: auto;
+}
+
+#text-express-app .te-category-edit {
+  width: 25px;
+  min-width: 25px;
+  height: 25px;
+  margin-right: 3px;
+  opacity: .5;
+  cursor: pointer;
+}
+
+#text-express-app .te-category-chip:hover .te-category-edit,
+#text-express-app .te-category-chip:focus-within .te-category-edit,
+#text-express-app .te-category-edit:hover,
+#text-express-app .te-category-edit:focus-visible {
+  width: 25px;
+  opacity: 1;
+}
+
+#text-express-app .te-category-chip.te-active {
+  outline: 1px solid color-mix(in srgb, var(--te-category-color) 70%, transparent);
+  outline-offset: 1px;
+}
+
+#text-express-app .te-category-button,
+#text-express-app .te-category-edit {
+  position: relative;
+  z-index: 1;
+}
+
+#text-express-app .te-category-bar.te-dragging .te-category-button,
+#text-express-app .te-category-bar.te-dragging .te-category-edit,
+#text-express-app .te-category-bar.te-dragging .te-category-add-button {
+  pointer-events: none !important;
+}
+
+/* ==========================================================
+   Text Express 15.0 — posição numérica simples
+   ========================================================== */
+
+#text-express-app .te-position-button {
+  position: relative;
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 27px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--te-muted);
+  cursor: pointer;
+}
+
+#text-express-app .te-position-button svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#text-express-app .te-position-current {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border: 2px solid var(--te-surface);
+  border-radius: 999px;
+  background: var(--te-surface-3);
+  color: var(--te-muted);
+  font-size: 7px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+#text-express-app .te-position-button:hover,
+#text-express-app .te-position-button:focus-visible {
+  border-color: color-mix(in srgb, var(--te-primary) 55%, var(--te-border));
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+}
+
+#text-express-app .te-position-button:hover .te-position-current,
+#text-express-app .te-position-button:focus-visible .te-position-current {
+  background: var(--te-primary);
+  color: #fff;
+}
+
+#text-express-app .te-card-actions .te-position-button {
+  order: 2;
+}
+
+#text-express-app .te-card-actions .te-card-insert {
+  order: 1;
+}
+
+#text-express-app .te-card-actions [data-te-action="edit"] {
+  order: 3;
+}
+
+#text-express-app .te-card-actions [data-te-action="delete"] {
+  order: 4;
+}
+
+/* Popover quase imperceptível, aberto apenas ao clicar na seta. */
+#text-express-app .te-position-popover {
+  position: fixed;
+  z-index: 2147483646;
+  width: 224px;
+  padding: 10px;
+  border: 1px solid var(--te-border);
+  border-radius: 11px;
+  background: var(--te-surface);
+  color: var(--te-text);
+  box-shadow:
+    0 18px 44px rgba(3, 10, 28, .34),
+    0 0 0 1px rgba(255, 255, 255, .025);
+}
+
+#text-express-app .te-position-form {
+  display: grid;
+  gap: 9px;
+}
+
+#text-express-app .te-position-popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#text-express-app .te-position-popover-header strong {
+  font-size: 11px;
+}
+
+#text-express-app .te-position-close {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--te-muted);
+  font-size: 17px;
+  cursor: pointer;
+}
+
+#text-express-app .te-position-close:hover {
+  background: var(--te-surface-3);
+  color: var(--te-text);
+}
+
+#text-express-app .te-position-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+#text-express-app .te-position-input {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 9px;
+  border: 1px solid var(--te-border);
+  border-radius: 8px;
+  background: var(--te-surface-2);
+  color: var(--te-text);
+  font-size: 15px;
+  font-weight: 800;
+  text-align: center;
+}
+
+#text-express-app .te-position-input:focus {
+  border-color: var(--te-primary);
+  outline: 2px solid color-mix(in srgb, var(--te-primary) 20%, transparent);
+}
+
+#text-express-app .te-position-of {
+  color: var(--te-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+#text-express-app .te-position-popover-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+#text-express-app .te-position-context {
+  overflow: hidden;
+  color: var(--te-muted);
+  font-size: 8.5px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#text-express-app .te-position-confirm {
+  min-height: 30px;
+  padding: 5px 11px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--te-primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#text-express-app .te-position-confirm:hover {
+  filter: brightness(1.06);
+}
+
+#text-express-app .te-position-moved {
+  animation: te-v15-position-flash 650ms ease;
+}
+
+@keyframes te-v15-position-flash {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--te-success) 58%, transparent);
+  }
+  42% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--te-success) 30%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (max-width: 540px) {
+  #text-express-app .te-position-popover {
+    width: min(224px, calc(100vw - 18px));
+  }
+}
+
+/* ==========================================================
+   Text Express 17.0 — movimento direto corrigido
+   ========================================================== */
+
+/* Remove completamente a interface numérica da versão anterior. */
+#text-express-app .te-position-button,
+#text-express-app .te-position-popover {
+  display: none !important;
+}
+
+#text-express-app .te-direct-move-handle {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 27px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--te-muted);
+  cursor: grab;
+  touch-action: none;
+}
+
+#text-express-app .te-direct-move-handle svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+#text-express-app .te-direct-move-handle:hover,
+#text-express-app .te-direct-move-handle:focus-visible {
+  border-color: color-mix(in srgb, var(--te-primary) 58%, var(--te-border));
+  background: var(--te-primary-soft);
+  color: var(--te-primary);
+}
+
+#text-express-app .te-direct-move-handle:active {
+  cursor: grabbing;
+}
+
+#text-express-app .te-card-actions .te-direct-move-handle {
+  order: 2;
+}
+
+#text-express-app .te-card-actions .te-card-insert {
+  order: 1;
+}
+
+#text-express-app .te-card-actions [data-te-action="edit"] {
+  order: 3;
+}
+
+#text-express-app .te-card-actions [data-te-action="delete"] {
+  order: 4;
+}
+
+/*
+ * O próprio card permanece no local de destino com o tamanho completo.
+ * O conteúdo fica oculto e a posição aparece no centro.
+ */
+#text-express-app .te-snippet-card.te-direct-placeholder {
+  min-height: var(--te-placeholder-height, auto);
+  border: 3px dashed var(--te-primary) !important;
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--te-primary) 17%, transparent),
+      color-mix(in srgb, var(--te-primary) 6%, var(--te-surface))
+    ) !important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--te-primary) 25%, transparent),
+    0 7px 20px color-mix(in srgb, var(--te-primary) 12%, transparent) !important;
+  cursor: grabbing;
+  transition: none !important;
+}
+
+#text-express-app .te-snippet-card.te-direct-placeholder > * {
+  visibility: hidden !important;
+}
+
+#text-express-app .te-snippet-card.te-direct-placeholder::after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  color: var(--te-primary);
+  content: attr(data-te-drop-position);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: .01em;
+  text-align: center;
+  visibility: visible;
+  pointer-events: none;
+}
+
+/* Clone visual que acompanha o ponteiro. */
+#text-express-app .te-snippet-card.te-direct-drag-ghost {
+  border-color: var(--te-primary) !important;
+  background: color-mix(
+    in srgb,
+    var(--te-primary-soft) 58%,
+    var(--te-surface)
+  ) !important;
+  box-shadow:
+    0 20px 44px rgba(3, 10, 28, .38),
+    0 0 0 2px color-mix(in srgb, var(--te-primary) 38%, transparent) !important;
+  opacity: .97;
+  cursor: grabbing !important;
+  transition: none !important;
+}
+
+#text-express-app .te-snippet-card.te-direct-drag-ghost button {
+  pointer-events: none !important;
+}
+
+#text-express-app .te-list.te-direct-reordering {
+  cursor: grabbing;
+  scroll-behavior: auto !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#text-express-app .te-list.te-direct-reordering .te-snippet-card {
+  transition: none !important;
+}
+
+#text-express-app .te-direct-move-saved {
+  animation: te-v16-move-saved 600ms ease;
+}
+
+@keyframes te-v16-move-saved {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--te-success) 55%, transparent);
+  }
+  42% {
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--te-success) 30%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@media (max-width: 540px) {
+  #text-express-app .te-direct-move-handle {
+    width: 30px;
+    height: 29px;
+  }
+}
+
+/* ==========================================================
+   Text Express 18.0 — importação completa
+   ========================================================== */
+
+#text-express-app .te-import-choice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(3, 10, 28, .68);
+  backdrop-filter: blur(5px);
+}
+
+#text-express-app .te-import-choice-dialog {
+  width: min(560px, calc(100vw - 28px));
+  overflow: hidden;
+  border: 1px solid var(--te-border);
+  border-radius: 15px;
+  background: var(--te-surface);
+  color: var(--te-text);
+  box-shadow: 0 28px 80px rgba(3, 10, 28, .52);
+}
+
+#text-express-app .te-import-choice-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 17px 18px 14px;
+  border-bottom: 1px solid var(--te-border);
+}
+
+#text-express-app .te-import-choice-kicker {
+  color: var(--te-primary);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .07em;
+}
+
+#text-express-app .te-import-choice-header h2 {
+  margin: 4px 0 0;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+#text-express-app .te-import-choice-close {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 31px;
+  height: 31px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--te-muted);
+  font-size: 21px;
+  cursor: pointer;
+}
+
+#text-express-app .te-import-choice-close:hover {
+  background: var(--te-surface-3);
+  color: var(--te-text);
+}
+
+#text-express-app .te-import-choice-summary {
+  display: grid;
+  gap: 3px;
+  padding: 12px 18px;
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-import-choice-summary strong {
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#text-express-app .te-import-choice-summary span {
+  color: var(--te-muted);
+  font-size: 9.5px;
+}
+
+#text-express-app .te-import-choice-options {
+  display: grid;
+  gap: 9px;
+  padding: 15px 18px 10px;
+}
+
+#text-express-app .te-import-option {
+  display: grid;
+  grid-template-columns: 39px minmax(0, 1fr);
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--te-border);
+  border-radius: 11px;
+  background: var(--te-surface-2);
+  color: var(--te-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+#text-express-app .te-import-option:hover,
+#text-express-app .te-import-option:focus-visible {
+  border-color: color-mix(in srgb, var(--te-primary) 62%, var(--te-border));
+  background: var(--te-primary-soft);
+  outline: 0;
+}
+
+#text-express-app .te-import-option-primary {
+  border-color: color-mix(in srgb, var(--te-primary) 48%, var(--te-border));
+}
+
+#text-express-app .te-import-option-icon {
+  display: grid;
+  place-items: center;
+  width: 39px;
+  height: 39px;
+  border-radius: 10px;
+  background: var(--te-surface-3);
+  color: var(--te-primary);
+  font-size: 21px;
+  font-weight: 800;
+}
+
+#text-express-app .te-import-option > span:last-child {
+  display: grid;
+  gap: 3px;
+}
+
+#text-express-app .te-import-option strong {
+  font-size: 12px;
+}
+
+#text-express-app .te-import-option small {
+  color: var(--te-muted);
+  font-size: 9.5px;
+  line-height: 1.45;
+}
+
+#text-express-app .te-import-option em {
+  justify-self: start;
+  margin-top: 2px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--te-primary);
+  color: #fff;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+#text-express-app .te-import-choice-warning {
+  margin: 0;
+  padding: 5px 18px 15px;
+  color: var(--te-muted);
+  font-size: 8.8px;
+  line-height: 1.4;
+}
+
+@media (max-width: 540px) {
+  #text-express-app .te-import-choice-overlay {
+    padding: 8px;
+  }
+
+  #text-express-app .te-import-choice-dialog {
+    width: calc(100vw - 16px);
+  }
+}
+
+/* ==========================================================
+   Text Express 21.0 — base visual preservada e interação por card
+   ========================================================== */
+
+#text-express-app .te-import-choice-overlay {
+  pointer-events: auto !important;
+}
+
+#text-express-app .te-import-choice-dialog,
+#text-express-app .te-import-choice-dialog *,
+#text-express-app .te-import-option,
+#text-express-app .te-import-choice-close {
+  pointer-events: auto !important;
+}
+
+#text-express-app .te-import-choice-header h2 {
+  color: var(--te-text) !important;
+}
+
+#text-express-app .te-import-option {
+  position: relative;
+  z-index: 1;
+}
+
+#text-express-app .te-import-option:active {
+  transform: translateY(1px);
+}
+
+#text-express-app .te-import-option:focus-visible,
+#text-express-app .te-import-choice-close:focus-visible {
+  outline: 2px solid var(--te-primary);
+  outline-offset: 2px;
+}
+
+/* ==========================================================
+   Text Express 22.0 — menu persistente de sequências
+   ========================================================== */
+#text-express-app .te-sequence-menu {
+  position: fixed;
+  right: 26px;
+  bottom: 26px;
+  z-index: 2147483646;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(760px, calc(100vh - 32px));
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--te-primary) 44%, var(--te-border));
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--te-header) 96%, #172554) 0%, color-mix(in srgb, var(--te-header) 88%, #111827) 100%);
+  color: #f8fbff;
+  box-shadow: 0 28px 90px rgba(3, 10, 28, .55), 0 0 0 1px rgba(255,255,255,.05) inset;
+  pointer-events: auto;
+}
+
+#text-express-app .te-sequence-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 17px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+
+#text-express-app .te-sequence-menu-title-wrap,
+#text-express-app .te-sequence-menu-meta,
+#text-express-app .te-sequence-menu-kicker {
+  display: flex;
+  align-items: center;
+}
+
+#text-express-app .te-sequence-menu-title-wrap {
+  min-width: 0;
+  gap: 11px;
+}
+
+#text-express-app .te-sequence-menu-title-wrap > div {
+  min-width: 0;
+}
+
+#text-express-app .te-sequence-menu-icon {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  box-shadow: 0 10px 25px rgba(124,58,237,.35);
+}
+
+#text-express-app .te-sequence-menu-icon .te-icon {
+  width: 21px;
+  height: 21px;
+}
+
+#text-express-app .te-sequence-menu-kicker {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 3px;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+
+#text-express-app .te-sequence-open-badge {
+  padding: 3px 8px;
+  border: 1px solid rgba(74,222,128,.28);
+  border-radius: 999px;
+  background: rgba(22,163,74,.2);
+  color: #86efac;
+  font-size: 9px;
+  letter-spacing: .02em;
+  text-transform: none;
+}
+
+#text-express-app .te-sequence-menu-title-wrap strong {
+  display: block;
+  overflow: hidden;
+  color: #fff;
+  font-size: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#text-express-app .te-sequence-menu-meta {
+  flex: 0 0 auto;
+  gap: 11px;
+  color: #dbeafe;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+#text-express-app .te-sequence-close {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 4px;
+  min-width: 50px;
+  min-height: 36px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  color: #fff;
+}
+
+#text-express-app .te-sequence-close:hover {
+  background: rgba(255,255,255,.12);
+}
+
+#text-express-app .te-sequence-close .te-icon {
+  width: 16px;
+  height: 16px;
+}
+
+#text-express-app .te-sequence-close small {
+  color: #94a3b8;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+#text-express-app .te-sequence-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 13px 14px 10px;
+  padding: 0 12px;
+  min-height: 43px;
+  border: 1px solid rgba(148,163,184,.28);
+  border-radius: 12px;
+  background: rgba(15,23,42,.48);
+  color: #94a3b8;
+}
+
+#text-express-app .te-sequence-search:focus-within {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139,92,246,.18);
+}
+
+#text-express-app .te-sequence-search .te-icon {
+  width: 17px;
+  height: 17px;
+}
+
+#text-express-app .te-sequence-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+}
+
+#text-express-app .te-sequence-search input::placeholder {
+  color: #8291aa;
+}
+
+#text-express-app .te-sequence-list {
+  display: grid;
+  gap: 8px;
+  overflow: auto;
+  padding: 2px 14px 13px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(139,92,246,.6) transparent;
+}
+
+#text-express-app .te-sequence-item {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 13px;
+  background: rgba(15,23,42,.5);
+  color: #fff;
+  text-align: left;
+  transition: border-color .16s ease, background .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+
+#text-express-app .te-sequence-item:hover,
+#text-express-app .te-sequence-item:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(139,92,246,.78);
+  background: rgba(49,46,129,.35);
+  box-shadow: 0 9px 24px rgba(0,0,0,.18);
+  outline: none;
+}
+
+#text-express-app .te-sequence-item.te-current {
+  border-color: #8b5cf6;
+  background: linear-gradient(135deg, rgba(91,33,182,.38), rgba(30,41,59,.72));
+  box-shadow: 0 0 0 2px rgba(139,92,246,.14) inset;
+}
+
+#text-express-app .te-sequence-item.te-used {
+  border-color: rgba(74,222,128,.34);
+}
+
+#text-express-app .te-sequence-number {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #7c3aed, #4f46e5);
+  color: #fff;
+  font-size: 25px;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(79,70,229,.28);
+}
+
+#text-express-app .te-sequence-item-content {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+#text-express-app .te-sequence-item-content strong {
+  color: #fff;
+  font-size: 12.5px;
+}
+
+#text-express-app .te-sequence-item-content > span:not(.te-sequence-keywords) {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #cbd5e1;
+  font-size: 11px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+#text-express-app .te-sequence-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+#text-express-app .te-sequence-keywords code {
+  padding: 3px 6px;
+  border: 1px solid rgba(167,139,250,.34);
+  border-radius: 7px;
+  background: rgba(76,29,149,.24);
+  color: #c4b5fd;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+#text-express-app .te-sequence-keywords em {
+  color: #718096;
+  font-size: 9px;
+  font-style: normal;
+}
+
+#text-express-app .te-sequence-item-action {
+  display: grid;
+  place-items: center;
+  color: #a78bfa;
+}
+
+#text-express-app .te-sequence-item.te-used .te-sequence-item-action {
+  color: #4ade80;
+}
+
+#text-express-app .te-sequence-item-action .te-icon {
+  width: 18px;
+  height: 18px;
+}
+
+#text-express-app .te-sequence-menu-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 16px;
+  padding: 11px 15px 13px;
+  border-top: 1px solid rgba(255,255,255,.09);
+  background: rgba(15,23,42,.42);
+  color: #94a3b8;
+  font-size: 9.5px;
+}
+
+#text-express-app .te-sequence-menu-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#text-express-app .te-sequence-menu-footer .te-icon {
+  width: 13px;
+  height: 13px;
+  color: #a78bfa;
+}
+
+#text-express-app .te-sequence-empty {
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  min-height: 150px;
+  padding: 20px;
+  border: 1px dashed rgba(148,163,184,.28);
+  border-radius: 13px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+#text-express-app .te-sequence-empty .te-icon {
+  width: 28px;
+  height: 28px;
+  color: #a78bfa;
+}
+
+#text-express-app .te-sequence-empty strong {
+  color: #e2e8f0;
+}
+
+#text-express-app .te-sequence-open-detail {
+  white-space: nowrap;
+}
+
+#text-express-app .te-flow-keywords-field {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 6px;
+}
+
+#text-express-app .te-flow-keywords-field > span {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+#text-express-app .te-flow-keywords-field input {
+  width: 100%;
+}
+
+#text-express-app .te-flow-keywords-field small {
+  color: var(--te-muted);
+  font-size: 9.5px;
+}
+
+@media (max-width: 680px) {
+  #text-express-app .te-sequence-menu {
+    right: 8px;
+    bottom: 8px;
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+    border-radius: 16px;
+  }
+
+  #text-express-app .te-sequence-menu-header {
+    align-items: flex-start;
+  }
+
+  #text-express-app .te-sequence-menu-meta {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 5px;
+  }
+
+  #text-express-app .te-sequence-item {
+    grid-template-columns: 44px minmax(0, 1fr) 22px;
+    gap: 8px;
+  }
+
+  #text-express-app .te-sequence-number {
+    width: 44px;
+    height: 44px;
+    font-size: 21px;
+  }
+}
+
+/* ==========================================================
+   Text Express 25.0 — arraste corrigido e redimensionamento
+   ========================================================== */
+#text-express-app .te-resizable-window {
+  min-width: 0;
+  min-height: 0;
+}
+
+#text-express-app .te-panel.te-window-moving,
+#text-express-app .te-panel.te-window-resizing,
+#text-express-app .te-sequence-menu.te-window-moving,
+#text-express-app .te-sequence-menu.te-window-resizing {
+  user-select: none;
+  transition: none !important;
+}
+
+#text-express-app .te-right-drag-handle {
+  cursor: move;
+  cursor: grab;
+}
+
+#text-express-app .te-sequence-menu-header.te-right-drag-handle {
+  position: relative;
+  user-select: none;
+  touch-action: none;
+}
+
+#text-express-app .te-sequence-menu.te-window-moving .te-sequence-menu-header,
+#text-express-app .te-panel.te-window-moving [data-te-drag-handle] {
+  cursor: grabbing;
+}
+
+#text-express-app .te-resize-handle {
+  position: absolute;
+  z-index: 80;
+  display: block;
+  background: transparent;
+  touch-action: none;
+}
+
+#text-express-app .te-resize-n,
+#text-express-app .te-resize-s {
+  left: 14px;
+  right: 14px;
+  height: 9px;
+  cursor: ns-resize;
+}
+
+#text-express-app .te-resize-n { top: 0; }
+#text-express-app .te-resize-s { bottom: 0; }
+
+#text-express-app .te-resize-e,
+#text-express-app .te-resize-w {
+  top: 14px;
+  bottom: 14px;
+  width: 9px;
+  cursor: ew-resize;
+}
+
+#text-express-app .te-resize-e { right: 0; }
+#text-express-app .te-resize-w { left: 0; }
+
+#text-express-app .te-resize-ne,
+#text-express-app .te-resize-nw,
+#text-express-app .te-resize-se,
+#text-express-app .te-resize-sw {
+  width: 16px;
+  height: 16px;
+}
+
+#text-express-app .te-resize-ne {
+  top: 0;
+  right: 0;
+  cursor: nesw-resize;
+}
+
+#text-express-app .te-resize-nw {
+  top: 0;
+  left: 0;
+  cursor: nwse-resize;
+}
+
+#text-express-app .te-resize-se {
+  right: 0;
+  bottom: 0;
+  cursor: nwse-resize;
+}
+
+#text-express-app .te-resize-sw {
+  left: 0;
+  bottom: 0;
+  cursor: nesw-resize;
+}
+
+#text-express-app .te-resize-se::after,
+#text-express-app .te-resize-sw::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  width: 7px;
+  height: 7px;
+  opacity: .42;
+  border-bottom: 2px solid currentColor;
+}
+
+#text-express-app .te-resize-se::after {
+  right: 4px;
+  border-right: 2px solid currentColor;
+  color: var(--te-muted);
+}
+
+#text-express-app .te-resize-sw::after {
+  left: 4px;
+  border-left: 2px solid currentColor;
+  color: var(--te-muted);
+}
+
+#text-express-app .te-sequence-menu .te-resize-se::after,
+#text-express-app .te-sequence-menu .te-resize-sw::after {
+  color: #a78bfa;
+}
+
+#text-express-app .te-panel.te-fullscreen > .te-resize-handle,
+#text-express-app .te-panel.te-minimized > .te-resize-handle {
+  display: none;
+}
+
+#text-express-app .te-sequence-list {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+@media (max-width: 680px) {
+  #text-express-app .te-panel.te-resizable-window,
+  #text-express-app .te-sequence-menu.te-resizable-window {
+    min-width: 0;
+    min-height: 0;
+  }
+}
+
+/* ==========================================================
+ * Text Express 27.0 — fluxos opcionais de Protocolo
+ * ========================================================== */
+.te-sequence-back {
+  min-width: 44px;
+  height: 38px;
+  border: 1px solid var(--te-border);
+  border-radius: 10px;
+  background: var(--te-surface-soft);
+  color: var(--te-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.te-sequence-back small {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.te-sequence-back:hover {
+  border-color: var(--te-primary);
+  color: var(--te-primary);
+}
+
+.te-protocol-workflow-menu .te-sequence-menu-icon,
+.te-protocol-workflow-menu .te-sequence-number {
+  color: #e64b4b;
+}
+
+.te-protocol-flow-actions-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.te-protocol-flow-actions-preview span,
+.te-protocol-action-inline,
+.te-protocol-action-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--te-border);
+  border-radius: 999px;
+  background: var(--te-surface-soft);
+  color: var(--te-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 4px 8px;
+}
+
+.te-protocol-action-inline {
+  width: fit-content;
+  margin-top: 4px;
+  color: var(--te-primary);
+}
+
+.te-protocol-action-badge {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.te-protocol-flow-step-editor .te-flow-step-editor-grid {
+  align-items: start;
+}
+
+.te-protocol-flow-step-editor .te-flow-step-content-field {
+  grid-column: 1 / -1;
+}
+
+.te-protocol-flow-step-editor .te-flow-step-content-field select,
+.te-protocol-flow-step-editor .te-flow-step-content-field input {
+  width: 100%;
+}
+
+.te-protocol-flow-step-editor code {
+  font-size: 11px;
+}
+
+@media (max-width: 760px) {
+  .te-protocol-action-badge {
+    display: none;
+  }
+
+  .te-sequence-back small {
+    display: none;
+  }
+}
+
+
+/* ==========================================================
+ * Text Express 27.1 — acabamento do modal e fluxo fixo de Protocolo
+ * ========================================================== */
+#text-express-app #te-snippet-modal #te-modal-kicker {
+  display: none !important;
+}
+
+#text-express-app #te-snippet-modal #te-modal-title {
+  margin: 0;
+  color: var(--te-text);
+  font-size: 19px;
+  font-weight: 850;
+  letter-spacing: -.015em;
+}
+
+#text-express-app .te-protocol-flow-fixed-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 9px 11px;
+  border: 1px solid color-mix(in srgb, var(--te-primary) 26%, var(--te-border));
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--te-primary) 7%, var(--te-surface));
+  color: var(--te-text-muted);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+#text-express-app .te-protocol-flow-fixed-note .te-icon {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: var(--te-primary);
+}
+
+#text-express-app .te-protocol-flow-step-editor > header > strong {
+  font-size: 12px;
+}
+
+#text-express-app .te-protocol-flow-step-editor .te-flow-step-content-field {
+  padding-top: 2px;
+}
+
+#text-express-app .te-protocol-flow-step-editor .te-flow-step-content-field textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+#text-express-app .te-protocol-workflow-menu .te-sequence-item-content > .te-protocol-preview {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #dbe5f3;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+#text-express-app .te-protocol-workflow-menu .te-sequence-item {
+  align-items: flex-start;
+}
+
+#text-express-app .te-protocol-workflow-menu .te-sequence-item-action {
+  padding-top: 16px;
+}
+
+@media (max-width: 560px) {
+  #text-express-app .te-model-kind-selector {
+    grid-template-columns: 1fr;
+  }
+}
+
+#text-express-app .te-model-kind-selector [data-te-kind-label] {
+  display: contents !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#text-express-app.te-fullscreen-active .te-model-kind-selector label > span {
+  min-height: 46px;
+  padding: 9px 13px;
+  font-size: 12px;
+}
+
+/* ==========================================================
+ * Text Express 27.2 — editor flexível e pesquisa inteligente
+ * ========================================================== */
+#text-express-app .te-protocol-flow-step-editor > header > strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#text-express-app .te-sequence-empty span {
+  max-width: 420px;
+}
+
+/* ==========================================================
+ * Text Express 27.3 — cartões de Protocolo no mesmo padrão
+ * visual das Falas da sequência
+ * ========================================================== */
+#text-express-app .te-protocol-card-editor {
+  padding: 10px;
+}
+
+#text-express-app .te-protocol-card-editor > header {
+  min-height: 28px;
+}
+
+#text-express-app .te-protocol-card-editor > header > strong {
+  font-size: 10px;
+}
+
+#text-express-app .te-protocol-card-editor .te-protocol-text-field textarea {
+  min-height: 96px;
+}
+
+#text-express-app .te-protocol-card-editor .te-protocol-action-type-field {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 4px;
+  padding-top: 7px;
+  border-top: 1px dashed var(--te-border);
+}
+
+#text-express-app .te-protocol-card-editor .te-protocol-action-type-field > small {
+  color: var(--te-muted);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+#text-express-app .te-protocol-card-editor .te-flow-keywords-field {
+  margin-top: 1px;
+}
+
+#text-express-app .te-protocol-card-editor .te-flow-keywords-field > span,
+#text-express-app .te-protocol-card-editor .te-protocol-action-type-field > span {
+  color: var(--te-muted);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+#text-express-app.te-fullscreen-active .te-protocol-card-editor .te-protocol-text-field textarea {
+  min-height: 120px;
+}
+
+@media (max-width: 760px) {
+  #text-express-app .te-protocol-card-editor .te-flow-optional-check {
+    align-self: start;
+  }
+}
+
+/* ==========================================================
+ * Text Express 28.0 — etiqueta opcional no editor de Protocolo
+ * ========================================================== */
+#text-express-app #te-protocol-label-field {
+  padding: 11px 12px;
+  border: 1px solid color-mix(in srgb, var(--te-protocol) 24%, var(--te-border));
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--te-protocol) 5%, var(--te-surface));
+}
+
+#text-express-app #te-protocol-label-field > span {
+  color: var(--te-protocol);
+}
+
+#text-express-app #te-form-system-label:focus {
+  border-color: var(--te-protocol);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--te-protocol) 15%, transparent);
+}
+
+/* Text Express 28.0.2 — confirmações pequenas das etiquetas. */
+#text-express-app .te-toast.te-label-notice {
+  justify-self: center;
+  width: max-content;
+  max-width: min(330px, calc(100vw - 40px));
+  gap: 6px;
+  padding: 7px 10px;
+  border-left-width: 3px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 1.25;
+  box-shadow: 0 8px 22px rgba(9, 23, 47, 0.16);
+}
+
+#text-express-app .te-toast.te-label-notice .te-icon {
+  width: 13px;
+  height: 13px;
+}
