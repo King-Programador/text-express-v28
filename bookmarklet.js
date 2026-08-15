@@ -1,4 +1,4 @@
-/* Text Express 28.0.3 — carregador autossuficiente */
+/* Text Express 28.0.4 — carregador autossuficiente */
 (() => {
   "use strict";
 
@@ -66,7 +66,7 @@
       stylesheet.rel = "stylesheet";
       (documentRef.head || documentRef.documentElement).appendChild(stylesheet);
     }
-    stylesheet.href = baseUrl + "styles.css?v=28.0.3";
+    stylesheet.href = baseUrl + "styles.css?v=28.0.4";
 
     let inlineStyles = documentRef.getElementById("te-bookmarklet-inline-style");
     if (!inlineStyles) {
@@ -106,7 +106,7 @@ if (!window.__textExpressStandaloneSkipBundle) {
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.0.3";
+  const APP_VERSION = "28.0.4";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -124,6 +124,29 @@ if (!window.__textExpressStandaloneSkipBundle) {
     autoExpand: true,
     keepOpenAfterInsert: true,
     confirmBeforeDelete: true
+  });
+
+  // Opções compartilhadas pela normalização, renderização e editor de categorias.
+  // Estas constantes existiam como referências na V28, mas não haviam sido
+  // declaradas no bundle, causando falha total na inicialização do bookmarklet.
+  const CATEGORY_ICON_OPTIONS = Object.freeze([
+    "folder", "message-circle", "check-circle", "clipboard-list", "network",
+    "phone", "monitor", "globe", "users", "zap", "send", "server",
+    "radio", "wallet", "compass", "headphones", "wifi", "smartphone",
+    "map-pin", "database", "package", "wrench", "shield-check", "tag",
+    "bell", "clock", "file-text", "layout-grid", "reply"
+  ]);
+
+  const CATEGORY_COLOR_OPTIONS = Object.freeze([
+    "#2563eb", "#4f46e5", "#7c3aed", "#db2777", "#e64b4b",
+    "#f97316", "#d97706", "#16a36a", "#0f766e", "#0891b2",
+    "#64748b", "#334155"
+  ]);
+
+  const TRIGGER_LABELS = Object.freeze({
+    space: "Espaço",
+    tab: "Tab",
+    enter: "Enter"
   });
 
   const DEFAULT_CATEGORIES = [{"id":"cat-atd-saudacoes","tipo":"atendimento","nome":"Saudações","icone":"message-circle","cor":"#16a36a","ordem":20,"padrao":false},{"id":"cat-atd-encerramentos","tipo":"atendimento","nome":"Encerramentos","icone":"check-circle","cor":"#e64b4b","ordem":30,"padrao":true},{"id":"cat-atd-dados-incorretos","tipo":"atendimento","nome":"Dados incorretos","icone":"clipboard-list","cor":"#e64b4b","ordem":40,"padrao":false},{"id":"cat-atd-problemas","tipo":"atendimento","nome":"Internet","icone":"network","cor":"#8b5cf6","ordem":50,"padrao":true},{"id":"cat-atd-orientacoes","tipo":"atendimento","nome":"Telefonia","icone":"phone","cor":"#0891b2","ordem":60,"padrao":true},{"id":"cat-atd-respostas","tipo":"atendimento","nome":"TV","icone":"monitor","cor":"#16a36a","ordem":70,"padrao":true},{"id":"cat-atd-abertura-de-o-s","tipo":"atendimento","nome":"Abertura de O.s","icone":"globe","cor":"#e64b4b","ordem":999,"padrao":false},{"id":"cat-atd-solicitacoes","tipo":"atendimento","nome":"Serviços com valores","icone":"clipboard-list","cor":"#f97316","ordem":1009,"padrao":true},{"id":"cat-atd-transferencias","tipo":"atendimento","nome":"Transferências","icone":"users","cor":"#16a36a","ordem":1019,"padrao":false},{"id":"cat-atd-cobrancas-de-atendimento","tipo":"atendimento","nome":"Cobranças de atendimento","icone":"zap","cor":"#0f766e","ordem":1029,"padrao":false},{"id":"cat-atd-outros","tipo":"atendimento","nome":"Outros","icone":"folder","cor":"#64748b","ordem":1039,"padrao":true},{"id":"cat-prot-instalacao-reparo","tipo":"protocolo","nome":"Abertura de O.s","icone":"send","cor":"#e64b4b","ordem":20,"padrao":true},{"id":"cat-prot-internet","tipo":"protocolo","nome":"Internet","icone":"globe","cor":"#4f46e5","ordem":30,"padrao":true},{"id":"cat-prot-telefonia","tipo":"protocolo","nome":"Telefonia","icone":"phone","cor":"#16a36a","ordem":50,"padrao":true},{"id":"cat-prot-tv","tipo":"protocolo","nome":"TV","icone":"monitor","cor":"#db2777","ordem":70,"padrao":true},{"id":"cat-prot-sistemas-aplicativos","tipo":"protocolo","nome":"Aplicativos","icone":"server","cor":"#2563eb","ordem":80,"padrao":true},{"id":"cat-prot-fwa","tipo":"protocolo","nome":"FWA","icone":"radio","cor":"#d97706","ordem":90,"padrao":true},{"id":"cat-prot-financeiro","tipo":"protocolo","nome":"Atendimentos com valores","icone":"wallet","cor":"#16a36a","ordem":100,"padrao":true},{"id":"cat-prot-orientacao","tipo":"protocolo","nome":"Orientação","icone":"compass","cor":"#0891b2","ordem":150,"padrao":true},{"id":"cat-prot-outros","tipo":"protocolo","nome":"Outros","icone":"folder","cor":"#64748b","ordem":190,"padrao":true},{"id":"cat-prot-cobrancas","tipo":"protocolo","nome":"Cobranças","icone":"headphones","cor":"#f97316","ordem":200,"padrao":false}];
