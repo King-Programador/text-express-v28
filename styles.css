@@ -4382,7 +4382,7 @@
 }
 
 
-/* Text Express 28.0.5 — dados rápidos do contato em Protocolos. */
+/* Text Express 28.0.6 — dados rápidos do contato em Protocolos. */
 .te-protocol-contact-modal {
   width: min(620px, calc(100vw - 32px));
 }
@@ -4489,4 +4489,16 @@
   .te-contact-choice-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+
+/* Text Express 28.0.6 — padronização visual das sequências. */
+#text-express-app .te-flow-card > .te-card-icon .te-icon {
+  width: 18px;
+  height: 18px;
+}
+
+#text-express-app .te-flow-card .te-card-insert {
+  font-weight: 800;
+  letter-spacing: .01em;
 }

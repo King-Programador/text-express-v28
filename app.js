@@ -1,12 +1,12 @@
 /*
- * Text Express 28.0.5
+ * Text Express 28.0.6
  * Expansor de textos para atendimento e registro de protocolos.
  * Sem dependências externas.
  */
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.0.5";
+  const APP_VERSION = "28.0.6";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -301,7 +301,7 @@
     }
 
     icon(name, extraClass = "") {
-      const safe = CATEGORY_ICON_OPTIONS.includes(name) || ["plus","edit","trash","copy","star","send","download","upload","rotate-ccw","x","chevron-left","chevron-right","palette","save","info","moon","sun","minus","maximize-2","sliders","heart","check","more-horizontal"].includes(name) ? name : "folder";
+      const safe = CATEGORY_ICON_OPTIONS.includes(name) || ["plus","edit","trash","copy","star","send","download","upload","rotate-ccw","x","chevron-left","chevron-right","palette","save","info","moon","sun","minus","maximize-2","sliders","heart","check","more-horizontal","play-circle"].includes(name) ? name : "folder";
       return `<svg class="te-icon ${this.escapeAttr(extraClass)}" aria-hidden="true"><use href="#te-i-${this.escapeAttr(safe)}"></use></svg>`;
     }
 
@@ -1932,7 +1932,7 @@
       const shortcuts = snippet.etapas.slice(0, 3).map((step) => `<code>${this.escapeHtml(step.atalho)}</code>`).join("");
       return `
         <article class="te-snippet-card te-flow-card ${selected}" data-te-card-id="${this.escapeAttr(snippet.id)}" data-te-snippet-type="atendimento" style="--te-card-accent:${this.escapeAttr(category.cor)}">
-          <span class="te-card-icon" aria-hidden="true" style="--te-category-color:${this.escapeAttr(category.cor)}">${this.icon("clipboard-list")}</span>
+          <span class="te-card-icon" aria-hidden="true" style="--te-category-color:${this.escapeAttr(category.cor)}">${this.icon("play-circle")}</span>
           <div class="te-card-main">
             <div class="te-card-title-row">
               <span class="te-card-title" title="${this.escapeAttr(snippet.nome)}">${this.escapeHtml(snippet.nome)}</span>
@@ -2061,13 +2061,13 @@
     this.detailPane.innerHTML = `
       <div class="te-detail-header te-flow-detail-header">
         <div class="te-detail-title-wrap">
-          <span class="te-detail-category-icon" style="--te-category-color:${this.escapeAttr(category.cor)}">${this.icon("clipboard-list")}</span>
+          <span class="te-detail-category-icon" style="--te-category-color:${this.escapeAttr(category.cor)}">${this.icon("play-circle")}</span>
           <div>
             <h2>${this.escapeHtml(flow.nome)}</h2>
             <div class="te-detail-meta">
               <span>Sequência de ${flow.etapas.length} falas</span>
               <code>${this.escapeHtml(flow.atalho)}</code>
-              <span>abre o fluxo</span>
+              <span>abre a sequência</span>
             </div>
           </div>
         </div>
@@ -9382,18 +9382,18 @@
       .join("");
     return `
       <article class="te-snippet-card te-flow-card te-protocol-flow-card ${selected}" tabindex="0" role="button" aria-selected="${snippet.id === this.selectedId ? "true" : "false"}" data-te-card-id="${this.escapeAttr(snippet.id)}" data-te-snippet-type="protocolo" style="--te-card-accent:${this.escapeAttr(category.cor)}">
-        <span class="te-card-icon" aria-hidden="true" style="--te-category-color:${this.escapeAttr(category.cor)}">${this.icon("clipboard-list")}</span>
+        <span class="te-card-icon" aria-hidden="true" style="--te-category-color:${this.escapeAttr(category.cor)}">${this.icon("play-circle")}</span>
         <div class="te-card-main">
           <div class="te-card-title-row">
             <span class="te-card-title" title="${this.escapeAttr(snippet.nome)}">${this.escapeHtml(snippet.nome)}</span>
             <span class="te-flow-count">${snippet.etapas.length} opções</span>
           </div>
-          <div class="te-shortcut-line"><code>${this.escapeHtml(snippet.atalho)}</code><span>abre o fluxo</span></div>
+          <div class="te-shortcut-line"><code>${this.escapeHtml(snippet.atalho)}</code><span>abre a sequência</span></div>
           <div class="te-protocol-flow-actions-preview">${actionLabels}</div>
           <div class="te-card-actions">
             <button class="te-text-button" type="button" data-te-action="edit" data-te-id="${this.escapeAttr(snippet.id)}">${this.icon("edit")} Editar</button>
             <button class="te-text-button te-delete" type="button" data-te-action="delete" data-te-id="${this.escapeAttr(snippet.id)}">${this.icon("trash")} Excluir</button>
-            <button class="te-text-button te-card-insert" type="button" data-te-action="flow-open" data-te-id="${this.escapeAttr(snippet.id)}">${this.icon("play-circle")} Inserir</button>
+            <button class="te-text-button te-card-insert" type="button" data-te-action="flow-open" data-te-id="${this.escapeAttr(snippet.id)}">${this.icon("play-circle")} ABRIR SEQUÊNCIA</button>
           </div>
         </div>
         <button class="te-favorite-button ${snippet.favorito ? "te-active" : ""}" type="button" data-te-action="favorite" data-te-id="${this.escapeAttr(snippet.id)}" title="Favorito">${this.icon("star")}</button>
@@ -9431,19 +9431,19 @@
     this.detailPane.innerHTML = `
       <div class="te-detail-header te-flow-detail-header">
         <div class="te-detail-title-wrap">
-          <span class="te-detail-category-icon" style="--te-category-color:${this.escapeAttr(category.cor)}">${this.icon("clipboard-list")}</span>
+          <span class="te-detail-category-icon" style="--te-category-color:${this.escapeAttr(category.cor)}">${this.icon("play-circle")}</span>
           <div>
             <h2>${this.escapeHtml(flow.nome)}</h2>
             <div class="te-detail-meta">
-              <span>Fluxo de ${flow.etapas.length} opções</span>
+              <span>Sequência de ${flow.etapas.length} opções</span>
               <code>${this.escapeHtml(flow.atalho)}</code>
-              <span>abre o menu</span>
+              <span>abre a sequência</span>
             </div>
           </div>
         </div>
         <div class="te-flow-header-actions">
-          <button class="te-primary-button te-sequence-open-detail" type="button" data-te-action="flow-open" data-te-id="${this.escapeAttr(flow.id)}">${this.icon("play-circle")} ABRIR FLUXO</button>
-          <button class="te-icon-action" type="button" data-te-action="flow-reset" data-te-id="${this.escapeAttr(flow.id)}" title="Reiniciar fluxo">${this.icon("rotate-ccw")}</button>
+          <button class="te-primary-button te-sequence-open-detail" type="button" data-te-action="flow-open" data-te-id="${this.escapeAttr(flow.id)}">${this.icon("play-circle")} ABRIR SEQUÊNCIA</button>
+          <button class="te-icon-action" type="button" data-te-action="flow-reset" data-te-id="${this.escapeAttr(flow.id)}" title="Reiniciar sequência">${this.icon("rotate-ccw")}</button>
           <button class="te-icon-action" type="button" data-te-action="edit" data-te-id="${this.escapeAttr(flow.id)}" title="Editar">${this.icon("edit")}</button>
           <button class="te-favorite-button ${flow.favorito ? "te-active" : ""}" type="button" data-te-action="favorite" data-te-id="${this.escapeAttr(flow.id)}">${this.icon("star")}</button>
         </div>
@@ -11610,7 +11610,8 @@
     "Irmão(ã)",
     "Amigo(a)",
     "Esposo(a)",
-    "Funcionário(a)"
+    "Funcionário(a)",
+    "Outro"
   ]);
 
   const teV285Original = Object.freeze({
@@ -11624,6 +11625,9 @@
   TextExpressApp.prototype.setupProtocolContactPrompt = function () {
     this.protocolContactModal = this.root.querySelector("#te-protocol-contact-modal");
     this.protocolContactForm = this.root.querySelector("#te-protocol-contact-form");
+    this.protocolContactRelationField = this.root.querySelector("#te-protocol-contact-relation-field");
+    this.protocolContactRelationInput = this.root.querySelector("#te-protocol-contact-relation");
+    this.protocolContactRelationError = this.root.querySelector("#te-protocol-contact-relation-error");
     this.protocolContactNameField = this.root.querySelector("#te-protocol-contact-name-field");
     this.protocolContactNameInput = this.root.querySelector("#te-protocol-contact-name");
     this.protocolContactNumberField = this.root.querySelector("#te-protocol-contact-number-field");
@@ -11678,10 +11682,17 @@
   TextExpressApp.prototype.updateProtocolContactPromptUI = function (changedElement = null) {
     const role = this.getSelectedProtocolContactRole();
     const anonymous = this.getSelectedProtocolContactMode() === "anonymous";
+    const needsCustomRelation = role === "Outro";
     const needsName = role !== "Titular";
 
+    this.protocolContactRelationField?.classList.toggle("te-hidden", !needsCustomRelation);
     this.protocolContactNameField?.classList.toggle("te-hidden", !needsName);
     this.protocolContactNumberField?.classList.toggle("te-contact-field-muted", anonymous);
+
+    if (this.protocolContactRelationInput) {
+      this.protocolContactRelationInput.required = needsCustomRelation;
+      if (!needsCustomRelation) this.protocolContactRelationInput.value = "";
+    }
     if (this.protocolContactNameInput) {
       this.protocolContactNameInput.required = needsName;
       if (!needsName) this.protocolContactNameInput.value = "";
@@ -11690,15 +11701,19 @@
       this.protocolContactNumberInput.disabled = anonymous;
       this.protocolContactNumberInput.required = !anonymous;
     }
+    if (this.protocolContactRelationError) this.protocolContactRelationError.textContent = "";
     if (this.protocolContactNameError) this.protocolContactNameError.textContent = "";
     if (this.protocolContactNumberError) this.protocolContactNumberError.textContent = "";
 
     if (
       changedElement?.matches?.('input[name="te-protocol-contact-role"]')
-      && needsName
       && !this.protocolContactModal?.classList.contains("te-hidden")
     ) {
-      window.requestAnimationFrame(() => this.protocolContactNameInput?.focus());
+      window.requestAnimationFrame(() => {
+        if (needsCustomRelation) this.protocolContactRelationInput?.focus();
+        else if (needsName) this.protocolContactNameInput?.focus();
+        else this.protocolContactNumberInput?.focus();
+      });
     }
     if (
       changedElement?.matches?.('input[name="te-protocol-contact-mode"]')
@@ -11716,8 +11731,10 @@
     this.root.querySelectorAll('input[name="te-protocol-contact-mode"]').forEach((input) => {
       input.checked = input.value === "number";
     });
+    if (this.protocolContactRelationInput) this.protocolContactRelationInput.value = "";
     if (this.protocolContactNameInput) this.protocolContactNameInput.value = "";
     if (this.protocolContactNumberInput) this.protocolContactNumberInput.value = "";
+    if (this.protocolContactRelationError) this.protocolContactRelationError.textContent = "";
     if (this.protocolContactNameError) this.protocolContactNameError.textContent = "";
     if (this.protocolContactNumberError) this.protocolContactNumberError.textContent = "";
     this.updateProtocolContactPromptUI();
@@ -11753,10 +11770,15 @@
     event?.preventDefault?.();
     const role = this.getSelectedProtocolContactRole();
     const anonymous = this.getSelectedProtocolContactMode() === "anonymous";
+    const relation = String(this.protocolContactRelationInput?.value || "").replace(/\s+/g, " ").trim().slice(0, 80);
     const name = String(this.protocolContactNameInput?.value || "").replace(/\s+/g, " ").trim().slice(0, 80);
     const number = String(this.protocolContactNumberInput?.value || "").replace(/\s+/g, " ").trim().slice(0, 40);
 
     let valid = true;
+    if (role === "Outro" && !relation) {
+      if (this.protocolContactRelationError) this.protocolContactRelationError.textContent = "Informe a relação com o titular.";
+      valid = false;
+    }
     if (role !== "Titular" && !name) {
       if (this.protocolContactNameError) this.protocolContactNameError.textContent = "Informe o nome de quem fez o contato.";
       valid = false;
@@ -11766,13 +11788,15 @@
       valid = false;
     }
     if (!valid) {
-      if (role !== "Titular" && !name) this.protocolContactNameInput?.focus();
+      if (role === "Outro" && !relation) this.protocolContactRelationInput?.focus();
+      else if (role !== "Titular" && !name) this.protocolContactNameInput?.focus();
       else this.protocolContactNumberInput?.focus();
       return false;
     }
 
     this.finishProtocolContactPrompt({
       role,
+      relation: role === "Outro" ? relation : "",
       name: role === "Titular" ? "" : name,
       contact: anonymous ? "Anônimo" : number,
       anonymous
@@ -11788,8 +11812,12 @@
       ? details.role
       : "Titular";
     const name = String(details.name || "").replace(/\s+/g, " ").trim();
+    const customRelation = String(details.relation || "").replace(/\s+/g, " ").trim();
     const contact = String(details.contact || (details.anonymous ? "Anônimo" : "")).replace(/\s+/g, " ").trim() || "Anônimo";
-    const actor = role === "Titular" ? "Titular" : `${name || "Contato"}, ${role},`;
+    const relationLabel = role === "Outro"
+      ? (customRelation ? (/\btitular\b/i.test(customRelation) ? customRelation : `${customRelation} do titular`) : "Outro contato")
+      : role;
+    const actor = role === "Titular" ? "Titular" : `${name || "Contato"}, ${relationLabel},`;
 
     // Evita duplicação caso um cartão personalizado já tenha CTT no fim.
     body = body.replace(/\s*(?:[.;,-]\s*)?CTT\s*:\s*[^\n]*$/i, "").trim();
@@ -11955,6 +11983,51 @@
     }
     this.root.dataset.version = APP_VERSION;
     return result;
+  };
+
+  /* ==========================================================
+   * Text Express 28.0.6 — ajustes combinados
+   * - OUTRO em Protocolo: relação livre -> nome -> número/anônimo;
+   * - favoritos permanecem persistidos e passam ao topo da categoria;
+   * - todo cartão de sequência/fluxo usa ícone Play e ABRIR SEQUÊNCIA.
+   * ========================================================== */
+  const teV286Original = Object.freeze({
+    renderCard: TextExpressApp.prototype.renderCard,
+    getFilteredSnippets: TextExpressApp.prototype.getFilteredSnippets
+  });
+
+  TextExpressApp.prototype.renderCard = function (snippet) {
+    let html = teV286Original.renderCard.call(this, snippet);
+    if (snippet?.modelo !== "fluxo") return html;
+
+    // Padroniza o ícone principal de todo cartão com sequência/fluxo.
+    html = html.replace(
+      /(<span class="te-card-icon"[^>]*>)[\s\S]*?(<\/span>)/,
+      `$1${this.icon("play-circle")}$2`
+    );
+
+    // Padroniza a ação principal, inclusive nos Protocolos.
+    html = html.replace(
+      /(<button\b[^>]*data-te-action="flow-open"[^>]*>)[\s\S]*?(<\/button>)/g,
+      `$1${this.icon("play-circle")} ABRIR SEQUÊNCIA$2`
+    );
+    html = html.replace(/<span>abre o fluxo<\/span>/gi, "<span>abre a sequência</span>");
+    html = html.replace(/Abrir sequência/g, "ABRIR SEQUÊNCIA");
+    return html;
+  };
+
+  TextExpressApp.prototype.getFilteredSnippets = function () {
+    const items = teV286Original.getFilteredSnippets.call(this);
+    if (!Array.isArray(items) || this.activeType === "favoritos") return items;
+
+    // Partição estável: mantém a ordem existente dentro dos grupos, mas
+    // coloca os favoritos primeiro na própria categoria/visão atual.
+    const favorites = [];
+    const regular = [];
+    for (const snippet of items) {
+      (snippet?.favorito ? favorites : regular).push(snippet);
+    }
+    return [...favorites, ...regular];
   };
 
   function bootTextExpress() {
