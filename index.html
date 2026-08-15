@@ -20,7 +20,7 @@
     </section>
   </main>
 
-  <div id="text-express-app" class="te-app" data-version="28.0.3">
+  <div id="text-express-app" class="te-app" data-version="28.0.5">
     <svg class="te-icon-sprite" aria-hidden="true" focusable="false">
       <symbol id="te-i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></symbol>
       <symbol id="te-i-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.9L3 21l1.6-4.2A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></symbol>
@@ -346,6 +346,59 @@
           <footer class="te-modal-footer">
             <button class="te-secondary-button" type="button" data-te-action="variable-cancel"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg> Cancelar</button>
             <button class="te-primary-button" type="submit"><svg class="te-icon" aria-hidden="true"><use href="#te-i-check"></use></svg> Aplicar e inserir</button>
+          </footer>
+        </form>
+      </section>
+    </div>
+
+    <div class="te-modal-backdrop te-hidden" id="te-protocol-contact-modal" role="presentation">
+      <section class="te-modal te-protocol-contact-modal" role="dialog" aria-modal="true" aria-labelledby="te-protocol-contact-title">
+        <header class="te-modal-header">
+          <div>
+            <span class="te-modal-kicker">Somente Protocolo</span>
+            <h2 id="te-protocol-contact-title">Dados do contato</h2>
+          </div>
+          <button class="te-icon-button" type="button" data-te-action="protocol-contact-cancel" aria-label="Cancelar inserção"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg></button>
+        </header>
+        <form id="te-protocol-contact-form" novalidate>
+          <div class="te-protocol-contact-body">
+            <fieldset class="te-contact-fieldset">
+              <legend>Quem fez o contato?</legend>
+              <div class="te-contact-choice-grid te-contact-role-grid">
+                <label><input type="radio" name="te-protocol-contact-role" value="Titular" checked><span>Titular</span></label>
+                <label><input type="radio" name="te-protocol-contact-role" value="Filho(a) do titular"><span>Filho(a) do titular</span></label>
+                <label><input type="radio" name="te-protocol-contact-role" value="Irmão(ã)"><span>Irmão(ã)</span></label>
+                <label><input type="radio" name="te-protocol-contact-role" value="Amigo(a)"><span>Amigo(a)</span></label>
+                <label><input type="radio" name="te-protocol-contact-role" value="Esposo(a)"><span>Esposo(a)</span></label>
+                <label><input type="radio" name="te-protocol-contact-role" value="Funcionário(a)"><span>Funcionário(a)</span></label>
+              </div>
+            </fieldset>
+
+            <label class="te-field te-hidden" id="te-protocol-contact-name-field">
+              <span>Nome de quem fez o contato</span>
+              <input id="te-protocol-contact-name" type="text" maxlength="80" autocomplete="off" placeholder="Ex.: João">
+              <small class="te-field-error" id="te-protocol-contact-name-error"></small>
+            </label>
+
+            <fieldset class="te-contact-fieldset">
+              <legend>Contato</legend>
+              <div class="te-contact-mode-grid">
+                <label><input type="radio" name="te-protocol-contact-mode" value="number" checked><span>Informar número</span></label>
+                <label><input type="radio" name="te-protocol-contact-mode" value="anonymous"><span>Contato anônimo</span></label>
+              </div>
+            </fieldset>
+
+            <label class="te-field" id="te-protocol-contact-number-field">
+              <span>Número do contato</span>
+              <input id="te-protocol-contact-number" type="text" maxlength="40" inputmode="tel" autocomplete="off" placeholder="Ex.: 8199999-9999">
+              <small class="te-field-error" id="te-protocol-contact-number-error"></small>
+            </label>
+
+            <p class="te-contact-preview-note">O Text Express adicionará esses dados somente ao protocolo que está sendo inserido.</p>
+          </div>
+          <footer class="te-modal-footer">
+            <button class="te-secondary-button" type="button" data-te-action="protocol-contact-cancel"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg> Cancelar</button>
+            <button class="te-primary-button" type="submit"><svg class="te-icon" aria-hidden="true"><use href="#te-i-check"></use></svg> Inserir protocolo</button>
           </footer>
         </form>
       </section>

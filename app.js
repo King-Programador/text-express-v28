@@ -1,12 +1,12 @@
 /*
- * Text Express 28.0.3
+ * Text Express 28.0.5
  * Expansor de textos para atendimento e registro de protocolos.
  * Sem dependências externas.
  */
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.0.4";
+  const APP_VERSION = "28.0.5";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -11590,6 +11590,369 @@
       console.error("Text Express — persistência de rascunhos:", error);
     }
 
+    this.root.dataset.version = APP_VERSION;
+    return result;
+  };
+
+
+  /* ==========================================================
+   * Text Express 28.0.5 — identificação rápida do contato
+   * Exclusivo para inserções de Protocolo.
+   * - Titular não exige nome;
+   * - demais relações exigem o nome da pessoa;
+   * - contato por número ou opção Anônimo;
+   * - funciona em cartão único e em opção inserida de fluxo;
+   * - não altera cartões de Atendimento nem a lógica de etiquetas.
+   * ========================================================== */
+  const TE_V285_PROTOCOL_CONTACT_RELATIONS = Object.freeze([
+    "Titular",
+    "Filho(a) do titular",
+    "Irmão(ã)",
+    "Amigo(a)",
+    "Esposo(a)",
+    "Funcionário(a)"
+  ]);
+
+  const teV285Original = Object.freeze({
+    init: TextExpressApp.prototype.init,
+    onGlobalKeyDown: TextExpressApp.prototype.onGlobalKeyDown,
+    insertSnippet: TextExpressApp.prototype.insertSnippet,
+    expandShortcut: TextExpressApp.prototype.expandShortcut,
+    executeWorkflowStep: TextExpressApp.prototype.executeWorkflowStep
+  });
+
+  TextExpressApp.prototype.setupProtocolContactPrompt = function () {
+    this.protocolContactModal = this.root.querySelector("#te-protocol-contact-modal");
+    this.protocolContactForm = this.root.querySelector("#te-protocol-contact-form");
+    this.protocolContactNameField = this.root.querySelector("#te-protocol-contact-name-field");
+    this.protocolContactNameInput = this.root.querySelector("#te-protocol-contact-name");
+    this.protocolContactNumberField = this.root.querySelector("#te-protocol-contact-number-field");
+    this.protocolContactNumberInput = this.root.querySelector("#te-protocol-contact-number");
+    this.protocolContactNameError = this.root.querySelector("#te-protocol-contact-name-error");
+    this.protocolContactNumberError = this.root.querySelector("#te-protocol-contact-number-error");
+
+    if (!this.protocolContactModal || !this.protocolContactForm) return false;
+    if (this.protocolContactForm.dataset.teContactBound === "true") {
+      this.updateProtocolContactPromptUI();
+      return true;
+    }
+    this.protocolContactForm.dataset.teContactBound = "true";
+
+    this.protocolContactForm.addEventListener("submit", (event) => {
+      this.submitProtocolContactPrompt(event);
+    });
+
+    this.protocolContactForm.addEventListener("change", (event) => {
+      if (
+        event.target?.matches?.('input[name="te-protocol-contact-role"]')
+        || event.target?.matches?.('input[name="te-protocol-contact-mode"]')
+      ) {
+        this.updateProtocolContactPromptUI(event.target);
+      }
+    });
+
+    this.protocolContactModal.addEventListener("click", (event) => {
+      const cancel = event.target.closest?.('[data-te-action="protocol-contact-cancel"]');
+      if (cancel || event.target === this.protocolContactModal) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.finishProtocolContactPrompt(null);
+      }
+    });
+
+    this.updateProtocolContactPromptUI();
+    return true;
+  };
+
+  TextExpressApp.prototype.getSelectedProtocolContactRole = function () {
+    const selected = this.root.querySelector('input[name="te-protocol-contact-role"]:checked')?.value;
+    return TE_V285_PROTOCOL_CONTACT_RELATIONS.includes(selected) ? selected : "Titular";
+  };
+
+  TextExpressApp.prototype.getSelectedProtocolContactMode = function () {
+    return this.root.querySelector('input[name="te-protocol-contact-mode"]:checked')?.value === "anonymous"
+      ? "anonymous"
+      : "number";
+  };
+
+  TextExpressApp.prototype.updateProtocolContactPromptUI = function (changedElement = null) {
+    const role = this.getSelectedProtocolContactRole();
+    const anonymous = this.getSelectedProtocolContactMode() === "anonymous";
+    const needsName = role !== "Titular";
+
+    this.protocolContactNameField?.classList.toggle("te-hidden", !needsName);
+    this.protocolContactNumberField?.classList.toggle("te-contact-field-muted", anonymous);
+    if (this.protocolContactNameInput) {
+      this.protocolContactNameInput.required = needsName;
+      if (!needsName) this.protocolContactNameInput.value = "";
+    }
+    if (this.protocolContactNumberInput) {
+      this.protocolContactNumberInput.disabled = anonymous;
+      this.protocolContactNumberInput.required = !anonymous;
+    }
+    if (this.protocolContactNameError) this.protocolContactNameError.textContent = "";
+    if (this.protocolContactNumberError) this.protocolContactNumberError.textContent = "";
+
+    if (
+      changedElement?.matches?.('input[name="te-protocol-contact-role"]')
+      && needsName
+      && !this.protocolContactModal?.classList.contains("te-hidden")
+    ) {
+      window.requestAnimationFrame(() => this.protocolContactNameInput?.focus());
+    }
+    if (
+      changedElement?.matches?.('input[name="te-protocol-contact-mode"]')
+      && !anonymous
+      && !this.protocolContactModal?.classList.contains("te-hidden")
+    ) {
+      window.requestAnimationFrame(() => this.protocolContactNumberInput?.focus());
+    }
+  };
+
+  TextExpressApp.prototype.resetProtocolContactPrompt = function () {
+    this.root.querySelectorAll('input[name="te-protocol-contact-role"]').forEach((input) => {
+      input.checked = input.value === "Titular";
+    });
+    this.root.querySelectorAll('input[name="te-protocol-contact-mode"]').forEach((input) => {
+      input.checked = input.value === "number";
+    });
+    if (this.protocolContactNameInput) this.protocolContactNameInput.value = "";
+    if (this.protocolContactNumberInput) this.protocolContactNumberInput.value = "";
+    if (this.protocolContactNameError) this.protocolContactNameError.textContent = "";
+    if (this.protocolContactNumberError) this.protocolContactNumberError.textContent = "";
+    this.updateProtocolContactPromptUI();
+  };
+
+  TextExpressApp.prototype.requestProtocolContactDetails = function () {
+    if (!this.protocolContactModal || !this.protocolContactForm) {
+      this.setupProtocolContactPrompt();
+    }
+    if (!this.protocolContactModal || !this.protocolContactForm) {
+      this.showToast("Não foi possível abrir os dados do contato.", "error");
+      return Promise.resolve(null);
+    }
+
+    if (this.protocolContactResolver) this.finishProtocolContactPrompt(null);
+    this.resetProtocolContactPrompt();
+    this.protocolContactModal.classList.remove("te-hidden");
+
+    return new Promise((resolve) => {
+      this.protocolContactResolver = resolve;
+      window.requestAnimationFrame(() => this.protocolContactNumberInput?.focus());
+    });
+  };
+
+  TextExpressApp.prototype.finishProtocolContactPrompt = function (value) {
+    if (this.protocolContactModal) this.protocolContactModal.classList.add("te-hidden");
+    const resolver = this.protocolContactResolver;
+    this.protocolContactResolver = null;
+    if (resolver) resolver(value);
+  };
+
+  TextExpressApp.prototype.submitProtocolContactPrompt = function (event) {
+    event?.preventDefault?.();
+    const role = this.getSelectedProtocolContactRole();
+    const anonymous = this.getSelectedProtocolContactMode() === "anonymous";
+    const name = String(this.protocolContactNameInput?.value || "").replace(/\s+/g, " ").trim().slice(0, 80);
+    const number = String(this.protocolContactNumberInput?.value || "").replace(/\s+/g, " ").trim().slice(0, 40);
+
+    let valid = true;
+    if (role !== "Titular" && !name) {
+      if (this.protocolContactNameError) this.protocolContactNameError.textContent = "Informe o nome de quem fez o contato.";
+      valid = false;
+    }
+    if (!anonymous && !number) {
+      if (this.protocolContactNumberError) this.protocolContactNumberError.textContent = "Informe o número do contato ou selecione Anônimo.";
+      valid = false;
+    }
+    if (!valid) {
+      if (role !== "Titular" && !name) this.protocolContactNameInput?.focus();
+      else this.protocolContactNumberInput?.focus();
+      return false;
+    }
+
+    this.finishProtocolContactPrompt({
+      role,
+      name: role === "Titular" ? "" : name,
+      contact: anonymous ? "Anônimo" : number,
+      anonymous
+    });
+    return true;
+  };
+
+  TextExpressApp.prototype.formatProtocolContactContent = function (rawContent, details = {}) {
+    let body = String(rawContent || "").trim();
+    if (!body) return body;
+
+    const role = TE_V285_PROTOCOL_CONTACT_RELATIONS.includes(details.role)
+      ? details.role
+      : "Titular";
+    const name = String(details.name || "").replace(/\s+/g, " ").trim();
+    const contact = String(details.contact || (details.anonymous ? "Anônimo" : "")).replace(/\s+/g, " ").trim() || "Anônimo";
+    const actor = role === "Titular" ? "Titular" : `${name || "Contato"}, ${role},`;
+
+    // Evita duplicação caso um cartão personalizado já tenha CTT no fim.
+    body = body.replace(/\s*(?:[.;,-]\s*)?CTT\s*:\s*[^\n]*$/i, "").trim();
+
+    const lowerFirst = (value) => value ? value.charAt(0).toLocaleLowerCase("pt-BR") + value.slice(1) : value;
+    const replaceLeadingSubject = (value) => {
+      const patterns = [
+        /^\(Cliente\)\s*/i,
+        /^Cliente\s+/i,
+        /^O\s+mesmo\s+/i,
+        /^A\s+mesma\s+/i,
+        /^A\/o\s+mesma\/o\s+/i,
+        /^A\/O\s+mesma\/o\s+/i,
+        /^O\/A\s+mesmo\/a\s+/i,
+        /^Pr[oó]prio(?:\(a\))?\s+titular[.\s]+/i,
+        /^Titular[.\s]+/i
+      ];
+      for (const pattern of patterns) {
+        if (pattern.test(value)) {
+          const rest = value.replace(pattern, "").replace(/^[,;:\s]+/, "");
+          return `${actor} ${lowerFirst(rest)}`.trim();
+        }
+      }
+      return "";
+    };
+
+    let composed = replaceLeadingSubject(body);
+    if (!composed) {
+      if (/^Informa\b/i.test(body)) {
+        composed = `${actor} ${lowerFirst(body)}`;
+      } else if (/^Informando\s+estar\b/i.test(body)) {
+        composed = `${actor} informa estar${body.replace(/^Informando\s+estar/i, "")}`;
+      } else if (/^Em\s+contato\b/i.test(body)) {
+        composed = `${actor} entra em contato${body.replace(/^Em\s+contato/i, "")}`;
+      } else if (/^(Entra|Entrou|Relata|Solicita|Deseja|Informou)\b/i.test(body)) {
+        composed = `${actor} ${lowerFirst(body)}`;
+      } else {
+        composed = `${actor} fez contato. ${body}`;
+      }
+    }
+
+    composed = composed.trim().replace(/[,;:]\s*$/, "");
+    const separator = /[.!?]$/.test(composed) ? " " : ". ";
+    return `${composed}${separator}CTT: ${contact}.`;
+  };
+
+  TextExpressApp.prototype.prepareProtocolContactContent = async function (content) {
+    const details = await this.requestProtocolContactDetails();
+    if (!details) return null;
+    return this.formatProtocolContactContent(content, details);
+  };
+
+  TextExpressApp.prototype.insertSnippet = async function (id) {
+    const snippet = this.snippets.find((item) => item.id === id);
+    if (!snippet || snippet.tipo !== "protocolo" || snippet.modelo === "fluxo") {
+      return teV285Original.insertSnippet.call(this, id);
+    }
+
+    const context = this.captureInsertionContext(this.lastActiveElement, 0);
+    let content = await this.processVariables(snippet.conteudo);
+    if (content === null) {
+      this.showToast("Inserção cancelada.");
+      return false;
+    }
+    content = await this.prepareProtocolContactContent(content);
+    if (content === null) {
+      this.showToast("Inserção do protocolo cancelada.");
+      return false;
+    }
+
+    if (context && this.applyInsertionContext(context, content)) {
+      this.showToast("Protocolo inserido com os dados do contato.", "success");
+    } else {
+      await this.copyText(content);
+      this.showToast("Nenhum campo ativo. O protocolo foi copiado.", "success");
+    }
+    if (snippet.etiquetaSistema) await this.queueProtocolLabelApplication(snippet.etiquetaSistema);
+    if (!this.settings.keepOpenAfterInsert) this.toggleMinimize(true);
+    return true;
+  };
+
+  TextExpressApp.prototype.expandShortcut = async function (entry, context) {
+    const snippet = entry?.snippet || entry;
+    if (!snippet || snippet.tipo !== "protocolo" || snippet.modelo === "fluxo" || entry?.kind === "flow-step") {
+      return teV285Original.expandShortcut.call(this, entry, context);
+    }
+    if (!context) return false;
+
+    let content = await this.processVariables(snippet.conteudo);
+    if (content === null) return false;
+    content = await this.prepareProtocolContactContent(content);
+    if (content === null) {
+      this.showToast("Inserção do protocolo cancelada.");
+      return false;
+    }
+
+    if (this.applyInsertionContext(context, content)) {
+      this.showToast(`Atalho ${snippet.atalho} expandido com os dados do contato.`, "success");
+    } else {
+      await this.copyText(content);
+      this.showToast("Não foi possível inserir; o protocolo foi copiado.", "error");
+    }
+    if (snippet.etiquetaSistema) await this.queueProtocolLabelApplication(snippet.etiquetaSistema);
+    return true;
+  };
+
+  TextExpressApp.prototype.executeWorkflowStep = async function (flow, step, stepIndex, suppliedContext = null) {
+    const actionType = flow?.tipo === "atendimento"
+      ? TE_V27_FLOW_ACTIONS.INSERT
+      : this.getFlowActionType(step);
+
+    if (flow?.tipo !== "protocolo" || actionType !== TE_V27_FLOW_ACTIONS.INSERT) {
+      return teV285Original.executeWorkflowStep.call(this, flow, step, stepIndex, suppliedContext);
+    }
+
+    const context = suppliedContext || this.captureInsertionContext(this.lastActiveElement, 0);
+    let content = await this.processFlowStep(flow, step);
+    if (content === null) {
+      this.showToast("Execução cancelada.");
+      return false;
+    }
+    content = await this.prepareProtocolContactContent(content);
+    if (content === null) {
+      this.showToast("Inserção do protocolo cancelada.");
+      return false;
+    }
+
+    let inserted = false;
+    if (context) inserted = this.applyInsertionContext(context, content);
+    if (!inserted) {
+      await this.copyText(content);
+      this.showToast("Protocolo copiado com os dados do contato.", "success", 2200);
+    } else {
+      this.showToast(`Opção ${stepIndex + 1} inserida com os dados do contato.`, "success");
+    }
+    this.markWorkflowStepUsed(flow, stepIndex);
+    if (flow.etiquetaSistema) await this.queueProtocolLabelApplication(flow.etiquetaSistema);
+    return true;
+  };
+
+  TextExpressApp.prototype.onGlobalKeyDown = function (event) {
+    if (
+      event?.key === "Escape"
+      && this.protocolContactResolver
+      && this.protocolContactModal
+      && !this.protocolContactModal.classList.contains("te-hidden")
+    ) {
+      event.preventDefault();
+      event.stopPropagation?.();
+      this.finishProtocolContactPrompt(null);
+      return;
+    }
+    return teV285Original.onGlobalKeyDown.call(this, event);
+  };
+
+  TextExpressApp.prototype.init = function () {
+    this.protocolContactResolver = null;
+    const result = teV285Original.init.call(this);
+    try {
+      this.setupProtocolContactPrompt();
+    } catch (error) {
+      console.error("Text Express — dados rápidos do protocolo:", error);
+    }
     this.root.dataset.version = APP_VERSION;
     return result;
   };

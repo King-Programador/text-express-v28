@@ -4380,3 +4380,113 @@
   width: 13px;
   height: 13px;
 }
+
+
+/* Text Express 28.0.5 — dados rápidos do contato em Protocolos. */
+.te-protocol-contact-modal {
+  width: min(620px, calc(100vw - 32px));
+}
+
+.te-protocol-contact-body {
+  display: grid;
+  gap: 16px;
+  padding: 18px 20px 4px;
+}
+
+.te-contact-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.te-contact-fieldset > legend {
+  margin-bottom: 9px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--te-muted, #64748b);
+  letter-spacing: .02em;
+}
+
+.te-contact-choice-grid,
+.te-contact-mode-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.te-contact-choice-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.te-contact-mode-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.te-contact-choice-grid label,
+.te-contact-mode-grid label {
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.te-contact-choice-grid input,
+.te-contact-mode-grid input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.te-contact-choice-grid span,
+.te-contact-mode-grid span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid var(--te-border, #dbe3ee);
+  border-radius: 10px;
+  background: var(--te-surface, #fff);
+  color: var(--te-text, #182230);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.25;
+  text-align: center;
+  transition: border-color .14s ease, background .14s ease, box-shadow .14s ease;
+}
+
+.te-contact-choice-grid input:checked + span,
+.te-contact-mode-grid input:checked + span {
+  border-color: var(--te-primary, #2563eb);
+  background: color-mix(in srgb, var(--te-primary, #2563eb) 10%, var(--te-surface, #fff));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--te-primary, #2563eb) 14%, transparent);
+  color: var(--te-primary, #2563eb);
+}
+
+.te-contact-choice-grid input:focus-visible + span,
+.te-contact-mode-grid input:focus-visible + span {
+  outline: 2px solid var(--te-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+.te-contact-field-muted {
+  opacity: .56;
+}
+
+.te-contact-preview-note {
+  margin: -2px 0 0;
+  color: var(--te-muted, #64748b);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+@media (max-width: 640px) {
+  .te-protocol-contact-body {
+    padding-inline: 14px;
+  }
+
+  .te-contact-choice-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
