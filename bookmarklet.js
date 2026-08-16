@@ -11266,38 +11266,127 @@ if (!window.__textExpressStandaloneSkipBundle) {
   };
 
   TextExpressApp.prototype.findExternalLabelPlusButton = function () {
-    const candidates = [...document.querySelectorAll('button, [role="button"]')]
-      .filter((element) =>
-        this.isExternalElementVisible(element)
-        && !element.disabled
-        && element.getAttribute("aria-disabled") !== "true"
-      );
-    let best = null;
-    let bestScore = -1;
-    for (const element of candidates) {
-      const text = this.getExternalElementText(element);
-      const folded = this.foldProtocolLabel(text);
-      const signature = this.foldProtocolLabel([
-        text,
-        element.getAttribute("aria-label"),
-        element.getAttribute("title"),
-        element.className,
-        element.innerHTML
-      ].join(" "));
+    const textSelectors = "h1, h2, h3, h4, h5, h6, label, strong, span, p, div";
+    const actionableSelector = 'button, [role="button"]';
+
+    const isEnabledAction = (element) =>
+      this.isExternalElementVisible(element)
+      && !element.disabled
+      && element.getAttribute("aria-disabled") !== "true";
+
+    const foldedElementSignature = (element) => this.foldProtocolLabel([
+      this.getExternalElementText(element),
+      element.getAttribute?.("aria-label") || "",
+      element.getAttribute?.("title") || "",
+      element.getAttribute?.("data-testid") || "",
+      element.getAttribute?.("data-test") || "",
+      element.getAttribute?.("data-cy") || "",
+      typeof element.className === "string" ? element.className : ""
+    ].join(" "));
+
+    const getAddCandidateScore = (element, sectionMarker = null, eventsMarker = null) => {
+      if (!isEnabledAction(element)) return -1;
+      const text = this.getExternalElementText(element).trim();
+      const signature = foldedElementSignature(element);
       let score = 0;
-      if (text === "+") score += 100;
-      if (/\badicionar\b/.test(folded)) score += 25;
-      if (/etiquet/.test(signature)) score += 80;
-      if (/plus|add|mais/.test(signature)) score += 15;
-      const rect = element.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.4) score += 8;
-      if (rect.left > window.innerWidth * 0.55) score += 5;
-      if (score > bestScore) {
-        best = element;
-        bestScore = score;
+
+      // O símbolo + só é considerado DEPOIS de o botão estar restrito ao
+      // componente contextual de Etiquetas. Nunca é usado em busca global.
+      if (text === "+") score += 120;
+      if (/etiquet/.test(signature) && /adicionar|add|plus|mais|nova|novo/.test(signature)) score += 150;
+      else if (/adicionar|add|plus|mais/.test(signature)) score += 55;
+      if (/etiquet/.test(signature)) score += 45;
+      if (element.querySelector?.('svg, [class*="plus"], [class*="add"]')) score += 12;
+
+      const rect = element.getBoundingClientRect?.();
+      if (rect && sectionMarker?.getBoundingClientRect) {
+        const markerRect = sectionMarker.getBoundingClientRect();
+        const elementCenterY = rect.top + (rect.height / 2);
+        const markerCenterY = markerRect.top + (markerRect.height / 2);
+        if (Math.abs(elementCenterY - markerCenterY) <= 90) score += 30;
+        if (rect.top >= markerRect.top - 70 && rect.top <= markerRect.bottom + 90) score += 20;
+      }
+      if (rect && eventsMarker?.getBoundingClientRect) {
+        const eventsRect = eventsMarker.getBoundingClientRect();
+        if (rect.bottom <= eventsRect.top + 8) score += 35;
+        else score -= 80;
+      }
+      return score;
+    };
+
+    const chooseInside = (container, sectionMarker = null, eventsMarker = null) => {
+      if (!container?.querySelectorAll) return null;
+      const candidates = [...container.querySelectorAll(actionableSelector)]
+        .filter(isEnabledAction);
+      let best = null;
+      let bestScore = -1;
+      for (const candidate of candidates) {
+        const score = getAddCandidateScore(candidate, sectionMarker, eventsMarker);
+        if (score > bestScore) {
+          best = candidate;
+          bestScore = score;
+        }
+      }
+      return bestScore >= 55 ? best : null;
+    };
+
+    const textElements = [...document.querySelectorAll(textSelectors)]
+      .filter((element) => this.isExternalElementVisible(element));
+    const labelMarkers = textElements.filter((element) =>
+      this.foldProtocolLabel(this.getExternalElementText(element)) === "etiquetas"
+    );
+    const eventsMarkers = textElements.filter((element) =>
+      this.foldProtocolLabel(this.getExternalElementText(element)) === "eventos"
+    );
+
+    // Estratégia principal: localizar primeiro o título/identificador "Etiquetas"
+    // e subir somente até o menor contêiner que contenha o seu botão de adição.
+    // Se a subida alcançar o bloco de Eventos, o contêiner já ficou amplo demais.
+    for (const labelMarker of labelMarkers) {
+      const labelRect = labelMarker.getBoundingClientRect?.();
+      const relatedEvents = eventsMarkers
+        .filter((eventsMarker) => {
+          const eventsRect = eventsMarker.getBoundingClientRect?.();
+          return !labelRect || !eventsRect || eventsRect.top >= labelRect.top;
+        })
+        .sort((a, b) => {
+          const aTop = a.getBoundingClientRect?.().top ?? Number.POSITIVE_INFINITY;
+          const bTop = b.getBoundingClientRect?.().top ?? Number.POSITIVE_INFINITY;
+          return aTop - bTop;
+        });
+      const eventsMarker = relatedEvents[0] || null;
+
+      let current = labelMarker;
+      for (let depth = 0; current && depth < 8; depth += 1, current = current.parentElement) {
+        if (eventsMarker && current !== labelMarker && current.contains?.(eventsMarker)) break;
+        const found = chooseInside(current, labelMarker, eventsMarker);
+        if (found) return found;
       }
     }
-    return bestScore >= 20 ? best : null;
+
+    // Fallback estrutural: usar "Eventos" como âncora e inspecionar apenas o
+    // bloco irmão imediatamente anterior (ou os poucos irmãos anteriores) que
+    // represente Etiquetas. O restante da página nunca entra na busca do +.
+    for (const eventsMarker of eventsMarkers) {
+      let branch = eventsMarker;
+      for (let depth = 0; branch && depth < 7; depth += 1, branch = branch.parentElement) {
+        let sibling = branch.previousElementSibling;
+        for (let offset = 0; sibling && offset < 3; offset += 1, sibling = sibling.previousElementSibling) {
+          if (!this.isExternalElementVisible(sibling)) continue;
+          const siblingSignature = foldedElementSignature(sibling);
+          const hasLabelsContext = /etiquet/.test(siblingSignature)
+            || [...sibling.querySelectorAll?.(textSelectors) || []].some((element) =>
+              this.isExternalElementVisible(element)
+              && this.foldProtocolLabel(this.getExternalElementText(element)) === "etiquetas"
+            );
+          if (!hasLabelsContext) continue;
+          const found = chooseInside(sibling, null, eventsMarker);
+          if (found) return found;
+        }
+      }
+    }
+
+    return null;
   };
 
   TextExpressApp.prototype.externalProtocolLabelAlreadyPresent = function (label) {
@@ -11395,7 +11484,10 @@ if (!window.__textExpressStandaloneSkipBundle) {
 
     let modal = this.findExternalLabelModal();
     if (!modal) {
-      const plusButton = this.findExternalLabelPlusButton();
+      const plusButton = await this.waitForExternalCondition(
+        () => this.findExternalLabelPlusButton(),
+        5000
+      );
       if (!plusButton) throw new Error("O botão + de etiquetas não foi localizado.");
       plusButton.click();
       modal = await this.waitForExternalCondition(() => this.findExternalLabelModal());
