@@ -11255,19 +11255,38 @@ if (!window.__textExpressStandaloneSkipBundle) {
         this.isExternalElementVisible(element)
         && this.foldProtocolLabel(this.getExternalElementText(element)) === "adicionar etiquetas"
       );
-    if (!title) return null;
-    let current = title;
-    for (let depth = 0; current && depth < 7; depth += 1, current = current.parentElement) {
-      if (current.querySelectorAll?.("button").length >= 2 && current.querySelector?.("input, [role=combobox]")) {
-        return current;
+    if (title) {
+      let current = title;
+      for (let depth = 0; current && depth < 7; depth += 1, current = current.parentElement) {
+        if (current.querySelectorAll?.("button").length >= 2 && current.querySelector?.("input, [role=combobox]")) {
+          return current;
+        }
+      }
+      const titleContainer = title.closest?.("section, form, div");
+      if (titleContainer) return titleContainer;
+    }
+
+    // Hotfix V28.0.6: no sistema real o seletor pode ser um nz-select/Ant Design
+    // sem role=dialog/título facilmente detectável. O placeholder e o botão
+    // Concluir fornecem duas âncoras estáveis para achar o menor contêiner comum.
+    const placeholders = [...document.querySelectorAll('.ant-select-selection__placeholder, [class*="select-selection__placeholder"]')]
+      .filter((element) =>
+        this.isExternalElementVisible(element)
+        && this.foldProtocolLabel(this.getExternalElementText(element)).includes("selecione as etiquetas")
+      );
+    for (const placeholder of placeholders) {
+      let current = placeholder;
+      for (let depth = 0; current && depth < 10; depth += 1, current = current.parentElement) {
+        const conclude = current.querySelector?.('button[data-testid="btn-Concluir"], [data-testid="btn-Concluir"]');
+        if (conclude && this.isExternalElementVisible(conclude)) return current;
       }
     }
-    return title.closest("section, form, div");
+    return null;
   };
 
   TextExpressApp.prototype.findExternalLabelPlusButton = function () {
     const textSelectors = "h1, h2, h3, h4, h5, h6, label, strong, span, p, div";
-    const actionableSelector = 'button, [role="button"]';
+    const actionableSelector = 'button, [role="button"], nz-tag.editable-tag, .editable-tag';
 
     const isEnabledAction = (element) =>
       this.isExternalElementVisible(element)
@@ -11296,7 +11315,11 @@ if (!window.__textExpressStandaloneSkipBundle) {
       if (/etiquet/.test(signature) && /adicionar|add|plus|mais|nova|novo/.test(signature)) score += 150;
       else if (/adicionar|add|plus|mais/.test(signature)) score += 55;
       if (/etiquet/.test(signature)) score += 45;
-      if (element.querySelector?.('svg, [class*="plus"], [class*="add"]')) score += 12;
+      // HTML real: <nz-tag class="editable-tag"><i nztype="plus" class="anticon-plus">...</i></nz-tag>.
+      // O nz-tag não possui role=button nem texto "+", portanto o ícone interno
+      // precisa valer como evidência forte quando já estamos no contexto Etiquetas.
+      if (element.querySelector?.('i[nztype="plus"], .anticon-plus, svg[data-icon="plus"]')) score += 120;
+      else if (element.querySelector?.('svg, [class*="plus"], [class*="add"]')) score += 12;
 
       const rect = element.getBoundingClientRect?.();
       if (rect && sectionMarker?.getBoundingClientRect) {
@@ -11401,6 +11424,22 @@ if (!window.__textExpressStandaloneSkipBundle) {
   };
 
   TextExpressApp.prototype.findExternalLabelsControl = function (modal) {
+    // Hotfix V28.0.6: âncora estável observada no nz-select real.
+    const placeholders = [...modal.querySelectorAll('.ant-select-selection__placeholder, [class*="select-selection__placeholder"]')]
+      .filter((element) =>
+        this.isExternalElementVisible(element)
+        && this.foldProtocolLabel(this.getExternalElementText(element)).includes("selecione as etiquetas")
+      );
+    for (const placeholder of placeholders) {
+      const selection = placeholder.closest?.('.ant-select-selection, nz-select, .ant-select') || placeholder.parentElement;
+      const host = placeholder.closest?.('nz-select, .ant-select') || selection;
+      const input = host?.querySelector?.('input.ant-select-search__field, input[role="combobox"], input')
+        || selection?.querySelector?.('input.ant-select-search__field, input[role="combobox"], input')
+        || null;
+      const clickable = selection || host || placeholder;
+      if (clickable) return { clickable, input: input?.matches?.("input") ? input : null };
+    }
+
     const labels = [...modal.querySelectorAll("label, span, div, p")]
       .filter((element) =>
         this.isExternalElementVisible(element)
@@ -11466,6 +11505,13 @@ if (!window.__textExpressStandaloneSkipBundle) {
   };
 
   TextExpressApp.prototype.findExternalConcludeButton = function (modal) {
+    const byTestId = modal.querySelector?.('button[data-testid="btn-Concluir"]');
+    if (byTestId
+      && this.isExternalElementVisible(byTestId)
+      && !byTestId.disabled
+      && byTestId.getAttribute("aria-disabled") !== "true") {
+      return byTestId;
+    }
     return [...modal.querySelectorAll('button, [role="button"]')].find((element) =>
       this.isExternalElementVisible(element)
       && this.foldProtocolLabel(this.getExternalElementText(element)) === "concluir"
