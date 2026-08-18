@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "description": "Estrutura local importada da base Mascara.js",
+  "fields": [
+    "id",
+    "titulo",
+    "mensagem",
+    "etiqueta",
+    "externo",
+    "aguardar",
+    "etiqueta_externo",
+    "servico"
+  ],
+  "storageKey": "text_express_mascara_catalog_v283"
+}

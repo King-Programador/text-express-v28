@@ -20,7 +20,7 @@
     </section>
   </main>
 
-  <div id="text-express-app" class="te-app" data-version="28.2.0">
+  <div id="text-express-app" class="te-app" data-version="28.3.0">
     <svg class="te-icon-sprite" aria-hidden="true" focusable="false">
       <symbol id="te-i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></symbol>
       <symbol id="te-i-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.9L3 21l1.6-4.2A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></symbol>
@@ -249,8 +249,22 @@
 
             <label class="te-check-field te-field-wide te-hidden te-protocol-external-field" id="te-protocol-external-field">
               <input id="te-form-external" type="checkbox">
-              <span><strong>Enviar para o Externo ao executar este protocolo</strong><small>O Text Express apenas aciona o encaminhamento. A equipe de destino continua sendo definida pelo próprio sistema.</small></span>
+              <span><strong>Enviar para o Externo ao executar este protocolo</strong><small>O sistema continua responsável por definir automaticamente a equipe de destino.</small></span>
             </label>
+
+            <div class="te-protocol-external-details te-field-wide te-hidden" id="te-protocol-external-details">
+              <label class="te-field">
+                <span>Problema externo</span>
+                <input id="te-form-external-problem" type="text" maxlength="180" list="te-external-problem-options" autocomplete="off" spellcheck="false" placeholder="Ex.: problema usado em Suporte Externo">
+                <datalist id="te-external-problem-options"></datalist>
+              </label>
+              <label class="te-field">
+                <span>Serviço</span>
+                <input id="te-form-external-service" type="text" maxlength="180" list="te-external-service-options" autocomplete="off" spellcheck="false" placeholder="Serviço selecionado no encaminhamento">
+                <datalist id="te-external-service-options"></datalist>
+              </label>
+              <small class="te-protocol-external-details-help">Quando houver correspondência na base local importada do Mascara, estes campos são preenchidos automaticamente e continuam editáveis.</small>
+            </div>
 
             <div class="te-field te-field-wide" id="te-single-content-wrap">
               <label>
@@ -360,7 +374,9 @@
     <div class="te-modal-backdrop te-hidden" id="te-protocol-preview-modal" role="presentation">
       <section class="te-protocol-preview" role="dialog" aria-modal="false" aria-labelledby="te-protocol-preview-title">
         <header class="te-protocol-preview-header" data-te-preview-drag-handle>
-          <h2 id="te-protocol-preview-title">Pré-Visualização</h2>
+          <div>
+            <h2 id="te-protocol-preview-title">Pré-Visualização</h2>
+          </div>
           <button class="te-icon-button" type="button" data-te-action="protocol-preview-cancel" aria-label="Fechar pré-visualização"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg></button>
         </header>
 
@@ -422,6 +438,10 @@
               <span>Externo</span>
               <strong id="te-preview-external-status">Não</strong>
               <small id="te-preview-external-help">Sem encaminhamento externo.</small>
+              <div class="te-preview-external-details te-hidden" id="te-preview-external-details">
+                <small><b>Problema:</b> <span id="te-preview-external-problem">—</span></small>
+                <small><b>Serviço:</b> <span id="te-preview-external-service">—</span></small>
+              </div>
             </div>
           </div>
 

@@ -1,12 +1,12 @@
 /*
- * Text Express 28.2.0
+ * Text Express 28.3.0
  * Expansor de textos para atendimento e registro de protocolos.
  * Sem dependências externas.
  */
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.2.0";
+  const APP_VERSION = "28.3.0";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -12941,6 +12941,852 @@
     }
     this.editingFlowSteps = steps;
     return steps;
+  };
+
+
+  /* ==========================================================
+   * Text Express 28.3.0 — integração real Mascara.js
+   * - usa o DOM real de registro, etiqueta e Suporte Externo;
+   * - copia a base legada para armazenamento próprio do Text Express;
+   * - não incorpora Saski nem qualquer reconfiguração de roteador;
+   * - Externo exige problema + serviço; equipe segue decidida pelo sistema;
+   * - Aguardar continua exclusivo da Pré-Visualização.
+   * ========================================================== */
+  const TE_V283_MASCARA_CATALOG_KEY = "text_express_mascara_catalog_v283";
+  const TE_V283_MASCARA_MIGRATION_KEY = "text_express_mascara_catalog_migration_v283";
+  const TE_V283_MASCARA_LEGACY_KEY = "mensagensJsonData";
+  const TE_V283_MASCARA_SOURCE_URL = "https://api.npoint.io/5b4a7c52730f8eb693cb";
+
+  const teV283Original = Object.freeze({
+    init: TextExpressApp.prototype.init,
+    normalizeSnippet: TextExpressApp.prototype.normalizeSnippet,
+    normalizeFlowStep: TextExpressApp.prototype.normalizeFlowStep,
+    openModal: TextExpressApp.prototype.openModal,
+    updateModelKindUI: TextExpressApp.prototype.updateModelKindUI,
+    collectSnippetFromForm: TextExpressApp.prototype.collectSnippetFromForm,
+    captureCurrentModelDraft: TextExpressApp.prototype.captureCurrentModelDraft,
+    restoreCurrentModelDraft: TextExpressApp.prototype.restoreCurrentModelDraft,
+    renderFlowEditorSteps: TextExpressApp.prototype.renderFlowEditorSteps,
+    syncEditingFlowSteps: TextExpressApp.prototype.syncEditingFlowSteps,
+    setupProtocolPreview: TextExpressApp.prototype.setupProtocolPreview,
+    openProtocolPreview: TextExpressApp.prototype.openProtocolPreview,
+    handleRootChange: TextExpressApp.prototype.handleRootChange,
+    executeProtocolPreview: TextExpressApp.prototype.executeProtocolPreview,
+    exportSnippets: TextExpressApp.prototype.exportSnippets,
+    restoreCompleteBackup: TextExpressApp.prototype.restoreCompleteBackup,
+    mergeImportedBackup: TextExpressApp.prototype.mergeImportedBackup
+  });
+
+  TextExpressApp.prototype.normalizeMascaraCatalogRecord = function (raw = {}) {
+    const clean = (value, max = 1200) => String(value ?? "").replace(/\s+/g, " ").trim().slice(0, max);
+    const external = this.normalizeProtocolExternalFlag?.(raw.externo ?? raw.external ?? false) || false;
+    return {
+      id: clean(raw.id, 80),
+      titulo: clean(raw.titulo ?? raw.nome ?? raw.title, 220),
+      mensagem: clean(raw.mensagem ?? raw.conteudo ?? raw.message, 4000),
+      etiqueta: this.normalizeProtocolLabel?.(raw.etiqueta ?? raw.etiquetaSistema ?? raw.label) || "",
+      externo: external,
+      aguardar: this.normalizeProtocolExternalFlag?.(raw.aguardar ?? false) || false,
+      etiqueta_externo: clean(raw.etiqueta_externo ?? raw.problemaExterno ?? raw.externalProblem, 220),
+      servico: clean(raw.servico ?? raw.servicoExterno ?? raw.externalService, 220)
+    };
+  };
+
+  TextExpressApp.prototype.normalizeMascaraCatalog = function (items) {
+    const out = [];
+    const seen = new Set();
+    for (const raw of Array.isArray(items) ? items : []) {
+      const item = this.normalizeMascaraCatalogRecord(raw);
+      if (!item.titulo && !item.mensagem && !item.etiqueta) continue;
+      const key = [item.id, this.foldProtocolLabel?.(item.titulo), this.foldProtocolLabel?.(item.etiqueta), this.foldProtocolLabel?.(item.etiqueta_externo), this.foldProtocolLabel?.(item.servico)].join("|");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(item);
+    }
+    return out;
+  };
+
+  TextExpressApp.prototype.loadMascaraCatalog = function () {
+    let items = [];
+    try {
+      const parsed = JSON.parse(this.storageGet(TE_V283_MASCARA_CATALOG_KEY) || "[]");
+      if (Array.isArray(parsed)) items = parsed;
+    } catch {}
+    this.mascaraCatalog = this.normalizeMascaraCatalog(items);
+    return this.mascaraCatalog;
+  };
+
+  TextExpressApp.prototype.saveMascaraCatalog = function (items = this.mascaraCatalog) {
+    this.mascaraCatalog = this.normalizeMascaraCatalog(items);
+    this.storageSet(TE_V283_MASCARA_CATALOG_KEY, JSON.stringify(this.mascaraCatalog));
+    return this.mascaraCatalog;
+  };
+
+  TextExpressApp.prototype.getLegacyMascaraCatalog = function () {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(TE_V283_MASCARA_LEGACY_KEY) || "null");
+      const data = Array.isArray(parsed) ? parsed : parsed?.data;
+      return this.normalizeMascaraCatalog(data);
+    } catch {
+      return [];
+    }
+  };
+
+  TextExpressApp.prototype.mergeMascaraLabelsIntoCatalog = function () {
+    const labels = (this.mascaraCatalog || []).map((item) => item.etiqueta).filter(Boolean);
+    if (!labels.length) return false;
+    this.protocolLabelCatalog = this.normalizeProtocolLabelCatalog([
+      ...(this.protocolLabelCatalog || TE_V28_DEFAULT_LABELS),
+      ...labels
+    ]);
+    this.saveProtocolLabelCatalog?.();
+    this.renderProtocolLabelOptions?.();
+    return true;
+  };
+
+  TextExpressApp.prototype.renderMascaraExternalOptions = function () {
+    const problems = [...new Set((this.mascaraCatalog || []).map((item) => item.etiqueta_externo).filter(Boolean))]
+      .sort((a,b) => a.localeCompare(b, "pt-BR", { sensitivity: "base" }));
+    const services = [...new Set((this.mascaraCatalog || []).map((item) => item.servico).filter(Boolean))]
+      .sort((a,b) => a.localeCompare(b, "pt-BR", { sensitivity: "base" }));
+    const render = (selector, items) => {
+      const list = this.root.querySelector(selector);
+      if (list) list.innerHTML = items.map((value) => `<option value="${this.escapeAttr(value)}"></option>`).join("");
+    };
+    render("#te-external-problem-options", problems);
+    render("#te-external-service-options", services);
+  };
+
+  TextExpressApp.prototype.foldMascaraText = function (value) {
+    return String(value || "")
+      .replace(/<[^>]*>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("pt-BR");
+  };
+
+  TextExpressApp.prototype.findMascaraMetadata = function (source = {}) {
+    const catalog = this.mascaraCatalog || [];
+    if (!catalog.length) return null;
+    const titles = [source.titulo, source.nome, source.reason, source.step?.nome, source.snippet?.nome, source.flow?.nome]
+      .map((value) => this.foldMascaraText(value)).filter(Boolean);
+    for (const title of titles) {
+      const match = catalog.find((item) => this.foldMascaraText(item.titulo) === title);
+      if (match) return match;
+    }
+    const message = this.foldMascaraText(source.mensagem || source.conteudo || source.content || source.snippet?.conteudo || source.step?.conteudo);
+    if (message) {
+      const exact = catalog.find((item) => this.foldMascaraText(item.mensagem) === message);
+      if (exact) return exact;
+    }
+    const label = this.foldProtocolLabel?.(source.etiquetaSistema || source.etiqueta || "");
+    if (label) {
+      const matches = catalog.filter((item) => this.foldProtocolLabel?.(item.etiqueta) === label);
+      if (matches.length === 1) return matches[0];
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.applyMascaraCatalogToSnippets = function () {
+    if (!Array.isArray(this.snippets) || !(this.mascaraCatalog || []).length) return false;
+    let changed = false;
+    this.snippets = this.snippets.map((snippet) => {
+      if (snippet?.tipo !== "protocolo") return snippet;
+      if (snippet.modelo === "fluxo") {
+        let localChanged = false;
+        const etapas = (snippet.etapas || []).map((step) => {
+          const match = this.findMascaraMetadata({ ...step, reason: step.nome, etiquetaSistema: snippet.etiquetaSistema });
+          if (!match) return step;
+          const next = { ...step };
+          if (!next.enviarExterno && match.externo) { next.enviarExterno = true; localChanged = true; }
+          if (!next.problemaExterno && match.etiqueta_externo) { next.problemaExterno = match.etiqueta_externo; localChanged = true; }
+          if (!next.servicoExterno && match.servico) { next.servicoExterno = match.servico; localChanged = true; }
+          return next;
+        });
+        if (!snippet.etiquetaSistema) {
+          const match = this.findMascaraMetadata(snippet);
+          if (match?.etiqueta) { snippet = { ...snippet, etiquetaSistema: match.etiqueta }; localChanged = true; }
+        }
+        if (localChanged) { changed = true; return { ...snippet, etapas }; }
+        return snippet;
+      }
+      const match = this.findMascaraMetadata(snippet);
+      if (!match) return snippet;
+      const next = { ...snippet };
+      if (!next.etiquetaSistema && match.etiqueta) { next.etiquetaSistema = match.etiqueta; changed = true; }
+      if (!next.enviarExterno && match.externo) { next.enviarExterno = true; changed = true; }
+      if (!next.problemaExterno && match.etiqueta_externo) { next.problemaExterno = match.etiqueta_externo; changed = true; }
+      if (!next.servicoExterno && match.servico) { next.servicoExterno = match.servico; changed = true; }
+      return next;
+    });
+    if (changed) {
+      this.saveSnippets?.();
+      this.rebuildShortcutMap?.();
+      this.render?.();
+    }
+    return changed;
+  };
+
+  TextExpressApp.prototype.importMascaraCatalogSnapshot = function (items, source = "local") {
+    const incoming = this.normalizeMascaraCatalog(items);
+    if (!incoming.length) return false;
+    const current = this.mascaraCatalog || [];
+    this.saveMascaraCatalog([...current, ...incoming]);
+    this.mergeMascaraLabelsIntoCatalog();
+    this.renderMascaraExternalOptions();
+    const updated = this.applyMascaraCatalogToSnippets();
+    this.storageSet(TE_V283_MASCARA_MIGRATION_KEY, JSON.stringify({ source, importedAt: new Date().toISOString(), total: this.mascaraCatalog.length }));
+    return updated || true;
+  };
+
+  TextExpressApp.prototype.syncMascaraCatalogOnce = async function () {
+    this.loadMascaraCatalog();
+    if (this.mascaraCatalog.length) {
+      this.mergeMascaraLabelsIntoCatalog();
+      this.renderMascaraExternalOptions();
+      this.applyMascaraCatalogToSnippets();
+      return true;
+    }
+
+    const legacy = this.getLegacyMascaraCatalog();
+    if (legacy.length) {
+      this.importMascaraCatalogSnapshot(legacy, "cache-local-do-Mascara");
+      return true;
+    }
+
+    // Migração única: se a base antiga ainda estiver online, faz uma cópia para o
+    // armazenamento próprio do Text Express. Depois disso, o uso não depende da URL.
+    try {
+      if (typeof fetch !== "function") return false;
+      const controller = typeof AbortController === "function" ? new AbortController() : null;
+      const timer = window.setTimeout(() => controller?.abort(), 6500);
+      const response = await fetch(TE_V283_MASCARA_SOURCE_URL, {
+        method: "GET",
+        cache: "no-store",
+        credentials: "omit",
+        signal: controller?.signal
+      });
+      window.clearTimeout(timer);
+      if (!response.ok) return false;
+      const data = await response.json();
+      if (!Array.isArray(data)) return false;
+      this.importMascaraCatalogSnapshot(data, "copia-unica-npoint");
+      return true;
+    } catch (error) {
+      console.warn("Text Express — catálogo Mascara não pôde ser importado nesta sessão:", error?.message || error);
+      return false;
+    }
+  };
+
+  TextExpressApp.prototype.normalizeSnippet = function (raw = {}) {
+    const snippet = teV283Original.normalizeSnippet.call(this, raw);
+    if (snippet?.tipo !== "protocolo") {
+      snippet.problemaExterno = "";
+      snippet.servicoExterno = "";
+      return snippet;
+    }
+    snippet.problemaExterno = this.normalizeProtocolLabel(raw.problemaExterno ?? raw.etiqueta_externo ?? raw.externalProblem ?? "");
+    snippet.servicoExterno = this.normalizeProtocolLabel(raw.servicoExterno ?? raw.servico ?? raw.externalService ?? "");
+    return snippet;
+  };
+
+  TextExpressApp.prototype.normalizeFlowStep = function (raw = {}, index = 0, parentShortcut = "/fluxo") {
+    const step = teV283Original.normalizeFlowStep.call(this, raw, index, parentShortcut);
+    step.problemaExterno = this.normalizeProtocolLabel(raw.problemaExterno ?? raw.etiqueta_externo ?? raw.externalProblem ?? "");
+    step.servicoExterno = this.normalizeProtocolLabel(raw.servicoExterno ?? raw.servico ?? raw.externalService ?? "");
+    return step;
+  };
+
+  TextExpressApp.prototype.updateProtocolExternalEditorUI = function () {
+    const external = this.root.querySelector("#te-form-external");
+    const details = this.root.querySelector("#te-protocol-external-details");
+    if (details) details.classList.toggle("te-hidden", !external?.checked || external.closest(".te-hidden"));
+  };
+
+  TextExpressApp.prototype.openModal = function (data = null) {
+    const result = teV283Original.openModal.call(this, data);
+    const key = data?.id || TE_V28_NEW_DRAFT_KEY;
+    const draft = this.loadModelDrafts?.()?.[key];
+    const draftTime = Date.parse(draft?.updatedAt || "") || 0;
+    const savedTime = Date.parse(data?.updatedAt || "") || 0;
+    const source = draft && (!data?.updatedAt || draftTime > savedTime) ? draft : data;
+    const problem = this.root.querySelector("#te-form-external-problem");
+    const service = this.root.querySelector("#te-form-external-service");
+    if (problem) problem.value = source?.tipo === "protocolo" ? (source?.problemaExterno || source?.etiqueta_externo || "") : "";
+    if (service) service.value = source?.tipo === "protocolo" ? (source?.servicoExterno || source?.servico || "") : "";
+    this.renderMascaraExternalOptions();
+    this.updateProtocolExternalEditorUI();
+    return result;
+  };
+
+  TextExpressApp.prototype.updateModelKindUI = function () {
+    const result = teV283Original.updateModelKindUI.call(this);
+    this.updateProtocolExternalEditorUI();
+    return result;
+  };
+
+  TextExpressApp.prototype.collectSnippetFromForm = function (showErrors = false) {
+    const collected = teV283Original.collectSnippetFromForm.call(this, showErrors);
+    if (!collected?.valid || !collected.snippet) return collected;
+    const external = collected.tipo === "protocolo" && collected.snippet.modelo !== "fluxo" && Boolean(collected.snippet.enviarExterno);
+    collected.snippet.problemaExterno = external ? this.normalizeProtocolLabel(this.root.querySelector("#te-form-external-problem")?.value) : "";
+    collected.snippet.servicoExterno = external ? this.normalizeProtocolLabel(this.root.querySelector("#te-form-external-service")?.value) : "";
+    if (external && (!collected.snippet.problemaExterno || !collected.snippet.servicoExterno)) {
+      const match = this.findMascaraMetadata({
+        ...collected.snippet,
+        reason: collected.snippet.nome,
+        etiquetaSistema: collected.snippet.etiquetaSistema
+      });
+      if (!collected.snippet.problemaExterno) collected.snippet.problemaExterno = match?.etiqueta_externo || "";
+      if (!collected.snippet.servicoExterno) collected.snippet.servicoExterno = match?.servico || "";
+    }
+    if (external && (!collected.snippet.problemaExterno || !collected.snippet.servicoExterno) && showErrors) {
+      this.showToast("Para enviar ao Externo, informe Problema externo e Serviço.", "error", 5200);
+      return { ...collected, valid: false };
+    }
+    return collected;
+  };
+
+  TextExpressApp.prototype.captureCurrentModelDraft = function () {
+    const draft = teV283Original.captureCurrentModelDraft.call(this);
+    if (!draft) return draft;
+    draft.problemaExterno = draft.enviarExterno ? this.normalizeProtocolLabel(this.root.querySelector("#te-form-external-problem")?.value) : "";
+    draft.servicoExterno = draft.enviarExterno ? this.normalizeProtocolLabel(this.root.querySelector("#te-form-external-service")?.value) : "";
+    return draft;
+  };
+
+  TextExpressApp.prototype.restoreCurrentModelDraft = function (data = null) {
+    const result = teV283Original.restoreCurrentModelDraft.call(this, data);
+    const key = data?.id || TE_V28_NEW_DRAFT_KEY;
+    const draft = this.loadModelDrafts?.()?.[key];
+    if (draft) {
+      const problem = this.root.querySelector("#te-form-external-problem");
+      const service = this.root.querySelector("#te-form-external-service");
+      if (problem) problem.value = draft.problemaExterno || "";
+      if (service) service.value = draft.servicoExterno || "";
+    }
+    this.updateProtocolExternalEditorUI();
+    return result;
+  };
+
+  TextExpressApp.prototype.renderFlowEditorSteps = function () {
+    const result = teV283Original.renderFlowEditorSteps.call(this);
+    if (this.getFlowEditorType?.() !== "protocolo") return result;
+    const editors = [...this.root.querySelectorAll(".te-protocol-card-editor")];
+    editors.forEach((editor, index) => {
+      const step = this.editingFlowSteps?.[index] || {};
+      const externalCheck = editor.querySelector('[data-te-flow-field="enviarExterno"]');
+      if (!externalCheck) return;
+      let details = editor.querySelector(".te-protocol-step-external-details");
+      if (!details) {
+        details = document.createElement("div");
+        details.className = "te-protocol-step-external-details";
+        details.innerHTML = `
+          <label>Problema externo
+            <input type="text" maxlength="180" data-te-flow-field="problemaExterno" list="te-external-problem-options" autocomplete="off" spellcheck="false" placeholder="Problema em Suporte Externo">
+          </label>
+          <label>Serviço
+            <input type="text" maxlength="180" data-te-flow-field="servicoExterno" list="te-external-service-options" autocomplete="off" spellcheck="false" placeholder="Serviço do encaminhamento">
+          </label>`;
+        externalCheck.closest(".te-protocol-step-external")?.insertAdjacentElement("afterend", details);
+      }
+      const problem = details.querySelector('[data-te-flow-field="problemaExterno"]');
+      const service = details.querySelector('[data-te-flow-field="servicoExterno"]');
+      if (problem) problem.value = step.problemaExterno || "";
+      if (service) service.value = step.servicoExterno || "";
+      details.classList.toggle("te-hidden", !externalCheck.checked);
+    });
+    return result;
+  };
+
+  TextExpressApp.prototype.syncEditingFlowSteps = function () {
+    const steps = teV283Original.syncEditingFlowSteps.call(this);
+    if (this.getFlowEditorType?.() !== "protocolo" || !Array.isArray(steps)) return steps;
+    const editors = [...this.root.querySelectorAll(".te-protocol-card-editor")];
+    editors.forEach((editor, index) => {
+      const step = steps[index];
+      if (!step) return;
+      const external = Boolean(editor.querySelector('[data-te-flow-field="enviarExterno"]')?.checked);
+      step.enviarExterno = external;
+      step.problemaExterno = external ? this.normalizeProtocolLabel(editor.querySelector('[data-te-flow-field="problemaExterno"]')?.value) : "";
+      step.servicoExterno = external ? this.normalizeProtocolLabel(editor.querySelector('[data-te-flow-field="servicoExterno"]')?.value) : "";
+      if (external && (!step.problemaExterno || !step.servicoExterno)) {
+        const match = this.findMascaraMetadata({ ...step, reason: step.nome });
+        if (!step.problemaExterno) step.problemaExterno = match?.etiqueta_externo || "";
+        if (!step.servicoExterno) step.servicoExterno = match?.servico || "";
+      }
+    });
+    this.editingFlowSteps = steps;
+    return steps;
+  };
+
+  TextExpressApp.prototype.setupProtocolPreview = function () {
+    const result = teV283Original.setupProtocolPreview.call(this);
+    this.protocolPreviewExternalDetails = this.root.querySelector("#te-preview-external-details");
+    this.protocolPreviewExternalProblem = this.root.querySelector("#te-preview-external-problem");
+    this.protocolPreviewExternalService = this.root.querySelector("#te-preview-external-service");
+    return result;
+  };
+
+  TextExpressApp.prototype.resolveProtocolExternalMetadata = function (payload = {}) {
+    const match = this.findMascaraMetadata(payload);
+    return {
+      problemaExterno: this.normalizeProtocolLabel(payload.problemaExterno || payload.etiqueta_externo || match?.etiqueta_externo || ""),
+      servicoExterno: this.normalizeProtocolLabel(payload.servicoExterno || payload.servico || match?.servico || "")
+    };
+  };
+
+  TextExpressApp.prototype.openProtocolPreview = function (payload = {}) {
+    const external = this.resolveProtocolExternalMetadata(payload);
+    const next = { ...payload, ...external };
+    const result = teV283Original.openProtocolPreview.call(this, next);
+    if (!result || !this.pendingProtocolPreview) return result;
+    this.pendingProtocolPreview.problemaExterno = external.problemaExterno;
+    this.pendingProtocolPreview.servicoExterno = external.servicoExterno;
+    const show = Boolean(this.pendingProtocolPreview.enviarExterno);
+    this.protocolPreviewExternalDetails?.classList.toggle("te-hidden", !show);
+    if (this.protocolPreviewExternalProblem) this.protocolPreviewExternalProblem.textContent = external.problemaExterno || "Não configurado";
+    if (this.protocolPreviewExternalService) this.protocolPreviewExternalService.textContent = external.servicoExterno || "Não configurado";
+    if (show && this.protocolPreviewExternalHelp) {
+      this.protocolPreviewExternalHelp.textContent = external.problemaExterno && external.servicoExterno
+        ? "A equipe será definida automaticamente pelo sistema."
+        : "Falta configurar o Problema externo ou o Serviço deste protocolo.";
+    }
+    return result;
+  };
+
+  TextExpressApp.prototype.handleRootChange = function (event) {
+    const result = teV283Original.handleRootChange.call(this, event);
+    if (event.target?.id === "te-form-external") this.updateProtocolExternalEditorUI();
+    if (event.target?.matches?.('[data-te-flow-field="enviarExterno"]')) {
+      event.target.closest(".te-protocol-card-editor")?.querySelector(".te-protocol-step-external-details")
+        ?.classList.toggle("te-hidden", !event.target.checked);
+    }
+    return result;
+  };
+
+  TextExpressApp.prototype.getVisibleExternalElements = function (selector) {
+    return [...document.querySelectorAll(selector)].filter((element) => {
+      if (!element || this.root.contains(element)) return false;
+      return typeof this.isExternalElementVisible === "function" ? this.isExternalElementVisible(element) : true;
+    });
+  };
+
+  TextExpressApp.prototype.findExternalExactText = function (selector, text, includes = false) {
+    const target = this.foldMascaraText(text);
+    return this.getVisibleExternalElements(selector).find((element) => {
+      const value = this.foldMascaraText(element.textContent || element.innerText || element.getAttribute?.("aria-label") || "");
+      return includes ? value.includes(target) : value === target;
+    }) || null;
+  };
+
+  TextExpressApp.prototype.waitExternalExactText = function (selector, text, timeout = 6000, includes = false) {
+    return this.waitForExternalCondition?.(() => this.findExternalExactText(selector, text, includes), timeout)
+      || Promise.resolve(this.findExternalExactText(selector, text, includes));
+  };
+
+  TextExpressApp.prototype.clickMascaraElement = function (element) {
+    if (!element) return false;
+    const target = element.closest?.("button, [role='button'], a, label, li") || element;
+    target.click?.();
+    return true;
+  };
+
+  TextExpressApp.prototype.findMascaraTagInput = function () {
+    try {
+      return document.evaluate("//*[@id='tags']/div/div/ul/li/input", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    } catch {
+      return document.querySelector("#tags input");
+    }
+  };
+
+  TextExpressApp.prototype.externalProtocolLabelAlreadyPresent = function (rawLabel) {
+    const label = this.foldProtocolLabel(rawLabel);
+    if (!label) return false;
+    const selectors = [
+      ".ant-select-selection__choice__content",
+      "#tags .ant-tag",
+      "#tags [class*='choice']",
+      "#tags [class*='tag']"
+    ];
+    return selectors.some((selector) => this.getVisibleExternalElements(selector)
+      .some((element) => this.foldProtocolLabel(element.textContent || "") === label));
+  };
+
+  TextExpressApp.prototype.applyProtocolLabelInExternalSystem = async function (rawLabel) {
+    const label = this.normalizeProtocolLabel(rawLabel);
+    if (!label) return true;
+    if (this.externalProtocolLabelAlreadyPresent(label)) {
+      this.showProtocolLabelNotice("Etiqueta já existente; encaminhamento seguirá normalmente.");
+      return true;
+    }
+
+    const plus = await this.waitForExternalCondition?.(() => {
+      const contextual = this.getVisibleExternalElements("#tags .anticon.anticon-plus")[0];
+      return contextual || this.getVisibleExternalElements(".anticon.anticon-plus")[0] || null;
+    }, 5000);
+    if (!plus) throw new Error("O botão + das etiquetas não foi localizado no sistema.");
+    this.clickMascaraElement(plus);
+
+    const input = await this.waitForExternalCondition?.(() => this.findMascaraTagInput(), 5000);
+    if (!input) throw new Error("O campo real de etiquetas (#tags) não foi localizado.");
+    input.focus?.();
+    input.click?.();
+    this.setExternalInputValue?.(input, label.toLowerCase());
+    if (!this.setExternalInputValue) {
+      input.value = label.toLowerCase();
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
+    const option = await this.waitExternalExactText(".ant-select-dropdown-menu-item", label, 6000, false);
+    if (!option) throw new Error(`A etiqueta exata “${label}” não apareceu no dropdown.`);
+    this.clickMascaraElement(option);
+
+    const conclude = await this.waitExternalExactText("span.ng-star-inserted", "Concluir", 4000, false);
+    if (!conclude) throw new Error("O botão Concluir da etiqueta não foi localizado.");
+    this.clickMascaraElement(conclude);
+
+    const confirmed = await this.waitForExternalCondition?.(() => this.externalProtocolLabelAlreadyPresent(label), 4500);
+    if (!confirmed && this.externalProtocolLabelAlreadyPresent(label) === false) {
+      console.warn("Text Express — etiqueta selecionada, mas a confirmação visual não apareceu a tempo.");
+    }
+    this.showProtocolLabelNotice("Etiqueta aplicada pelo fluxo real do sistema.");
+    return true;
+  };
+
+  TextExpressApp.prototype.preflightProtocolRealSystem = async function (pending, waiting) {
+    const textarea = await this.waitForExternalCondition?.(() => this.getVisibleExternalElements("textarea.text-area")[0] || null, 2200);
+    if (!textarea) throw new Error("O campo real de registro do protocolo (textarea.text-area) não foi localizado.");
+    const send = document.querySelector("button#send_button");
+    if (!send || this.root.contains(send)) throw new Error("O botão real de registrar protocolo (#send_button) não foi localizado.");
+    if (send.disabled || send.hasAttribute("disabled")) throw new Error("O botão de registrar protocolo está desabilitado no momento.");
+    if (pending.etiquetaSistema && !this.externalProtocolLabelAlreadyPresent(pending.etiquetaSistema)) {
+      const plus = this.getVisibleExternalElements("#tags .anticon.anticon-plus")[0] || this.getVisibleExternalElements(".anticon.anticon-plus")[0];
+      if (!plus) throw new Error("A área real de etiquetas não está disponível neste chamado.");
+    }
+    if (pending.enviarExterno) {
+      if (!pending.problemaExterno || !pending.servicoExterno) throw new Error("Este protocolo está marcado para Externo, mas falta Problema externo ou Serviço.");
+      const enviar = this.findExternalExactText(".icon-label", "Enviar");
+      if (!enviar) throw new Error("O comando Enviar do sistema não foi localizado para o encaminhamento externo.");
+      if (waiting) {
+        const block = document.querySelector("nz-switch#blocking button.ant-switch");
+        if (!block) throw new Error("O controle Aguardar (#blocking) não foi localizado no sistema.");
+      }
+    }
+    return { textarea, send };
+  };
+
+  TextExpressApp.prototype.registerProtocolTextRealSystem = async function (content, preflight = null) {
+    const textarea = preflight?.textarea || await this.waitForExternalCondition?.(() => this.getVisibleExternalElements("textarea.text-area")[0] || null, 3000);
+    if (!textarea) throw new Error("O campo de protocolo não foi localizado.");
+    textarea.focus?.();
+    if (this.setExternalInputValue) this.setExternalInputValue(textarea, content);
+    else {
+      textarea.value = content;
+      textarea.dispatchEvent(new Event("input", { bubbles: true }));
+      textarea.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+    const send = preflight?.send || document.querySelector("button#send_button");
+    if (!send || send.disabled || send.hasAttribute("disabled")) throw new Error("O botão de registrar protocolo não está disponível.");
+    send.click();
+    await new Promise((resolve) => window.setTimeout(resolve, 450));
+    return true;
+  };
+
+  TextExpressApp.prototype.isMascaraSwitchOn = function (button) {
+    return Boolean(button?.getAttribute?.("aria-checked") === "true" || button?.classList?.contains("ant-switch-checked"));
+  };
+
+  TextExpressApp.prototype.setMascaraBlockingState = async function (waiting) {
+    const button = await this.waitForExternalCondition?.(() => document.querySelector("nz-switch#blocking button.ant-switch"), 3500);
+    if (!button) {
+      if (waiting) throw new Error("O controle Aguardar (#blocking) não foi localizado.");
+      return false;
+    }
+    const active = this.isMascaraSwitchOn(button);
+    if (active !== Boolean(waiting)) {
+      button.click();
+      await new Promise((resolve) => window.setTimeout(resolve, 260));
+    }
+    return true;
+  };
+
+  TextExpressApp.prototype.selectMascaraDropdownItem = async function (text, options = {}) {
+    const exact = options.exact !== false;
+    const timeout = options.timeout || 7000;
+    const item = await this.waitForExternalCondition?.(() => {
+      const candidates = this.getVisibleExternalElements(".ant-select-dropdown-menu-item");
+      const wanted = this.foldMascaraText(text);
+      return candidates.find((candidate) => {
+        const current = this.foldMascaraText(candidate.textContent || "");
+        return exact ? current === wanted : current.includes(wanted);
+      }) || null;
+    }, timeout);
+    if (!item) throw new Error(`A opção “${text}” não apareceu no sistema.`);
+    this.clickMascaraElement(item);
+    await new Promise((resolve) => window.setTimeout(resolve, 320));
+    return true;
+  };
+
+  TextExpressApp.prototype.activateProtocolExternalRoute = async function (pendingOrProblem, serviceOrWaiting = "", maybeWaiting = false) {
+    const pending = typeof pendingOrProblem === "object" && pendingOrProblem
+      ? pendingOrProblem
+      : { problemaExterno: pendingOrProblem, servicoExterno: serviceOrWaiting };
+    const waiting = typeof pendingOrProblem === "object" ? Boolean(serviceOrWaiting) : Boolean(maybeWaiting);
+    const problem = this.normalizeProtocolLabel(pending.problemaExterno || pending.etiqueta_externo || "");
+    const service = this.normalizeProtocolLabel(pending.servicoExterno || pending.servico || "");
+    if (!problem || !service) throw new Error("Problema externo e Serviço são obrigatórios para o encaminhamento.");
+
+    await this.setMascaraBlockingState(waiting);
+
+    const enviar = await this.waitExternalExactText(".icon-label", "Enviar", 5000, false);
+    if (!enviar) throw new Error("O comando Enviar não foi localizado.");
+    this.clickMascaraElement(enviar);
+    await new Promise((resolve) => window.setTimeout(resolve, 700));
+
+    const pesquisar = await this.waitExternalExactText(".ant-select-selection__placeholder", "Pesquisar...", 5000, false);
+    if (!pesquisar) throw new Error("O seletor Pesquisar... do envio não foi localizado.");
+    this.clickMascaraElement(pesquisar);
+    await new Promise((resolve) => window.setTimeout(resolve, 500));
+    await this.selectMascaraDropdownItem("Suporte Externo", { exact: true, timeout: 6000 });
+
+    const problemPlaceholder = await this.waitExternalExactText(".ant-select-selection__placeholder", "Selecione os problemas", 6000, false);
+    if (!problemPlaceholder) throw new Error("O campo Selecione os problemas não foi localizado.");
+    this.clickMascaraElement(problemPlaceholder);
+    await new Promise((resolve) => window.setTimeout(resolve, 250));
+    const searchFields = this.getVisibleExternalElements(".ant-select-search__field");
+    const problemInput = searchFields[searchFields.length - 1];
+    if (problemInput) {
+      if (this.setExternalInputValue) this.setExternalInputValue(problemInput, problem);
+      else {
+        problemInput.value = problem;
+        problemInput.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 480));
+    }
+    try {
+      await this.selectMascaraDropdownItem(problem, { exact: true, timeout: 3500 });
+    } catch {
+      await this.selectMascaraDropdownItem(problem, { exact: false, timeout: 5000 });
+    }
+
+    let servicePlaceholder = null;
+    for (let attempt = 0; attempt < 8 && !servicePlaceholder; attempt += 1) {
+      servicePlaceholder = this.findExternalExactText(".ant-select-selection__placeholder", "Selecione um serviço");
+      if (!servicePlaceholder) await new Promise((resolve) => window.setTimeout(resolve, 450));
+    }
+    if (!servicePlaceholder) throw new Error("O campo Selecione um serviço não foi localizado.");
+    this.clickMascaraElement(servicePlaceholder);
+
+    let selected = false;
+    for (let attempt = 0; attempt < 15 && !selected; attempt += 1) {
+      const candidate = this.findExternalExactText(".ant-select-dropdown-menu-item", service);
+      if (candidate) {
+        this.clickMascaraElement(candidate);
+        selected = true;
+        break;
+      }
+      if (attempt > 0 && attempt % 4 === 0) {
+        const placeholder = this.findExternalExactText(".ant-select-selection__placeholder", "Selecione um serviço");
+        if (placeholder) this.clickMascaraElement(placeholder);
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, 450));
+    }
+    if (!selected) throw new Error(`O serviço exato “${service}” não apareceu no encaminhamento.`);
+
+    const continuar = await this.waitExternalExactText("span.ng-star-inserted", "Continuar", 6500, false);
+    if (!continuar) throw new Error("O botão Continuar do encaminhamento externo não foi localizado.");
+    this.clickMascaraElement(continuar);
+    await new Promise((resolve) => window.setTimeout(resolve, 500));
+    return true;
+  };
+
+  // Na integração real do Mascara, o fechamento/aguardo do encaminhamento é
+  // determinado pelo switch #blocking + Continuar. Não clicamos em botões
+  // genéricos de "Finalizar" para evitar encerramentos indevidos.
+  TextExpressApp.prototype.finalizeProtocolInExternalSystem = async function () {
+    return false;
+  };
+
+  TextExpressApp.prototype.executeProtocolPreview = async function () {
+    const pending = this.pendingProtocolPreview;
+    if (!pending || !this.isProtocolPreviewOpen()) return false;
+    if (this.protocolPreviewConfirm?.disabled) return false;
+
+    const content = String(this.protocolPreviewContent?.value || "").trim();
+    if (!content) {
+      if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = "O texto do protocolo não pode ficar vazio.";
+      this.protocolPreviewContent?.focus();
+      return false;
+    }
+    const contact = this.getProtocolPreviewContactDetails();
+    if (!contact.valid) {
+      if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = contact.message;
+      return false;
+    }
+
+    const waiting = Boolean(pending.enviarExterno && this.protocolPreviewWait?.checked);
+    const observation = String(this.protocolPreviewObservation?.value || "").replace(/\s+/g, " ").trim().slice(0, 800);
+    let finalContent = this.formatProtocolContactContent(content, contact.details);
+    if (observation) finalContent = `${finalContent}\n\nObservação: ${observation}`;
+
+    const externalMeta = this.resolveProtocolExternalMetadata(pending);
+    pending.problemaExterno = externalMeta.problemaExterno;
+    pending.servicoExterno = externalMeta.servicoExterno;
+    if (pending.enviarExterno && (!pending.problemaExterno || !pending.servicoExterno)) {
+      const message = "Para encaminhar ao Externo, configure Problema externo e Serviço neste protocolo.";
+      if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = message;
+      this.showToast(message, "error", 6000);
+      return false;
+    }
+    if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = "";
+
+    this.protocolPreviewConfirm.disabled = true;
+    this.protocolPreviewConfirm.dataset.teBusy = "true";
+    try {
+      const preflight = await this.preflightProtocolRealSystem(pending, waiting);
+      await this.registerProtocolTextRealSystem(finalContent, preflight);
+
+      if (pending.etiquetaSistema) {
+        const labelOk = await this.queueProtocolLabelApplication(pending.etiquetaSistema);
+        if (!labelOk) throw new Error("O protocolo foi registrado, mas a etiqueta não pôde ser confirmada. O Externo não foi acionado para evitar encaminhamento incompleto.");
+      }
+
+      if (pending.enviarExterno) {
+        await this.activateProtocolExternalRoute(pending, waiting);
+      }
+
+      if (pending.flow && Number.isInteger(pending.stepIndex)) this.markWorkflowStepUsed(pending.flow, pending.stepIndex);
+      this.protocolPreviewModal?.classList.add("te-hidden");
+      this.pendingProtocolPreview = null;
+
+      if (pending.enviarExterno && waiting) {
+        this.showToast("Protocolo registrado, etiquetado e encaminhado. Chamado deixado aguardando.", "success", 5600);
+      } else if (pending.enviarExterno) {
+        this.showToast("Protocolo registrado, etiquetado e encaminhado ao Externo.", "success", 5200);
+      } else {
+        this.showToast("Protocolo registrado e etiqueta processada com sucesso.", "success", 4200);
+      }
+      if (!this.settings.keepOpenAfterInsert) this.toggleMinimize?.(true);
+      return true;
+    } catch (error) {
+      console.error("Text Express — execução real do protocolo:", error);
+      const message = error?.message || "Não foi possível executar o protocolo.";
+      if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = message;
+      this.showToast(message, "error", 7000);
+      return false;
+    } finally {
+      if (this.protocolPreviewConfirm) {
+        this.protocolPreviewConfirm.disabled = false;
+        delete this.protocolPreviewConfirm.dataset.teBusy;
+      }
+      this.updateProtocolPreviewWaitUI?.();
+    }
+  };
+
+  // Garante que os metadados externos viajem com cartões diretos e etapas de fluxo.
+  const teV283OpenPreviewBase = TextExpressApp.prototype.openProtocolPreview;
+  TextExpressApp.prototype.insertSnippet = (function (original) {
+    return async function (id) {
+      const snippet = this.snippets.find((item) => item.id === id);
+      if (!snippet || snippet.tipo !== "protocolo" || snippet.modelo === "fluxo") return original.call(this, id);
+      const context = this.captureInsertionContext(this.lastActiveElement, 0);
+      const content = await this.processVariables(snippet.conteudo);
+      if (content === null) { this.showToast("Inserção cancelada."); return false; }
+      return this.openProtocolPreview({
+        snippet, context, content, reason: snippet.nome,
+        etiquetaSistema: snippet.etiquetaSistema,
+        enviarExterno: Boolean(snippet.enviarExterno),
+        problemaExterno: snippet.problemaExterno,
+        servicoExterno: snippet.servicoExterno
+      });
+    };
+  })(TextExpressApp.prototype.insertSnippet);
+
+  TextExpressApp.prototype.expandShortcut = (function (original) {
+    return async function (entry, context) {
+      const snippet = entry?.snippet || entry;
+      if (!snippet || snippet.tipo !== "protocolo") return original.call(this, entry, context);
+      if (entry?.kind === "flow" || (snippet.modelo === "fluxo" && entry?.kind !== "flow-step")) return original.call(this, entry, context);
+      if (entry?.kind === "flow-step") return this.insertSequenceStep(snippet.id, entry.stepIndex, context);
+      if (!context) return false;
+      const content = await this.processVariables(snippet.conteudo);
+      if (content === null) return false;
+      return this.openProtocolPreview({
+        snippet, context, content, reason: snippet.nome,
+        etiquetaSistema: snippet.etiquetaSistema,
+        enviarExterno: Boolean(snippet.enviarExterno),
+        problemaExterno: snippet.problemaExterno,
+        servicoExterno: snippet.servicoExterno
+      });
+    };
+  })(TextExpressApp.prototype.expandShortcut);
+
+  TextExpressApp.prototype.executeWorkflowStep = (function (original) {
+    return async function (flow, step, stepIndex, suppliedContext = null) {
+      if (flow?.tipo !== "protocolo") return original.call(this, flow, step, stepIndex, suppliedContext);
+      const actionType = this.getFlowActionType(step);
+      if (actionType !== TE_V27_FLOW_ACTIONS.INSERT) return original.call(this, flow, step, stepIndex, suppliedContext);
+      const context = suppliedContext || this.captureInsertionContext(this.lastActiveElement, 0);
+      const content = await this.processFlowStep(flow, step);
+      if (content === null) { this.showToast("Execução cancelada."); return false; }
+      if (this.isSequenceMenuOpen?.()) this.closeSequenceMenu(false);
+      return this.openProtocolPreview({
+        flow, step, stepIndex, context, content,
+        reason: `${flow.nome} — ${step.nome || `Opção ${stepIndex + 1}`}`,
+        etiquetaSistema: flow.etiquetaSistema,
+        enviarExterno: Boolean(step.enviarExterno),
+        problemaExterno: step.problemaExterno,
+        servicoExterno: step.servicoExterno
+      });
+    };
+  })(TextExpressApp.prototype.executeWorkflowStep);
+
+  TextExpressApp.prototype.exportSnippets = function () {
+    const uiState = this.captureCurrentUiState?.();
+    this.saveUiState?.();
+    const payload = {
+      app: "Text Express", backupType: "complete", schemaVersion: 9, appVersion: APP_VERSION,
+      exportedAt: new Date().toISOString(), total: this.snippets.length,
+      categories: this.categories, snippets: this.snippets, settings: this.settings,
+      rememberedVariables: this.rememberedVariables || {}, uiState,
+      labelCatalog: this.protocolLabelCatalog || TE_V28_DEFAULT_LABELS,
+      mascaraCatalog: this.mascaraCatalog || []
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `text-express-backup-completo-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(link); link.click(); link.remove(); URL.revokeObjectURL(url);
+    this.showToast("Backup completo exportado, incluindo catálogo local do Mascara.", "success", 4800);
+  };
+
+  TextExpressApp.prototype.restoreCompleteBackup = function (parsed, source, rawCategories) {
+    const result = teV283Original.restoreCompleteBackup.call(this, parsed, source, rawCategories);
+    if (Array.isArray(parsed?.mascaraCatalog)) this.importMascaraCatalogSnapshot(parsed.mascaraCatalog, "backup-restaurado");
+    return result;
+  };
+
+  TextExpressApp.prototype.mergeImportedBackup = function (parsed, source, rawCategories) {
+    const result = teV283Original.mergeImportedBackup.call(this, parsed, source, rawCategories);
+    if (Array.isArray(parsed?.mascaraCatalog)) this.importMascaraCatalogSnapshot(parsed.mascaraCatalog, "backup-mesclado");
+    return result;
+  };
+
+  TextExpressApp.prototype.init = function () {
+    const result = teV283Original.init.call(this);
+    this.loadMascaraCatalog();
+    this.mergeMascaraLabelsIntoCatalog();
+    this.renderMascaraExternalOptions();
+    this.applyMascaraCatalogToSnippets();
+    // Não bloqueia a abertura da interface; a cópia da base acontece em paralelo.
+    Promise.resolve().then(() => this.syncMascaraCatalogOnce()).catch((error) => {
+      console.warn("Text Express — migração do catálogo Mascara:", error);
+    });
+    this.root.dataset.version = APP_VERSION;
+    return result;
   };
 
   function bootTextExpress() {

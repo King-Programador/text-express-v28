@@ -4874,7 +4874,7 @@
 }
 
 /* ==========================================================
- * Text Express 28.2.0 — correções consolidadas de interface
+ * Text Express 28.3.0 — correções consolidadas de interface
  * ========================================================== */
 
 /* Cartões de sequência: somente o atalho principal fica visível. */
@@ -5193,4 +5193,64 @@
     width: calc(100vw - 16px);
     max-height: calc(100vh - 16px);
   }
+}
+
+
+/* ==========================================================
+ * Text Express 28.3.0 — integração limpa com o DOM do Mascara
+ * ========================================================== */
+#text-express-app .te-protocol-external-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px 12px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--te-primary) 30%, var(--te-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--te-primary-soft) 34%, var(--te-surface));
+}
+#text-express-app .te-protocol-external-details > .te-field { min-width: 0; }
+#text-express-app .te-protocol-external-details-help {
+  grid-column: 1 / -1;
+  color: var(--te-muted);
+  line-height: 1.4;
+}
+#text-express-app .te-protocol-step-external-details {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap: 8px 10px;
+  margin: 8px 0 2px;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--te-primary) 26%, var(--te-border));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--te-primary-soft) 24%, var(--te-surface));
+}
+#text-express-app .te-protocol-step-external-details label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: var(--te-muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+#text-express-app .te-protocol-step-external-details input {
+  width: 100%;
+  min-width: 0;
+}
+#text-express-app .te-preview-external-details {
+  display: grid;
+  gap: 3px;
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid color-mix(in srgb, var(--te-primary) 18%, var(--te-border));
+  color: var(--te-muted);
+}
+#text-express-app .te-preview-external-details small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+#text-express-app .te-preview-external-details b { color: var(--te-text); }
+#text-express-app .te-preview-confirm[data-te-busy="true"] { opacity: .72; cursor: wait; }
+@media (max-width: 620px) {
+  #text-express-app .te-protocol-external-details,
+  #text-express-app .te-protocol-step-external-details { grid-template-columns: 1fr; }
 }
