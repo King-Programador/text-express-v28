@@ -1,12 +1,12 @@
 /*
- * Text Express 28.0.6
+ * Text Express 28.1.0
  * Expansor de textos para atendimento e registro de protocolos.
  * Sem dependências externas.
  */
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.0.6";
+  const APP_VERSION = "28.1.0";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -12166,6 +12166,665 @@
       (snippet?.favorito ? favorites : regular).push(snippet);
     }
     return [...favorites, ...regular];
+  };
+
+
+  /* ==========================================================
+   * Text Express 28.1.0 — Pré-Visualização de Protocolo
+   * - exclusiva para ações finais do tipo Protocolo;
+   * - sequência fecha antes da Pré-Visualização;
+   * - nada é inserido/aplicado antes da confirmação;
+   * - Externo é configuração permanente do protocolo/opção;
+   * - Aguardar existe somente na Pré-Visualização;
+   * - equipe externa permanece definida pelo sistema;
+   * - integrações externas não relacionadas ficam fora desta versão.
+   * ========================================================== */
+  const teV281Original = Object.freeze({
+    init: TextExpressApp.prototype.init,
+    normalizeSnippet: TextExpressApp.prototype.normalizeSnippet,
+    normalizeFlowStep: TextExpressApp.prototype.normalizeFlowStep,
+    openModal: TextExpressApp.prototype.openModal,
+    updateModelKindUI: TextExpressApp.prototype.updateModelKindUI,
+    collectSnippetFromForm: TextExpressApp.prototype.collectSnippetFromForm,
+    captureCurrentModelDraft: TextExpressApp.prototype.captureCurrentModelDraft,
+    restoreCurrentModelDraft: TextExpressApp.prototype.restoreCurrentModelDraft,
+    renderFlowEditorSteps: TextExpressApp.prototype.renderFlowEditorSteps,
+    syncEditingFlowSteps: TextExpressApp.prototype.syncEditingFlowSteps,
+    handleRootClick: TextExpressApp.prototype.handleRootClick,
+    handleRootChange: TextExpressApp.prototype.handleRootChange,
+    insertSnippet: TextExpressApp.prototype.insertSnippet,
+    expandShortcut: TextExpressApp.prototype.expandShortcut,
+    executeWorkflowStep: TextExpressApp.prototype.executeWorkflowStep,
+    onGlobalKeyDown: TextExpressApp.prototype.onGlobalKeyDown
+  });
+
+  TextExpressApp.prototype.normalizeProtocolExternalFlag = function (value) {
+    if (typeof value === "string") {
+      const normalized = value.trim().toLowerCase();
+      if (["1", "true", "sim", "yes", "on"].includes(normalized)) return true;
+      if (["0", "false", "nao", "não", "no", "off", ""].includes(normalized)) return false;
+    }
+    return Boolean(value);
+  };
+
+  TextExpressApp.prototype.normalizeSnippet = function (raw = {}) {
+    const snippet = teV281Original.normalizeSnippet.call(this, raw);
+    snippet.enviarExterno = snippet.tipo === "protocolo"
+      ? this.normalizeProtocolExternalFlag(
+          raw.enviarExterno ?? raw.abrirExterno ?? raw.external ?? raw.externo ?? false
+        )
+      : false;
+    return snippet;
+  };
+
+  TextExpressApp.prototype.normalizeFlowStep = function (raw = {}, index = 0, parentShortcut = "/fluxo") {
+    const step = teV281Original.normalizeFlowStep.call(this, raw, index, parentShortcut);
+    step.enviarExterno = this.normalizeProtocolExternalFlag(
+      raw.enviarExterno ?? raw.abrirExterno ?? raw.external ?? raw.externo ?? false
+    );
+    return step;
+  };
+
+  TextExpressApp.prototype.openModal = function (data = null) {
+    const result = teV281Original.openModal.call(this, data);
+    const external = this.root.querySelector("#te-form-external");
+    if (external) {
+      const key = data?.id || TE_V28_NEW_DRAFT_KEY;
+      const draft = this.loadModelDrafts?.()?.[key];
+      const draftTime = Date.parse(draft?.updatedAt || "") || 0;
+      const savedTime = Date.parse(data?.updatedAt || "") || 0;
+      const useDraft = Boolean(draft && (!data?.updatedAt || draftTime > savedTime));
+      external.checked = Boolean(
+        data?.tipo === "protocolo"
+        && (useDraft ? draft?.enviarExterno : data?.enviarExterno)
+      );
+    }
+    this.updateModelKindUI();
+    return result;
+  };
+
+  TextExpressApp.prototype.updateModelKindUI = function () {
+    const result = teV281Original.updateModelKindUI.call(this);
+    const type = this.getFlowEditorType?.()
+      || this.root.querySelector('input[name="te-type"]:checked')?.value
+      || "atendimento";
+    const kind = this.root.querySelector('input[name="te-model-kind"]:checked')?.value || "unico";
+    const externalField = this.root.querySelector("#te-protocol-external-field");
+    if (externalField) externalField.classList.toggle("te-hidden", type !== "protocolo" || kind !== "unico");
+    return result;
+  };
+
+  TextExpressApp.prototype.collectSnippetFromForm = function (showErrors = false) {
+    const collected = teV281Original.collectSnippetFromForm.call(this, showErrors);
+    if (!collected?.valid || !collected.snippet) return collected;
+    const kind = collected.snippet.modelo || this.root.querySelector('input[name="te-model-kind"]:checked')?.value || "unico";
+    collected.snippet.enviarExterno = collected.tipo === "protocolo" && kind !== "fluxo"
+      ? Boolean(this.root.querySelector("#te-form-external")?.checked)
+      : false;
+    return collected;
+  };
+
+  TextExpressApp.prototype.captureCurrentModelDraft = function () {
+    const draft = teV281Original.captureCurrentModelDraft.call(this);
+    if (!draft) return draft;
+    draft.enviarExterno = draft.tipo === "protocolo" && draft.modelo !== "fluxo"
+      ? Boolean(this.root.querySelector("#te-form-external")?.checked)
+      : false;
+    return draft;
+  };
+
+  TextExpressApp.prototype.restoreCurrentModelDraft = function (data = null) {
+    const restored = teV281Original.restoreCurrentModelDraft.call(this, data);
+    const key = data?.id || TE_V28_NEW_DRAFT_KEY;
+    const draft = this.loadModelDrafts?.()?.[key];
+    const external = this.root.querySelector("#te-form-external");
+    if (external && draft) external.checked = Boolean(draft.enviarExterno);
+    this.updateModelKindUI();
+    return restored;
+  };
+
+  TextExpressApp.prototype.renderFlowEditorSteps = function () {
+    const result = teV281Original.renderFlowEditorSteps.call(this);
+    if (this.getFlowEditorType?.() !== "protocolo") return result;
+
+    const editors = [...this.root.querySelectorAll(".te-protocol-card-editor")];
+    editors.forEach((editor, index) => {
+      if (editor.querySelector('[data-te-flow-field="enviarExterno"]')) return;
+      const step = this.editingFlowSteps?.[index] || {};
+      const actionType = this.getFlowActionType?.(step) || TE_V27_FLOW_ACTIONS.INSERT;
+      const target = editor.querySelector(".te-protocol-action-type-field") || editor.querySelector(".te-flow-step-editor-grid");
+      if (!target) return;
+      const html = `
+        <label class="te-flow-optional-check te-protocol-step-external ${actionType === TE_V27_FLOW_ACTIONS.INSERT ? "" : "te-hidden"}">
+          <input type="checkbox" data-te-flow-field="enviarExterno" ${step.enviarExterno ? "checked" : ""}>
+          <span>Enviar para o Externo ao executar esta opção</span>
+        </label>`;
+      if (target.matches?.(".te-protocol-action-type-field")) target.insertAdjacentHTML("beforebegin", html);
+      else target.insertAdjacentHTML("beforeend", html);
+    });
+    return result;
+  };
+
+  TextExpressApp.prototype.syncEditingFlowSteps = function () {
+    const steps = teV281Original.syncEditingFlowSteps.call(this);
+    if (this.getFlowEditorType?.() !== "protocolo" || !Array.isArray(steps)) return steps;
+    const editors = [...this.root.querySelectorAll(".te-protocol-card-editor")];
+    editors.forEach((editor, index) => {
+      if (!steps[index]) return;
+      steps[index].enviarExterno = Boolean(editor.querySelector('[data-te-flow-field="enviarExterno"]')?.checked);
+    });
+    this.editingFlowSteps = steps;
+    return steps;
+  };
+
+  TextExpressApp.prototype.setupProtocolPreview = function () {
+    this.protocolPreviewModal = this.root.querySelector("#te-protocol-preview-modal");
+    this.protocolPreviewContent = this.root.querySelector("#te-preview-content");
+    this.protocolPreviewReason = this.root.querySelector("#te-preview-reason");
+    this.protocolPreviewLabel = this.root.querySelector("#te-preview-label");
+    this.protocolPreviewExternalStatus = this.root.querySelector("#te-preview-external-status");
+    this.protocolPreviewExternalHelp = this.root.querySelector("#te-preview-external-help");
+    this.protocolPreviewWaitField = this.root.querySelector("#te-preview-wait-field");
+    this.protocolPreviewWait = this.root.querySelector("#te-preview-wait");
+    this.protocolPreviewObservation = this.root.querySelector("#te-preview-observation");
+    this.protocolPreviewValidation = this.root.querySelector("#te-preview-validation");
+    this.protocolPreviewConfirm = this.root.querySelector('[data-te-action="protocol-preview-confirm"]');
+    this.protocolPreviewConfirmLabel = this.root.querySelector("#te-preview-confirm-label");
+    this.protocolPreviewThirdParty = this.root.querySelector("#te-preview-third-party");
+    this.protocolPreviewRelation = this.root.querySelector("#te-preview-relation");
+    this.protocolPreviewCustomRelationField = this.root.querySelector("#te-preview-custom-relation-field");
+    this.protocolPreviewCustomRelation = this.root.querySelector("#te-preview-custom-relation");
+    this.protocolPreviewContactName = this.root.querySelector("#te-preview-contact-name");
+    this.protocolPreviewContactNumberField = this.root.querySelector("#te-preview-contact-number-field");
+    this.protocolPreviewContactNumber = this.root.querySelector("#te-preview-contact-number");
+    this.protocolPreviewContactAnonymous = this.root.querySelector("#te-preview-contact-anonymous");
+    this.protocolPreviewRole = "Titular";
+    return Boolean(this.protocolPreviewModal);
+  };
+
+  TextExpressApp.prototype.isProtocolPreviewOpen = function () {
+    return Boolean(this.protocolPreviewModal && !this.protocolPreviewModal.classList.contains("te-hidden"));
+  };
+
+  TextExpressApp.prototype.updateProtocolPreviewContactUI = function () {
+    const isThirdParty = this.protocolPreviewRole === "Terceiro";
+    const anonymous = Boolean(this.protocolPreviewContactAnonymous?.checked);
+    const customRelation = isThirdParty && this.protocolPreviewRelation?.value === "Outro";
+    this.protocolPreviewThirdParty?.classList.toggle("te-hidden", !isThirdParty);
+    this.protocolPreviewCustomRelationField?.classList.toggle("te-hidden", !customRelation);
+    if (this.protocolPreviewContactNumber) {
+      this.protocolPreviewContactNumber.disabled = anonymous;
+      if (anonymous) this.protocolPreviewContactNumber.value = "";
+    }
+    this.protocolPreviewContactNumberField?.classList.toggle("te-contact-field-muted", anonymous);
+  };
+
+  TextExpressApp.prototype.updateProtocolPreviewWaitUI = function () {
+    const waiting = Boolean(this.pendingProtocolPreview?.enviarExterno && this.protocolPreviewWait?.checked);
+    if (this.protocolPreviewConfirm) this.protocolPreviewConfirm.dataset.teWaiting = waiting ? "true" : "false";
+    if (this.protocolPreviewConfirmLabel) {
+      this.protocolPreviewConfirmLabel.textContent = waiting ? "Registrar e Aguardar" : "Registrar e Finalizar";
+    }
+  };
+
+  TextExpressApp.prototype.resetProtocolPreview = function () {
+    this.protocolPreviewRole = "Titular";
+    this.root.querySelectorAll('[data-te-action="protocol-preview-role"]').forEach((button) => {
+      button.classList.toggle("te-active", button.dataset.teRole === "Titular");
+    });
+    if (this.protocolPreviewRelation) this.protocolPreviewRelation.value = "Filho(a) do titular";
+    if (this.protocolPreviewCustomRelation) this.protocolPreviewCustomRelation.value = "";
+    if (this.protocolPreviewContactName) this.protocolPreviewContactName.value = "";
+    if (this.protocolPreviewContactNumber) {
+      this.protocolPreviewContactNumber.disabled = false;
+      this.protocolPreviewContactNumber.value = "";
+    }
+    if (this.protocolPreviewContactAnonymous) this.protocolPreviewContactAnonymous.checked = false;
+    if (this.protocolPreviewWait) this.protocolPreviewWait.checked = false;
+    if (this.protocolPreviewObservation) this.protocolPreviewObservation.value = "";
+    if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = "";
+    this.updateProtocolPreviewContactUI();
+    this.updateProtocolPreviewWaitUI();
+  };
+
+  TextExpressApp.prototype.openProtocolPreview = function (payload = {}) {
+    if (!this.protocolPreviewModal) this.setupProtocolPreview();
+    if (!this.protocolPreviewModal) {
+      this.showToast("Não foi possível abrir a Pré-Visualização do protocolo.", "error");
+      return false;
+    }
+
+    this.pendingProtocolPreview = {
+      ...payload,
+      content: String(payload.content || ""),
+      reason: String(payload.reason || payload.step?.nome || payload.snippet?.nome || payload.flow?.nome || "Protocolo"),
+      etiquetaSistema: this.normalizeProtocolLabel?.(payload.etiquetaSistema || "") || "",
+      enviarExterno: Boolean(payload.enviarExterno)
+    };
+
+    this.resetProtocolPreview();
+    if (this.protocolPreviewReason) this.protocolPreviewReason.value = this.pendingProtocolPreview.reason;
+    if (this.protocolPreviewContent) this.protocolPreviewContent.value = this.pendingProtocolPreview.content;
+    if (this.protocolPreviewLabel) {
+      this.protocolPreviewLabel.textContent = this.pendingProtocolPreview.etiquetaSistema || "Sem etiqueta";
+      this.protocolPreviewLabel.title = this.pendingProtocolPreview.etiquetaSistema || "Sem etiqueta";
+    }
+    if (this.protocolPreviewExternalStatus) {
+      this.protocolPreviewExternalStatus.textContent = this.pendingProtocolPreview.enviarExterno ? "Sim" : "Não";
+      const card = this.protocolPreviewExternalStatus.closest(".te-preview-status-card");
+      card?.classList.toggle("te-external-active", this.pendingProtocolPreview.enviarExterno);
+    }
+    if (this.protocolPreviewExternalHelp) {
+      this.protocolPreviewExternalHelp.textContent = this.pendingProtocolPreview.enviarExterno
+        ? "A equipe será definida automaticamente pelo sistema."
+        : "Sem encaminhamento externo.";
+    }
+    this.protocolPreviewWaitField?.classList.toggle("te-hidden", !this.pendingProtocolPreview.enviarExterno);
+    this.updateProtocolPreviewWaitUI();
+
+    this.protocolPreviewModal.classList.remove("te-hidden");
+    window.requestAnimationFrame(() => this.protocolPreviewContactNumber?.focus());
+    return true;
+  };
+
+  TextExpressApp.prototype.cancelProtocolPreview = function () {
+    if (this.protocolPreviewModal) this.protocolPreviewModal.classList.add("te-hidden");
+    this.pendingProtocolPreview = null;
+    if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = "";
+    return true;
+  };
+
+  TextExpressApp.prototype.getProtocolPreviewContactDetails = function () {
+    const anonymous = Boolean(this.protocolPreviewContactAnonymous?.checked);
+    const number = String(this.protocolPreviewContactNumber?.value || "").replace(/\s+/g, " ").trim().slice(0, 40);
+    if (this.protocolPreviewRole !== "Terceiro") {
+      return {
+        valid: Boolean(anonymous || number),
+        message: anonymous || number ? "" : "Informe o número do contato ou marque Anônimo.",
+        details: { role: "Titular", relation: "", name: "", contact: anonymous ? "Anônimo" : number, anonymous }
+      };
+    }
+
+    const selectedRelation = String(this.protocolPreviewRelation?.value || "").trim();
+    const customRelation = String(this.protocolPreviewCustomRelation?.value || "").replace(/\s+/g, " ").trim().slice(0, 80);
+    const name = String(this.protocolPreviewContactName?.value || "").replace(/\s+/g, " ").trim().slice(0, 80);
+    if (!name) return { valid: false, message: "Informe o nome de quem fez o contato.", details: null };
+    if (selectedRelation === "Outro" && !customRelation) {
+      return { valid: false, message: "Informe a relação de quem fez o contato com o titular.", details: null };
+    }
+    if (!anonymous && !number) {
+      return { valid: false, message: "Informe o número do contato ou marque Anônimo.", details: null };
+    }
+    return {
+      valid: true,
+      message: "",
+      details: {
+        role: TE_V285_PROTOCOL_CONTACT_RELATIONS.includes(selectedRelation) ? selectedRelation : "Outro",
+        relation: selectedRelation === "Outro" ? customRelation : "",
+        name,
+        contact: anonymous ? "Anônimo" : number,
+        anonymous
+      }
+    };
+  };
+
+  TextExpressApp.prototype.getSystemControlText = function (element) {
+    if (!element) return "";
+    const text = this.getExternalElementText?.(element)
+      || element.innerText
+      || element.textContent
+      || element.getAttribute?.("aria-label")
+      || element.getAttribute?.("title")
+      || "";
+    return this.foldProtocolLabel?.(text) || String(text).trim().toLowerCase();
+  };
+
+  TextExpressApp.prototype.findExternalSystemControl = function (labels = [], options = {}) {
+    const foldedLabels = labels.map((label) => this.foldProtocolLabel?.(label) || String(label).toLowerCase());
+    const exact = options.exact !== false;
+    const candidates = [...document.querySelectorAll(
+      'button, [role="button"], [role="switch"], label, input[type="checkbox"], input[type="radio"]'
+    )];
+    for (const element of candidates) {
+      if (!element || this.root.contains(element)) continue;
+      if (typeof this.isExternalElementVisible === "function" && !this.isExternalElementVisible(element)) continue;
+      const text = this.getSystemControlText(element);
+      const matches = foldedLabels.some((label) => exact ? text === label : text.includes(label));
+      if (!matches) continue;
+
+      if (element.tagName === "LABEL") {
+        const input = element.querySelector('input[type="checkbox"], input[type="radio"]')
+          || (element.htmlFor ? document.getElementById(element.htmlFor) : null);
+        if (input && !this.root.contains(input)) return input;
+      }
+      return element;
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.activateProtocolExternalRoute = async function () {
+    const control = await this.waitForExternalCondition?.(
+      () => this.findExternalSystemControl([
+        "Externo",
+        "Enviar para o Externo",
+        "Atendimento Externo"
+      ]),
+      2600
+    ) || this.findExternalSystemControl(["Externo", "Enviar para o Externo", "Atendimento Externo"]);
+
+    if (!control) {
+      throw new Error("A opção Externo não foi localizada no sistema.");
+    }
+
+    const alreadyEnabled = Boolean(
+      control.checked
+      || control.getAttribute?.("aria-checked") === "true"
+      || control.classList?.contains("active")
+      || control.classList?.contains("selected")
+    );
+    if (!alreadyEnabled) {
+      control.click?.();
+      await new Promise((resolve) => window.setTimeout(resolve, 180));
+    }
+    return true;
+  };
+
+  TextExpressApp.prototype.finalizeProtocolInExternalSystem = async function () {
+    const labels = [
+      "Registrar e Finalizar",
+      "Finalizar atendimento",
+      "Finalizar chamado",
+      "Encerrar atendimento",
+      "Encerrar chamado",
+      "Finalizar"
+    ];
+    const control = await this.waitForExternalCondition?.(
+      () => this.findExternalSystemControl(labels),
+      1800
+    ) || this.findExternalSystemControl(labels);
+    if (!control) return false;
+    control.click?.();
+    return true;
+  };
+
+  TextExpressApp.prototype.executeProtocolPreview = async function () {
+    const pending = this.pendingProtocolPreview;
+    if (!pending || !this.isProtocolPreviewOpen()) return false;
+    if (this.protocolPreviewConfirm?.disabled) return false;
+
+    const content = String(this.protocolPreviewContent?.value || "").trim();
+    if (!content) {
+      if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = "O texto do protocolo não pode ficar vazio.";
+      this.protocolPreviewContent?.focus();
+      return false;
+    }
+
+    const contact = this.getProtocolPreviewContactDetails();
+    if (!contact.valid) {
+      if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = contact.message;
+      return false;
+    }
+    if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = "";
+
+    const waiting = Boolean(pending.enviarExterno && this.protocolPreviewWait?.checked);
+    const observation = String(this.protocolPreviewObservation?.value || "").replace(/\s+/g, " ").trim().slice(0, 800);
+    let finalContent = this.formatProtocolContactContent(content, contact.details);
+    if (observation) finalContent = `${finalContent}\n\nObservação: ${observation}`;
+
+    this.protocolPreviewConfirm.disabled = true;
+    try {
+      // Encaminhamento primeiro: se o controle do sistema não existir, nada é registrado por engano.
+      if (pending.enviarExterno) await this.activateProtocolExternalRoute();
+
+      let inserted = false;
+      if (pending.context) inserted = this.applyInsertionContext(pending.context, finalContent);
+      if (!inserted && pending.context?.element) {
+        const refreshed = this.captureInsertionContext(pending.context.element, 0);
+        if (refreshed) inserted = this.applyInsertionContext(refreshed, finalContent);
+      }
+      if (!inserted) {
+        await this.copyText(finalContent);
+        this.showToast("O protocolo foi copiado porque o campo ativo não estava disponível.", "success", 3000);
+      }
+
+      if (pending.etiquetaSistema) {
+        await this.queueProtocolLabelApplication(pending.etiquetaSistema);
+      }
+
+      if (pending.flow && Number.isInteger(pending.stepIndex)) {
+        this.markWorkflowStepUsed(pending.flow, pending.stepIndex);
+      }
+
+      let finalized = false;
+      if (!waiting) finalized = await this.finalizeProtocolInExternalSystem();
+
+      this.protocolPreviewModal?.classList.add("te-hidden");
+      this.pendingProtocolPreview = null;
+
+      if (waiting) {
+        this.showToast("Protocolo registrado e encaminhado ao Externo. Chamado mantido aguardando.", "success", 5200);
+      } else if (finalized) {
+        this.showToast("Protocolo registrado e finalização acionada.", "success", 4200);
+      } else {
+        this.showToast("Protocolo registrado. A finalização automática não foi localizada; finalize no sistema se necessário.", "success", 6000);
+      }
+      if (!this.settings.keepOpenAfterInsert) this.toggleMinimize?.(true);
+      return true;
+    } catch (error) {
+      console.error("Text Express — Pré-Visualização do protocolo:", error);
+      if (this.protocolPreviewValidation) this.protocolPreviewValidation.textContent = error?.message || "Não foi possível executar o protocolo.";
+      this.showToast(error?.message || "Não foi possível executar o protocolo.", "error", 6500);
+      return false;
+    } finally {
+      if (this.protocolPreviewConfirm) this.protocolPreviewConfirm.disabled = false;
+      this.updateProtocolPreviewWaitUI();
+    }
+  };
+
+  TextExpressApp.prototype.handleRootClick = function (event) {
+    const actionButton = event.target.closest?.("[data-te-action]");
+    const action = actionButton?.dataset.teAction;
+
+    if (action === "protocol-preview-role") {
+      event.preventDefault();
+      event.stopPropagation();
+      this.protocolPreviewRole = actionButton.dataset.teRole === "Terceiro" ? "Terceiro" : "Titular";
+      this.root.querySelectorAll('[data-te-action="protocol-preview-role"]').forEach((button) => {
+        button.classList.toggle("te-active", button === actionButton);
+      });
+      this.updateProtocolPreviewContactUI();
+      return;
+    }
+    if (action === "protocol-preview-cancel") {
+      event.preventDefault();
+      event.stopPropagation();
+      this.cancelProtocolPreview();
+      return;
+    }
+    if (action === "protocol-preview-confirm") {
+      event.preventDefault();
+      event.stopPropagation();
+      void this.executeProtocolPreview();
+      return;
+    }
+    if (event.target === this.protocolPreviewModal) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.cancelProtocolPreview();
+      return;
+    }
+    return teV281Original.handleRootClick.call(this, event);
+  };
+
+  TextExpressApp.prototype.handleRootChange = function (event) {
+    const result = teV281Original.handleRootChange.call(this, event);
+    if (event.target === this.protocolPreviewRelation || event.target === this.protocolPreviewContactAnonymous) {
+      this.updateProtocolPreviewContactUI();
+    }
+    if (event.target === this.protocolPreviewWait) this.updateProtocolPreviewWaitUI();
+    return result;
+  };
+
+  TextExpressApp.prototype.insertSnippet = async function (id) {
+    const snippet = this.snippets.find((item) => item.id === id);
+    if (!snippet || snippet.tipo !== "protocolo" || snippet.modelo === "fluxo") {
+      return teV281Original.insertSnippet.call(this, id);
+    }
+
+    const context = this.captureInsertionContext(this.lastActiveElement, 0);
+    const content = await this.processVariables(snippet.conteudo);
+    if (content === null) {
+      this.showToast("Inserção cancelada.");
+      return false;
+    }
+    return this.openProtocolPreview({
+      snippet,
+      context,
+      content,
+      reason: snippet.nome,
+      etiquetaSistema: snippet.etiquetaSistema,
+      enviarExterno: Boolean(snippet.enviarExterno)
+    });
+  };
+
+  TextExpressApp.prototype.expandShortcut = async function (entry, context) {
+    const snippet = entry?.snippet || entry;
+    if (!snippet || snippet.tipo !== "protocolo") {
+      return teV281Original.expandShortcut.call(this, entry, context);
+    }
+
+    if (entry?.kind === "flow" || snippet.modelo === "fluxo" && entry?.kind !== "flow-step") {
+      return teV281Original.expandShortcut.call(this, entry, context);
+    }
+    if (entry?.kind === "flow-step") {
+      return this.insertSequenceStep(snippet.id, entry.stepIndex, context);
+    }
+    if (!context) return false;
+
+    const content = await this.processVariables(snippet.conteudo);
+    if (content === null) return false;
+    return this.openProtocolPreview({
+      snippet,
+      context,
+      content,
+      reason: snippet.nome,
+      etiquetaSistema: snippet.etiquetaSistema,
+      enviarExterno: Boolean(snippet.enviarExterno)
+    });
+  };
+
+  TextExpressApp.prototype.executeWorkflowStep = async function (flow, step, stepIndex, suppliedContext = null) {
+    const actionType = flow?.tipo === "atendimento"
+      ? TE_V27_FLOW_ACTIONS.INSERT
+      : this.getFlowActionType(step);
+
+    if (flow?.tipo !== "protocolo") {
+      return teV281Original.executeWorkflowStep.call(this, flow, step, stepIndex, suppliedContext);
+    }
+
+    // Em Protocolo, ações intermediárias apenas navegam/executam sua função.
+    // Etiqueta, Externo e finalização ficam reservados à ação final confirmada
+    // pela Pré-Visualização.
+    if (actionType !== TE_V27_FLOW_ACTIONS.INSERT) {
+      if (suppliedContext && !this.clearFlowShortcutContext(suppliedContext)) {
+        this.showToast("Não foi possível remover o atalho digitado.", "error");
+        return false;
+      }
+
+      if (actionType === TE_V27_FLOW_ACTIONS.FLOW || actionType === TE_V27_FLOW_ACTIONS.SEQUENCE) {
+        const expectedType = actionType === TE_V27_FLOW_ACTIONS.FLOW ? "protocolo" : "atendimento";
+        const target = this.snippets.find((item) =>
+          item.id === step.acaoAlvoId
+          && item.tipo === expectedType
+          && item.modelo === "fluxo"
+          && item.ativo
+        );
+        if (!target) {
+          this.showToast("O fluxo de destino não está disponível.", "error");
+          return false;
+        }
+        this.markWorkflowStepUsed(flow, stepIndex);
+        this.openSequenceMenu(target, { pushCurrent: true });
+        this.showToast(`${target.tipo === "protocolo" ? "Fluxo" : "Sequência"} “${target.nome}” aberto.`, "success");
+        return true;
+      }
+
+      if (actionType === TE_V27_FLOW_ACTIONS.URL) {
+        const safeUrl = this.isSafeExternalFlowUrl(step.acaoUrl);
+        if (!safeUrl) {
+          this.showToast("O endereço externo configurado não é válido.", "error");
+          return false;
+        }
+        let opened = null;
+        try {
+          opened = window.open(safeUrl, "_blank");
+          if (opened) opened.opener = null;
+        } catch {
+          opened = null;
+        }
+        this.markWorkflowStepUsed(flow, stepIndex);
+        this.showToast(
+          opened === null
+            ? "A abertura foi solicitada. Se a nova guia não apareceu, permita pop-ups para este sistema."
+            : "URL externa aberta.",
+          opened === null ? "error" : "success",
+          4500
+        );
+        return true;
+      }
+
+      if (actionType === TE_V27_FLOW_ACTIONS.CUSTOM) {
+        const handled = await this.executeCustomProtocolFlowAction(flow, step, stepIndex, suppliedContext);
+        if (handled) this.markWorkflowStepUsed(flow, stepIndex);
+        return handled;
+      }
+      return false;
+    }
+
+    const context = suppliedContext || this.captureInsertionContext(this.lastActiveElement, 0);
+    const content = await this.processFlowStep(flow, step);
+    if (content === null) {
+      this.showToast("Execução cancelada.");
+      return false;
+    }
+
+    // Regra V28.1: escolha final de Protocolo fecha a sequência e abre a Pré-Visualização.
+    if (this.isSequenceMenuOpen?.()) this.closeSequenceMenu(false);
+
+    return this.openProtocolPreview({
+      flow,
+      step,
+      stepIndex,
+      context,
+      content,
+      reason: `${flow.nome} — ${step.nome || `Opção ${stepIndex + 1}`}`,
+      etiquetaSistema: flow.etiquetaSistema,
+      enviarExterno: Boolean(step.enviarExterno)
+    });
+  };
+
+  TextExpressApp.prototype.onGlobalKeyDown = function (event) {
+    if (event?.key === "Escape" && this.isProtocolPreviewOpen()) {
+      event.preventDefault();
+      event.stopImmediatePropagation?.();
+      event.stopPropagation?.();
+      this.cancelProtocolPreview();
+      return;
+    }
+    return teV281Original.onGlobalKeyDown.call(this, event);
+  };
+
+  TextExpressApp.prototype.init = function () {
+    this.pendingProtocolPreview = null;
+    this.protocolPreviewRole = "Titular";
+    const result = teV281Original.init.call(this);
+    try {
+      this.setupProtocolPreview();
+    } catch (error) {
+      console.error("Text Express — Pré-Visualização:", error);
+    }
+    this.root.dataset.version = APP_VERSION;
+    return result;
   };
 
   function bootTextExpress() {

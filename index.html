@@ -20,7 +20,7 @@
     </section>
   </main>
 
-  <div id="text-express-app" class="te-app" data-version="28.0.6">
+  <div id="text-express-app" class="te-app" data-version="28.1.0">
     <svg class="te-icon-sprite" aria-hidden="true" focusable="false">
       <symbol id="te-i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></symbol>
       <symbol id="te-i-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.9L3 21l1.6-4.2A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></symbol>
@@ -247,6 +247,11 @@
               <small>Opcional. Vale para o cartão inteiro e, em cartões com sequência, é usada uma única vez mesmo ao trocar de opção.</small>
             </label>
 
+            <label class="te-check-field te-field-wide te-hidden te-protocol-external-field" id="te-protocol-external-field">
+              <input id="te-form-external" type="checkbox">
+              <span><strong>Enviar para o Externo ao executar este protocolo</strong><small>O Text Express apenas aciona o encaminhamento. A equipe de destino continua sendo definida pelo próprio sistema.</small></span>
+            </label>
+
             <div class="te-field te-field-wide" id="te-single-content-wrap">
               <label>
                 <span>Conteúdo do modelo</span>
@@ -351,63 +356,98 @@
       </section>
     </div>
 
-    <div class="te-modal-backdrop te-hidden" id="te-protocol-contact-modal" role="presentation">
-      <section class="te-modal te-protocol-contact-modal" role="dialog" aria-modal="true" aria-labelledby="te-protocol-contact-title">
-        <header class="te-modal-header">
+
+    <div class="te-modal-backdrop te-hidden" id="te-protocol-preview-modal" role="presentation">
+      <section class="te-protocol-preview" role="dialog" aria-modal="true" aria-labelledby="te-protocol-preview-title">
+        <header class="te-protocol-preview-header">
           <div>
-            <span class="te-modal-kicker">Somente Protocolo</span>
-            <h2 id="te-protocol-contact-title">Dados do contato</h2>
+            <span class="te-protocol-preview-kicker">Somente Protocolo</span>
+            <h2 id="te-protocol-preview-title">Pré-Visualização</h2>
           </div>
-          <button class="te-icon-button" type="button" data-te-action="protocol-contact-cancel" aria-label="Cancelar inserção"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg></button>
+          <button class="te-icon-button" type="button" data-te-action="protocol-preview-cancel" aria-label="Fechar pré-visualização"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg></button>
         </header>
-        <form id="te-protocol-contact-form" novalidate>
-          <div class="te-protocol-contact-body">
-            <fieldset class="te-contact-fieldset">
-              <legend>Quem fez o contato?</legend>
-              <div class="te-contact-choice-grid te-contact-role-grid">
-                <label><input type="radio" name="te-protocol-contact-role" value="Titular" checked><span>Titular</span></label>
-                <label><input type="radio" name="te-protocol-contact-role" value="Filho(a) do titular"><span>Filho(a) do titular</span></label>
-                <label><input type="radio" name="te-protocol-contact-role" value="Irmão(ã)"><span>Irmão(ã)</span></label>
-                <label><input type="radio" name="te-protocol-contact-role" value="Amigo(a)"><span>Amigo(a)</span></label>
-                <label><input type="radio" name="te-protocol-contact-role" value="Esposo(a)"><span>Esposo(a)</span></label>
-                <label><input type="radio" name="te-protocol-contact-role" value="Funcionário(a)"><span>Funcionário(a)</span></label>
-                <label><input type="radio" name="te-protocol-contact-role" value="Outro"><span>Outro</span></label>
-              </div>
-            </fieldset>
 
-            <label class="te-field te-hidden" id="te-protocol-contact-relation-field">
-              <span>Relação com o titular</span>
-              <input id="te-protocol-contact-relation" type="text" maxlength="80" autocomplete="off" placeholder="Ex.: Vizinho, Cunhado, Síndico">
-              <small class="te-field-error" id="te-protocol-contact-relation-error"></small>
-            </label>
-
-            <label class="te-field te-hidden" id="te-protocol-contact-name-field">
-              <span>Nome de quem fez o contato</span>
-              <input id="te-protocol-contact-name" type="text" maxlength="80" autocomplete="off" placeholder="Ex.: João">
-              <small class="te-field-error" id="te-protocol-contact-name-error"></small>
-            </label>
-
-            <fieldset class="te-contact-fieldset">
-              <legend>Contato</legend>
-              <div class="te-contact-mode-grid">
-                <label><input type="radio" name="te-protocol-contact-mode" value="number" checked><span>Informar número</span></label>
-                <label><input type="radio" name="te-protocol-contact-mode" value="anonymous"><span>Contato anônimo</span></label>
-              </div>
-            </fieldset>
-
-            <label class="te-field" id="te-protocol-contact-number-field">
-              <span>Número do contato</span>
-              <input id="te-protocol-contact-number" type="text" maxlength="40" inputmode="tel" autocomplete="off" placeholder="Ex.: 8199999-9999">
-              <small class="te-field-error" id="te-protocol-contact-number-error"></small>
-            </label>
-
-            <p class="te-contact-preview-note">O Text Express adicionará esses dados somente ao protocolo que está sendo inserido.</p>
+        <div class="te-protocol-preview-body">
+          <div class="te-preview-contact-toggle" role="group" aria-label="Quem fez o contato?">
+            <button type="button" class="te-preview-contact-button te-active" data-te-action="protocol-preview-role" data-te-role="Titular">Titular</button>
+            <button type="button" class="te-preview-contact-button" data-te-action="protocol-preview-role" data-te-role="Terceiro">Terceiro</button>
           </div>
-          <footer class="te-modal-footer">
-            <button class="te-secondary-button" type="button" data-te-action="protocol-contact-cancel"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg> Cancelar</button>
-            <button class="te-primary-button" type="submit"><svg class="te-icon" aria-hidden="true"><use href="#te-i-check"></use></svg> Inserir protocolo</button>
-          </footer>
-        </form>
+
+          <div class="te-preview-third-party te-hidden" id="te-preview-third-party">
+            <label class="te-field">
+              <span>Relação com o titular</span>
+              <select id="te-preview-relation">
+                <option value="Filho(a) do titular">Filho(a) do titular</option>
+                <option value="Irmão(ã)">Irmão(ã)</option>
+                <option value="Amigo(a)">Amigo(a)</option>
+                <option value="Esposo(a)">Esposo(a)</option>
+                <option value="Funcionário(a)">Funcionário(a)</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </label>
+            <label class="te-field te-hidden" id="te-preview-custom-relation-field">
+              <span>Outra relação</span>
+              <input id="te-preview-custom-relation" type="text" maxlength="80" autocomplete="off" placeholder="Ex.: Vizinho, cunhado, síndico">
+            </label>
+            <label class="te-field">
+              <span>Nome de quem fez o contato</span>
+              <input id="te-preview-contact-name" type="text" maxlength="80" autocomplete="off" placeholder="Ex.: João">
+            </label>
+          </div>
+
+          <div class="te-preview-contact-row">
+            <label class="te-field te-preview-contact-number-field" id="te-preview-contact-number-field">
+              <span>Número do contato</span>
+              <input id="te-preview-contact-number" type="text" maxlength="40" inputmode="tel" autocomplete="off" placeholder="Ex.: 8199999-9999">
+            </label>
+            <label class="te-preview-anonymous">
+              <input id="te-preview-contact-anonymous" type="checkbox">
+              <span>Anônimo</span>
+            </label>
+          </div>
+
+          <label class="te-preview-field">
+            <span>Protocolo selecionado</span>
+            <input id="te-preview-reason" type="text" readonly>
+          </label>
+
+          <label class="te-preview-field te-preview-field-main">
+            <span>Motivo</span>
+            <textarea id="te-preview-content" rows="8" spellcheck="true"></textarea>
+          </label>
+
+          <div class="te-preview-status-grid">
+            <div class="te-preview-status-card">
+              <span>Etiqueta</span>
+              <strong id="te-preview-label">Sem etiqueta</strong>
+            </div>
+            <div class="te-preview-status-card">
+              <span>Externo</span>
+              <strong id="te-preview-external-status">Não</strong>
+              <small id="te-preview-external-help">Sem encaminhamento externo.</small>
+            </div>
+          </div>
+
+          <label class="te-preview-wait-card te-hidden" id="te-preview-wait-field">
+            <input id="te-preview-wait" type="checkbox">
+            <span>
+              <strong>Aguardar após enviar para o Externo</strong>
+              <small>Quando marcado, o chamado não será finalizado após o encaminhamento.</small>
+            </span>
+          </label>
+
+          <label class="te-preview-field">
+            <span>Observação</span>
+            <textarea id="te-preview-observation" rows="3" maxlength="800" placeholder="Opcional. A observação será acrescentada ao protocolo."></textarea>
+          </label>
+
+          <p class="te-preview-validation" id="te-preview-validation" role="alert" aria-live="polite"></p>
+        </div>
+
+        <footer class="te-protocol-preview-footer">
+          <button class="te-secondary-button" type="button" data-te-action="protocol-preview-cancel"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg> Cancelar</button>
+          <button class="te-primary-button te-preview-confirm" type="button" data-te-action="protocol-preview-confirm"><svg class="te-icon" aria-hidden="true"><use href="#te-i-check"></use></svg> <span id="te-preview-confirm-label">Registrar e Finalizar</span></button>
+        </footer>
       </section>
     </div>
 

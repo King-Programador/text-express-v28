@@ -4382,7 +4382,7 @@
 }
 
 
-/* Text Express 28.0.6 — dados rápidos do contato em Protocolos. */
+/* Text Express 28.1.0 — dados rápidos do contato em Protocolos. */
 .te-protocol-contact-modal {
   width: min(620px, calc(100vw - 32px));
 }
@@ -4501,4 +4501,374 @@
 #text-express-app .te-flow-card .te-card-insert {
   font-weight: 800;
   letter-spacing: .01em;
+}
+
+/* ==========================================================
+ * Text Express 28.1.0 — Pré-Visualização exclusiva de Protocolo
+ * Layout inspirado no painel operacional de referência, integrado
+ * ao visual do Text Express e isolado pelo prefixo te-.
+ * ========================================================== */
+#text-express-app .te-protocol-external-field {
+  align-items: flex-start;
+  gap: 10px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--te-protocol) 30%, var(--te-border));
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--te-protocol-soft) 68%, var(--te-surface));
+}
+
+#text-express-app .te-protocol-external-field > span {
+  font-weight: 800;
+}
+
+#text-express-app .te-protocol-external-field small {
+  display: block;
+  margin-top: 3px;
+  color: var(--te-muted);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+#text-express-app #te-protocol-preview-modal {
+  z-index: 2147483600;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(8, 18, 34, 0.48);
+  backdrop-filter: blur(5px);
+  pointer-events: auto;
+}
+
+#text-express-app .te-protocol-preview {
+  width: min(640px, calc(100vw - 28px));
+  max-height: min(860px, calc(100vh - 28px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, #198754 44%, var(--te-border));
+  border-radius: 17px;
+  background: var(--te-surface);
+  box-shadow: 0 26px 70px rgba(4, 18, 31, 0.34);
+  pointer-events: auto;
+}
+
+#text-express-app .te-protocol-preview-header {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px 12px 18px;
+  background: linear-gradient(135deg, #14834f, #0f6f43);
+  color: #fff;
+}
+
+#text-express-app .te-protocol-preview-header h2 {
+  margin: 2px 0 0;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+#text-express-app .te-protocol-preview-kicker {
+  display: block;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+#text-express-app .te-protocol-preview-body {
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--te-surface-2) 45%, transparent), transparent 180px),
+    var(--te-surface);
+}
+
+#text-express-app .te-preview-contact-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#text-express-app .te-preview-contact-button {
+  min-height: 42px;
+  border: 1px solid #d2dae6;
+  border-radius: 9px;
+  background: var(--te-surface);
+  color: var(--te-muted);
+  font-weight: 850;
+  transition: 140ms ease;
+}
+
+#text-express-app .te-preview-contact-button:hover {
+  border-color: #69a9ff;
+  color: var(--te-text);
+}
+
+#text-express-app .te-preview-contact-button.te-active {
+  border-color: #0d6efd;
+  background: #0d6efd;
+  color: #fff;
+  box-shadow: 0 5px 13px rgba(13, 110, 253, 0.22);
+}
+
+#text-express-app .te-preview-third-party {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 12px;
+  border: 1px solid var(--te-border);
+  border-radius: 11px;
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-preview-third-party > .te-field:last-child {
+  grid-column: 1 / -1;
+}
+
+#text-express-app .te-preview-contact-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+#text-express-app .te-preview-anonymous {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid var(--te-border);
+  border-radius: 9px;
+  background: var(--te-surface-2);
+  color: var(--te-text);
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+#text-express-app .te-preview-field {
+  display: block;
+  margin-top: 11px;
+}
+
+#text-express-app .te-preview-field > span,
+#text-express-app .te-preview-third-party .te-field > span,
+#text-express-app .te-preview-contact-row .te-field > span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--te-text);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+#text-express-app .te-preview-field input,
+#text-express-app .te-preview-field textarea,
+#text-express-app .te-preview-third-party input,
+#text-express-app .te-preview-third-party select,
+#text-express-app .te-preview-contact-row input {
+  width: 100%;
+  border: 1px solid var(--te-border);
+  border-radius: 9px;
+  background: var(--te-surface);
+  color: var(--te-text);
+  outline: none;
+}
+
+#text-express-app .te-preview-field input,
+#text-express-app .te-preview-third-party input,
+#text-express-app .te-preview-third-party select,
+#text-express-app .te-preview-contact-row input {
+  height: 42px;
+  padding: 0 11px;
+}
+
+#text-express-app .te-preview-field textarea {
+  resize: vertical;
+  padding: 11px 12px;
+  line-height: 1.47;
+}
+
+#text-express-app .te-preview-field-main textarea {
+  min-height: 145px;
+  font-size: 13px;
+}
+
+#text-express-app .te-preview-field input:focus,
+#text-express-app .te-preview-field textarea:focus,
+#text-express-app .te-preview-third-party input:focus,
+#text-express-app .te-preview-third-party select:focus,
+#text-express-app .te-preview-contact-row input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+#text-express-app #te-preview-reason[readonly] {
+  background: var(--te-surface-2);
+  color: var(--te-muted);
+  font-weight: 700;
+}
+
+#text-express-app .te-preview-status-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+#text-express-app .te-preview-status-card {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid var(--te-border);
+  border-radius: 10px;
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-preview-status-card > span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--te-muted);
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+#text-express-app .te-preview-status-card strong {
+  display: block;
+  overflow: hidden;
+  color: var(--te-text);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#text-express-app .te-preview-status-card small {
+  display: block;
+  margin-top: 3px;
+  color: var(--te-muted);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+#text-express-app .te-preview-status-card.te-external-active {
+  border-color: #f2c94c;
+  background: #fff8dc;
+}
+
+#text-express-app .te-preview-status-card.te-external-active strong {
+  color: #8c6300;
+}
+
+.te-dark #text-express-app .te-preview-status-card.te-external-active,
+#text-express-app.te-dark .te-preview-status-card.te-external-active {
+  border-color: #8a6c24;
+  background: #3b3219;
+}
+
+.te-dark #text-express-app .te-preview-status-card.te-external-active strong,
+#text-express-app.te-dark .te-preview-status-card.te-external-active strong {
+  color: #ffd86a;
+}
+
+#text-express-app .te-preview-wait-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 11px 12px;
+  border: 1px solid #f1c75b;
+  border-radius: 10px;
+  background: #fff9e7;
+  color: #704f00;
+}
+
+.te-dark #text-express-app .te-preview-wait-card,
+#text-express-app.te-dark .te-preview-wait-card {
+  border-color: #80651f;
+  background: #342d19;
+  color: #ffe293;
+}
+
+#text-express-app .te-preview-wait-card input {
+  margin-top: 2px;
+}
+
+#text-express-app .te-preview-wait-card strong,
+#text-express-app .te-preview-wait-card small {
+  display: block;
+}
+
+#text-express-app .te-preview-wait-card small {
+  margin-top: 2px;
+  opacity: .78;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+#text-express-app .te-preview-validation {
+  min-height: 18px;
+  margin: 9px 0 0;
+  color: var(--te-danger);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+#text-express-app .te-protocol-preview-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--te-border);
+  background: var(--te-surface-2);
+}
+
+#text-express-app .te-preview-confirm {
+  min-width: 190px;
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+}
+
+#text-express-app .te-preview-confirm[data-te-waiting="true"] {
+  background: linear-gradient(135deg, #d99a00, #b97d00);
+}
+
+@media (max-width: 620px) {
+  #text-express-app .te-protocol-preview {
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+    border-radius: 13px;
+  }
+
+  #text-express-app .te-protocol-preview-body {
+    padding: 12px;
+  }
+
+  #text-express-app .te-preview-third-party,
+  #text-express-app .te-preview-status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app .te-preview-contact-row {
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app .te-preview-anonymous {
+    justify-content: flex-start;
+  }
+
+  #text-express-app .te-protocol-preview-footer {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  #text-express-app .te-preview-confirm {
+    min-width: 0;
+  }
 }
