@@ -20,7 +20,7 @@
     </section>
   </main>
 
-  <div id="text-express-app" class="te-app" data-version="28.1.0">
+  <div id="text-express-app" class="te-app" data-version="28.2.0">
     <svg class="te-icon-sprite" aria-hidden="true" focusable="false">
       <symbol id="te-i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/></symbol>
       <symbol id="te-i-message-circle" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.9L3 21l1.6-4.2A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/></symbol>
@@ -358,12 +358,9 @@
 
 
     <div class="te-modal-backdrop te-hidden" id="te-protocol-preview-modal" role="presentation">
-      <section class="te-protocol-preview" role="dialog" aria-modal="true" aria-labelledby="te-protocol-preview-title">
-        <header class="te-protocol-preview-header">
-          <div>
-            <span class="te-protocol-preview-kicker">Somente Protocolo</span>
-            <h2 id="te-protocol-preview-title">Pré-Visualização</h2>
-          </div>
+      <section class="te-protocol-preview" role="dialog" aria-modal="false" aria-labelledby="te-protocol-preview-title">
+        <header class="te-protocol-preview-header" data-te-preview-drag-handle>
+          <h2 id="te-protocol-preview-title">Pré-Visualização</h2>
           <button class="te-icon-button" type="button" data-te-action="protocol-preview-cancel" aria-label="Fechar pré-visualização"><svg class="te-icon" aria-hidden="true"><use href="#te-i-x"></use></svg></button>
         </header>
 

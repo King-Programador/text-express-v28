@@ -4872,3 +4872,325 @@
     min-width: 0;
   }
 }
+
+/* ==========================================================
+ * Text Express 28.2.0 — correções consolidadas de interface
+ * ========================================================== */
+
+/* Cartões de sequência: somente o atalho principal fica visível. */
+#text-express-app .te-flow-card .te-flow-shortcuts,
+#text-express-app .te-flow-card .te-protocol-flow-actions-preview {
+  display: none !important;
+}
+
+/* Pré-Visualização modeless: fundo do sistema nítido e clicável. */
+#text-express-app #te-protocol-preview-modal {
+  display: block;
+  padding: 0;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  pointer-events: none;
+}
+
+#text-express-app #te-protocol-preview-modal.te-hidden {
+  display: none !important;
+}
+
+#text-express-app .te-protocol-preview {
+  position: absolute;
+  z-index: 2147483646;
+  width: min(640px, calc(100vw - 32px));
+  max-width: none;
+  max-height: min(860px, calc(100vh - 16px));
+  min-width: 390px;
+  min-height: 360px;
+  border: 1px solid color-mix(in srgb, var(--te-primary) 58%, var(--te-border));
+  border-radius: 16px;
+  background: var(--te-surface);
+  color: var(--te-text);
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--te-header) 28%, transparent);
+  pointer-events: auto;
+}
+
+#text-express-app .te-protocol-preview.te-window-moving,
+#text-express-app .te-protocol-preview.te-window-resizing {
+  user-select: none;
+  transition: none !important;
+}
+
+#text-express-app .te-protocol-preview-header {
+  position: relative;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 52px;
+  border-bottom: 1px solid color-mix(in srgb, var(--te-primary) 35%, transparent);
+  background: linear-gradient(
+    135deg,
+    var(--te-header),
+    color-mix(in srgb, var(--te-header) 76%, var(--te-primary))
+  );
+  color: #fff;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+#text-express-app .te-protocol-preview.te-window-moving .te-protocol-preview-header {
+  cursor: grabbing;
+}
+
+#text-express-app .te-protocol-preview-header h2 {
+  width: 100%;
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 850;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+  text-align: center;
+}
+
+#text-express-app .te-protocol-preview-header > .te-icon-button {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: #fff;
+}
+
+#text-express-app .te-protocol-preview-kicker {
+  display: none !important;
+}
+
+#text-express-app .te-protocol-preview-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background: var(--te-surface);
+}
+
+/* Estados ativos seguem a cor do tema em vez de amarelo/verde fixos. */
+#text-express-app .te-preview-contact-button.te-active {
+  border-color: var(--te-primary);
+  background: var(--te-primary);
+  color: #fff;
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--te-primary) 24%, transparent);
+}
+
+#text-express-app .te-preview-contact-button:hover {
+  border-color: color-mix(in srgb, var(--te-primary) 68%, var(--te-border));
+}
+
+#text-express-app .te-preview-field input:focus,
+#text-express-app .te-preview-field textarea:focus,
+#text-express-app .te-preview-third-party input:focus,
+#text-express-app .te-preview-third-party select:focus,
+#text-express-app .te-preview-contact-row input:focus {
+  border-color: var(--te-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--te-primary) 15%, transparent);
+}
+
+#text-express-app .te-preview-status-card.te-external-active {
+  border-color: color-mix(in srgb, var(--te-primary) 68%, var(--te-border));
+  background: color-mix(in srgb, var(--te-primary-soft) 78%, var(--te-surface));
+}
+
+#text-express-app .te-preview-status-card.te-external-active strong {
+  color: var(--te-primary-strong);
+}
+
+.te-dark #text-express-app .te-preview-status-card.te-external-active,
+#text-express-app.te-dark .te-preview-status-card.te-external-active {
+  border-color: color-mix(in srgb, var(--te-primary) 72%, var(--te-border));
+  background: color-mix(in srgb, var(--te-primary-soft) 74%, var(--te-surface));
+}
+
+.te-dark #text-express-app .te-preview-status-card.te-external-active strong,
+#text-express-app.te-dark .te-preview-status-card.te-external-active strong {
+  color: var(--te-primary-strong);
+}
+
+#text-express-app .te-preview-wait-card {
+  border-color: var(--te-border);
+  background: var(--te-surface-2);
+  color: var(--te-text);
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+
+#text-express-app .te-preview-wait-card.te-wait-active {
+  border-color: color-mix(in srgb, var(--te-primary) 68%, var(--te-border));
+  background: color-mix(in srgb, var(--te-primary-soft) 78%, var(--te-surface));
+  color: var(--te-text);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--te-primary) 10%, transparent) inset;
+}
+
+.te-dark #text-express-app .te-preview-wait-card,
+#text-express-app.te-dark .te-preview-wait-card {
+  border-color: var(--te-border);
+  background: var(--te-surface-2);
+  color: var(--te-text);
+}
+
+.te-dark #text-express-app .te-preview-wait-card.te-wait-active,
+#text-express-app.te-dark .te-preview-wait-card.te-wait-active {
+  border-color: color-mix(in srgb, var(--te-primary) 72%, var(--te-border));
+  background: color-mix(in srgb, var(--te-primary-soft) 74%, var(--te-surface));
+  color: var(--te-text);
+}
+
+#text-express-app .te-preview-confirm,
+#text-express-app .te-preview-confirm[data-te-waiting="true"] {
+  background: linear-gradient(135deg, var(--te-primary), var(--te-primary-strong));
+  color: #fff;
+}
+
+#text-express-app .te-protocol-preview .te-resize-se::after,
+#text-express-app .te-protocol-preview .te-resize-sw::after {
+  color: var(--te-primary);
+}
+
+/* Sequência herda integralmente o tema atual do Text Express. */
+#text-express-app .te-sequence-menu {
+  border-color: color-mix(in srgb, var(--te-primary) 48%, var(--te-border));
+  background: var(--te-surface);
+  color: var(--te-text);
+  box-shadow: var(--te-shadow);
+}
+
+#text-express-app .te-sequence-menu-header {
+  border-bottom-color: var(--te-border);
+  background: color-mix(in srgb, var(--te-surface-2) 72%, var(--te-surface));
+}
+
+#text-express-app .te-sequence-menu-icon,
+#text-express-app .te-sequence-number {
+  background: linear-gradient(145deg, var(--te-primary), var(--te-primary-strong));
+  color: #fff;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--te-primary) 24%, transparent);
+}
+
+#text-express-app .te-sequence-menu-kicker,
+#text-express-app .te-sequence-menu-meta,
+#text-express-app .te-sequence-close small {
+  color: var(--te-muted);
+}
+
+#text-express-app .te-sequence-open-badge {
+  border-color: color-mix(in srgb, var(--te-primary) 32%, var(--te-border));
+  background: color-mix(in srgb, var(--te-primary-soft) 76%, var(--te-surface));
+  color: var(--te-primary-strong);
+}
+
+#text-express-app .te-sequence-menu-title-wrap strong {
+  color: var(--te-text);
+}
+
+#text-express-app .te-sequence-close {
+  border-color: var(--te-border);
+  background: var(--te-surface);
+  color: var(--te-text);
+}
+
+#text-express-app .te-sequence-close:hover {
+  border-color: color-mix(in srgb, var(--te-primary) 40%, var(--te-border));
+  background: var(--te-primary-soft);
+}
+
+#text-express-app .te-sequence-search {
+  border-color: var(--te-border);
+  background: var(--te-surface-2);
+  color: var(--te-muted);
+}
+
+#text-express-app .te-sequence-search:focus-within {
+  border-color: var(--te-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--te-primary) 15%, transparent);
+}
+
+#text-express-app .te-sequence-search input {
+  color: var(--te-text);
+}
+
+#text-express-app .te-sequence-search input::placeholder {
+  color: var(--te-muted);
+}
+
+#text-express-app .te-sequence-list {
+  scrollbar-color: color-mix(in srgb, var(--te-primary) 58%, transparent) transparent;
+}
+
+#text-express-app .te-sequence-item {
+  border-color: var(--te-border);
+  background: var(--te-surface-2);
+  color: var(--te-text);
+}
+
+#text-express-app .te-sequence-item:hover,
+#text-express-app .te-sequence-item:focus-visible {
+  border-color: color-mix(in srgb, var(--te-primary) 72%, var(--te-border));
+  background: color-mix(in srgb, var(--te-primary-soft) 68%, var(--te-surface));
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--te-header) 12%, transparent);
+}
+
+#text-express-app .te-sequence-item.te-current {
+  border-color: var(--te-primary);
+  background: color-mix(in srgb, var(--te-primary-soft) 80%, var(--te-surface));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--te-primary) 12%, transparent) inset;
+}
+
+#text-express-app .te-sequence-item.te-used {
+  border-color: color-mix(in srgb, var(--te-primary) 48%, var(--te-border));
+}
+
+#text-express-app .te-sequence-item-content strong {
+  color: var(--te-text);
+}
+
+#text-express-app .te-sequence-item-content > span:not(.te-sequence-keywords),
+#text-express-app .te-protocol-workflow-menu .te-sequence-item-content > .te-protocol-preview {
+  color: var(--te-muted);
+}
+
+#text-express-app .te-sequence-keywords code {
+  border-color: color-mix(in srgb, var(--te-primary) 32%, var(--te-border));
+  background: color-mix(in srgb, var(--te-primary-soft) 74%, var(--te-surface));
+  color: var(--te-primary-strong);
+}
+
+#text-express-app .te-sequence-keywords em,
+#text-express-app .te-sequence-item-action,
+#text-express-app .te-sequence-item.te-used .te-sequence-item-action {
+  color: var(--te-primary);
+}
+
+#text-express-app .te-sequence-menu-footer {
+  border-top-color: var(--te-border);
+  background: var(--te-surface-2);
+  color: var(--te-muted);
+}
+
+#text-express-app .te-sequence-menu-footer .te-icon,
+#text-express-app .te-sequence-empty .te-icon {
+  color: var(--te-primary);
+}
+
+#text-express-app .te-sequence-empty {
+  border-color: var(--te-border);
+  color: var(--te-muted);
+}
+
+#text-express-app .te-sequence-empty strong {
+  color: var(--te-text);
+}
+
+@media (max-width: 620px) {
+  #text-express-app .te-protocol-preview {
+    min-width: 0;
+    min-height: 320px;
+    width: calc(100vw - 16px);
+    max-height: calc(100vh - 16px);
+  }
+}

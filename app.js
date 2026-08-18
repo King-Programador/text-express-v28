@@ -1,12 +1,12 @@
 /*
- * Text Express 28.1.0
+ * Text Express 28.2.0
  * Expansor de textos para atendimento e registro de protocolos.
  * Sem dependências externas.
  */
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.1.0";
+  const APP_VERSION = "28.2.0";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -17,7 +17,8 @@
     rememberedVariables: "text_express_remembered_variables",
     uiState: "text_express_ui_state",
     panelGeometry: "text_express_panel_geometry_v24",
-    sequenceGeometry: "text_express_sequence_geometry_v24"
+    sequenceGeometry: "text_express_sequence_geometry_v24",
+    protocolPreviewGeometry: "text_express_protocol_preview_geometry_v282"
   });
 
   const DEFAULT_SETTINGS = Object.freeze({
@@ -2185,10 +2186,6 @@
               <option value="tab" ${step.triggerKey === "tab" ? "selected" : ""}>Tab</option>
               <option value="enter" ${step.triggerKey === "enter" ? "selected" : ""}>Enter</option>
             </select>
-          </label>
-          <label class="te-flow-optional-check">
-            <input type="checkbox" data-te-flow-field="opcional" ${step.opcional ? "checked" : ""}>
-            <span>Fala opcional</span>
           </label>
           <label class="te-flow-step-content-field">
             <span>Texto enviado ao cliente</span>
@@ -7763,6 +7760,14 @@
         margin: 8
       };
     }
+    if (scope === "preview") {
+      return {
+        storageKey: STORAGE_KEYS.protocolPreviewGeometry,
+        minWidth: 390,
+        minHeight: 360,
+        margin: 8
+      };
+    }
     return {
       storageKey: STORAGE_KEYS.panelGeometry,
       minWidth: 520,
@@ -7885,8 +7890,8 @@
   TextExpressApp.prototype.startManagedDrag = function (target, scope, event) {
     if (!target || !event) return;
 
-    const isSequence = scope === "sequence";
-    const allowedButton = event.button === 2 || (isSequence && event.button === 0);
+    const allowsPrimaryDrag = scope === "sequence" || scope === "preview";
+    const allowedButton = event.button === 2 || (allowsPrimaryDrag && event.button === 0);
     if (!allowedButton) return;
     if (event.target.closest?.("button, input, textarea, select, a, [data-te-resize-edge]")) return;
     if (scope === "panel" && (target.classList.contains("te-fullscreen") || target.classList.contains("te-hidden"))) return;
@@ -7970,6 +7975,8 @@
     this.storageSet(this.getManagedWindowConfig(scope).storageKey, JSON.stringify(geometry));
     if (scope === "panel") {
       this.storageSet(STORAGE_KEYS.position, JSON.stringify({ left: geometry.left, top: geometry.top }));
+    } else if (scope === "preview") {
+      this.protocolPreviewHasSavedGeometry = true;
     }
   };
 
@@ -8035,8 +8042,10 @@
       if (dragHandle) {
         dragHandle.classList.add("te-right-drag-handle");
         dragHandle.title = scope === "sequence"
-          ? "Arraste este cabeçalho com o botão esquerdo ou direito para mover a sequência"
-          : "Arraste para mover. Também funciona com o botão direito";
+          ? "Arraste este cabeçalho para mover a sequência"
+          : scope === "preview"
+            ? "Arraste este cabeçalho para mover a Pré-Visualização"
+            : "Arraste para mover. Também funciona com o botão direito";
         dragHandle.addEventListener("contextmenu", (event) => {
           if (event.target.closest?.("button, input, textarea, select, a")) return;
           event.preventDefault();
@@ -8044,7 +8053,7 @@
         }, true);
         dragHandle.addEventListener("dragstart", (event) => event.preventDefault(), true);
         dragHandle.addEventListener("pointerdown", (event) => {
-          const canStart = event.button === 2 || (scope === "sequence" && event.button === 0);
+          const canStart = event.button === 2 || ((scope === "sequence" || scope === "preview") && event.button === 0);
           if (canStart) this.startManagedDrag(target, scope, event);
         }, true);
       }
@@ -8077,6 +8086,7 @@
       this.managedWindowResizeListener = () => {
         this.constrainManagedWindow(this.panel, "panel");
         this.constrainManagedWindow(this.sequenceMenu, "sequence");
+        this.constrainManagedWindow(this.protocolPreviewWindow, "preview");
       };
       window.addEventListener("resize", this.managedWindowResizeListener);
     }
@@ -10612,33 +10622,6 @@
               <input type="text" data-te-flow-field="palavrasChave" value="${this.escapeAttr((step.palavrasChave || []).join(", "))}" spellcheck="false" placeholder="/normal, /resolvido, /os">
               <small>Separe por vírgulas. Elas funcionam enquanto este protocolo estiver aberto.</small>
             </label>
-            <label class="te-protocol-action-type-field">
-              <span>Ação ao selecionar</span>
-              <select data-te-flow-field="acaoTipo">
-                <option value="inserir" ${isInsert ? "selected" : ""}>Inserir o texto do protocolo</option>
-                <option value="fluxo" ${isFlow ? "selected" : ""}>Abrir outro fluxo de protocolo</option>
-                <option value="sequencia" ${isSequence ? "selected" : ""}>Abrir sequência do Atendimento</option>
-                <option value="url" ${isUrl ? "selected" : ""}>Abrir atendimento externo</option>
-                <option value="personalizada" ${isCustom ? "selected" : ""}>Executar ação personalizada</option>
-              </select>
-              <small>O padrão é inserir o texto. As demais ações continuam disponíveis para integrações avançadas.</small>
-            </label>
-            <label class="te-flow-step-content-field ${isFlow ? "" : "te-hidden"}" data-te-flow-action-panel="fluxo">
-              <span>Fluxo de destino</span>
-              <select data-te-flow-field="acaoAlvoIdFluxo">${this.renderFlowTargetOptions(flowTargets, step.acaoAlvoId, "Selecione outro fluxo de protocolo")}</select>
-            </label>
-            <label class="te-flow-step-content-field ${isSequence ? "" : "te-hidden"}" data-te-flow-action-panel="sequencia">
-              <span>Sequência de destino</span>
-              <select data-te-flow-field="acaoAlvoIdSequencia">${this.renderFlowTargetOptions(sequenceTargets, step.acaoAlvoId, "Selecione uma sequência do Atendimento")}</select>
-            </label>
-            <label class="te-flow-step-content-field ${isUrl ? "" : "te-hidden"}" data-te-flow-action-panel="url">
-              <span>Endereço do atendimento externo</span>
-              <input type="url" data-te-flow-field="acaoUrl" value="${this.escapeAttr(step.acaoUrl || "")}" placeholder="https://sistema.exemplo/atendimento">
-            </label>
-            <label class="te-flow-step-content-field ${isCustom ? "" : "te-hidden"}" data-te-flow-action-panel="personalizada">
-              <span>Identificador da ação personalizada</span>
-              <input type="text" data-te-flow-field="acaoPersonalizada" value="${this.escapeAttr(step.acaoPersonalizada || "")}" placeholder="ex.: abrir-painel-tecnico">
-            </label>
           </div>
         </article>`;
     }).join("");
@@ -12319,6 +12302,7 @@
 
   TextExpressApp.prototype.setupProtocolPreview = function () {
     this.protocolPreviewModal = this.root.querySelector("#te-protocol-preview-modal");
+    this.protocolPreviewWindow = this.protocolPreviewModal?.querySelector(".te-protocol-preview") || null;
     this.protocolPreviewContent = this.root.querySelector("#te-preview-content");
     this.protocolPreviewReason = this.root.querySelector("#te-preview-reason");
     this.protocolPreviewLabel = this.root.querySelector("#te-preview-label");
@@ -12339,7 +12323,28 @@
     this.protocolPreviewContactNumber = this.root.querySelector("#te-preview-contact-number");
     this.protocolPreviewContactAnonymous = this.root.querySelector("#te-preview-contact-anonymous");
     this.protocolPreviewRole = "Titular";
-    return Boolean(this.protocolPreviewModal);
+    this.protocolPreviewHasSavedGeometry = Boolean(this.storageGet?.(STORAGE_KEYS.protocolPreviewGeometry));
+    this.setupManagedWindow?.(
+      this.protocolPreviewWindow,
+      "preview",
+      this.protocolPreviewWindow?.querySelector("[data-te-preview-drag-handle]")
+    );
+    return Boolean(this.protocolPreviewModal && this.protocolPreviewWindow);
+  };
+
+  TextExpressApp.prototype.centerProtocolPreviewWindow = function () {
+    const target = this.protocolPreviewWindow;
+    if (!target || target.classList.contains("te-hidden")) return false;
+    const rect = target.getBoundingClientRect();
+    if (!rect.width || !rect.height) return false;
+    const margin = this.getManagedWindowConfig?.("preview")?.margin || 8;
+    const left = Math.max(margin, Math.round((window.innerWidth - rect.width) / 2));
+    const top = Math.max(margin, Math.round((window.innerHeight - rect.height) / 2));
+    target.style.left = `${left}px`;
+    target.style.top = `${top}px`;
+    target.style.right = "auto";
+    target.style.bottom = "auto";
+    return true;
   };
 
   TextExpressApp.prototype.isProtocolPreviewOpen = function () {
@@ -12361,6 +12366,7 @@
 
   TextExpressApp.prototype.updateProtocolPreviewWaitUI = function () {
     const waiting = Boolean(this.pendingProtocolPreview?.enviarExterno && this.protocolPreviewWait?.checked);
+    this.protocolPreviewWaitField?.classList.toggle("te-wait-active", waiting);
     if (this.protocolPreviewConfirm) this.protocolPreviewConfirm.dataset.teWaiting = waiting ? "true" : "false";
     if (this.protocolPreviewConfirmLabel) {
       this.protocolPreviewConfirmLabel.textContent = waiting ? "Registrar e Aguardar" : "Registrar e Finalizar";
@@ -12423,7 +12429,14 @@
     this.updateProtocolPreviewWaitUI();
 
     this.protocolPreviewModal.classList.remove("te-hidden");
-    window.requestAnimationFrame(() => this.protocolPreviewContactNumber?.focus());
+    window.requestAnimationFrame(() => {
+      if (!this.protocolPreviewHasSavedGeometry && !this.protocolPreviewWindow?.style.left) {
+        this.centerProtocolPreviewWindow?.();
+      } else {
+        this.constrainManagedWindow?.(this.protocolPreviewWindow, "preview");
+      }
+      this.protocolPreviewContactNumber?.focus();
+    });
     return true;
   };
 
@@ -12825,6 +12838,109 @@
     }
     this.root.dataset.version = APP_VERSION;
     return result;
+  };
+
+
+
+  /* ==========================================================
+   * Text Express 28.2.0 — consolidação das correções de UX
+   * - sequência mostra apenas o atalho principal no cartão;
+   * - "Fala opcional" removida do Atendimento;
+   * - "Ação ao selecionar" removida dos fluxos de Protocolo;
+   * - toda opção final de Protocolo passa pela Pré-Visualização;
+   * - ações avançadas antigas de Protocolo são normalizadas para inserir;
+   * - Pré-Visualização e sequências herdam o tema ativo pelo CSS.
+   * ========================================================== */
+  const teV282Original = Object.freeze({
+    normalizeSnippet: TextExpressApp.prototype.normalizeSnippet,
+    renderCard: TextExpressApp.prototype.renderCard,
+    renderFlowEditorSteps: TextExpressApp.prototype.renderFlowEditorSteps,
+    syncEditingFlowSteps: TextExpressApp.prototype.syncEditingFlowSteps
+  });
+
+  TextExpressApp.prototype.normalizeSnippet = function (raw = {}) {
+    const snippet = teV282Original.normalizeSnippet.call(this, raw);
+    if (!Array.isArray(snippet?.etapas)) return snippet;
+
+    if (snippet.tipo === "atendimento" && snippet.modelo === "fluxo") {
+      snippet.etapas = snippet.etapas.map((step) => ({
+        ...step,
+        opcional: false
+      }));
+    }
+
+    if (snippet.tipo === "protocolo" && snippet.modelo === "fluxo") {
+      snippet.etapas = snippet.etapas.map((step) => ({
+        ...step,
+        acaoTipo: TE_V27_FLOW_ACTIONS.INSERT,
+        acaoAlvoId: "",
+        acaoUrl: "",
+        acaoPersonalizada: ""
+      }));
+    }
+    return snippet;
+  };
+
+  TextExpressApp.prototype.renderCard = function (snippet) {
+    let html = teV282Original.renderCard.call(this, snippet);
+    if (snippet?.modelo !== "fluxo") return html;
+
+    // A listagem principal exibe somente o comando que abre a sequência.
+    html = html.replace(/\s*<div class="te-flow-shortcuts">[\s\S]*?<\/div>/g, "");
+    html = html.replace(/\s*<div class="te-protocol-flow-actions-preview">[\s\S]*?<\/div>/g, "");
+    return html;
+  };
+
+  TextExpressApp.prototype.renderFlowEditorSteps = function () {
+    const editorType = this.getFlowEditorType?.()
+      || this.root.querySelector('input[name="te-type"]:checked')?.value
+      || "atendimento";
+
+    if (editorType === "protocolo" && Array.isArray(this.editingFlowSteps)) {
+      this.editingFlowSteps = this.editingFlowSteps.map((step) => ({
+        ...step,
+        acaoTipo: TE_V27_FLOW_ACTIONS.INSERT,
+        acaoAlvoId: "",
+        acaoUrl: "",
+        acaoPersonalizada: ""
+      }));
+    }
+
+    const result = teV282Original.renderFlowEditorSteps.call(this);
+
+    if (editorType === "atendimento") {
+      this.root.querySelectorAll('#te-flow-editor [data-te-flow-field="opcional"]').forEach((input) => {
+        input.checked = false;
+        input.closest(".te-flow-optional-check")?.remove();
+      });
+    }
+
+    if (editorType === "protocolo") {
+      this.root.querySelectorAll("#te-flow-editor .te-protocol-action-type-field").forEach((field) => field.remove());
+      this.root.querySelectorAll('#te-flow-editor [data-te-flow-action-panel]').forEach((field) => field.remove());
+    }
+    return result;
+  };
+
+  TextExpressApp.prototype.syncEditingFlowSteps = function () {
+    const editorType = this.getFlowEditorType?.()
+      || this.root.querySelector('input[name="te-type"]:checked')?.value
+      || "atendimento";
+    const steps = teV282Original.syncEditingFlowSteps.call(this);
+    if (!Array.isArray(steps)) return steps;
+
+    if (editorType === "atendimento") {
+      for (const step of steps) step.opcional = false;
+    } else if (editorType === "protocolo") {
+      for (const step of steps) {
+        step.acaoTipo = TE_V27_FLOW_ACTIONS.INSERT;
+        step.acaoAlvoId = "";
+        step.acaoUrl = "";
+        step.acaoPersonalizada = "";
+      }
+    }
+    this.editingFlowSteps = steps;
+    return steps;
   };
 
   function bootTextExpress() {
