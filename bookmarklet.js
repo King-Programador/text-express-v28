@@ -1,9 +1,9 @@
-/* Text Express 28.4.0 — carregador autossuficiente */
+/* Text Express 28.5.0 — carregador autossuficiente */
 (() => {
   "use strict";
 
   const documentRef = document;
-  const targetVersion = "28.4.0";
+  const targetVersion = "28.5.0";
   const currentScript = documentRef.currentScript;
   const baseUrl = currentScript?.src
     ? new URL("./", currentScript.src).href
@@ -69,7 +69,7 @@
       stylesheet.rel = "stylesheet";
       (documentRef.head || documentRef.documentElement).appendChild(stylesheet);
     }
-    stylesheet.href = baseUrl + "styles.css?v=28.4.0";
+    stylesheet.href = baseUrl + "styles.css?v=28.5.0";
 
     let inlineStyles = documentRef.getElementById("te-bookmarklet-inline-style");
     if (!inlineStyles) {
@@ -81,7 +81,7 @@
 
     if (!documentRef.getElementById("text-express-app")) {
       const parsed = new DOMParser().parseFromString(
-        "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"color-scheme\" content=\"light dark\">\n  <title>Text Express</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body class=\"te-page\">\n  <main class=\"te-demo-page\" aria-label=\"Página demonstrativa do Text Express\">\n    <section class=\"te-demo-card\">\n      <span class=\"te-demo-eyebrow\">Demonstração local</span>\n      <h1>Text Express</h1>\n      <p>Use o campo abaixo para testar os atalhos. Por exemplo, digite <strong>/sky</strong> e pressione Espaço.</p>\n      <label for=\"te-demo-message\">Mensagem de atendimento</label>\n      <textarea id=\"te-demo-message\" rows=\"8\" placeholder=\"Digite uma mensagem ou um atalho...\"></textarea>\n      <label for=\"te-demo-protocol\">Registro do protocolo</label>\n      <textarea id=\"te-demo-protocol\" rows=\"8\" placeholder=\"Digite um protocolo ou use o painel...\"></textarea>\n    </section>\n  </main>\n\n  <div id=\"text-express-app\" class=\"te-app\" data-version=\"28.4.0\">\n    <svg class=\"te-icon-sprite\" aria-hidden=\"true\" focusable=\"false\">\n      <symbol id=\"te-i-zap\" viewBox=\"0 0 24 24\"><path d=\"M13 2 3 14h9l-1 8 10-12h-9l1-8Z\"/></symbol>\n      <symbol id=\"te-i-message-circle\" viewBox=\"0 0 24 24\"><path d=\"M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.9L3 21l1.6-4.2A8.5 8.5 0 1 1 21 11.5Z\"/><path d=\"M8 12h.01M12 12h.01M16 12h.01\"/></symbol>\n      <symbol id=\"te-i-file-text\" viewBox=\"0 0 24 24\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z\"/><path d=\"M14 2v6h6M8 13h8M8 17h8M8 9h2\"/></symbol>\n      <symbol id=\"te-i-star\" viewBox=\"0 0 24 24\"><path d=\"m12 2 3 6.1 6.7 1-4.9 4.7 1.2 6.7-6-3.2-6 3.2 1.2-6.7-4.9-4.7 6.7-1Z\"/></symbol>\n      <symbol id=\"te-i-moon\" viewBox=\"0 0 24 24\"><path d=\"M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z\"/></symbol>\n      <symbol id=\"te-i-sun\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4\"/></symbol>\n      <symbol id=\"te-i-minus\" viewBox=\"0 0 24 24\"><path d=\"M5 12h14\"/></symbol>\n      <symbol id=\"te-i-maximize-2\" viewBox=\"0 0 24 24\"><path d=\"M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7\"/></symbol>\n      <symbol id=\"te-i-minimize-2\" viewBox=\"0 0 24 24\"><path d=\"M4 14h6v6M20 10h-6V4M10 14l-7 7M14 10l7-7\"/></symbol>\n      <symbol id=\"te-i-x\" viewBox=\"0 0 24 24\"><path d=\"m18 6-12 12M6 6l12 12\"/></symbol>\n      <symbol id=\"te-i-search\" viewBox=\"0 0 24 24\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-4-4\"/></symbol>\n      <symbol id=\"te-i-plus\" viewBox=\"0 0 24 24\"><path d=\"M12 5v14M5 12h14\"/></symbol>\n      <symbol id=\"te-i-settings\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1H21v4h-.1a1.7 1.7 0 0 0-1.5 1Z\"/></symbol>\n      <symbol id=\"te-i-upload\" viewBox=\"0 0 24 24\"><path d=\"M12 16V4M7 9l5-5 5 5M5 20h14\"/></symbol>\n      <symbol id=\"te-i-download\" viewBox=\"0 0 24 24\"><path d=\"M12 4v12M7 11l5 5 5-5M5 20h14\"/></symbol>\n      <symbol id=\"te-i-rotate-ccw\" viewBox=\"0 0 24 24\"><path d=\"M3 12a9 9 0 1 0 3-6.7L3 8\"/><path d=\"M3 3v5h5\"/></symbol>\n      <symbol id=\"te-i-edit\" viewBox=\"0 0 24 24\"><path d=\"M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z\"/></symbol>\n      <symbol id=\"te-i-trash\" viewBox=\"0 0 24 24\"><path d=\"M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6\"/></symbol>\n      <symbol id=\"te-i-send\" viewBox=\"0 0 24 24\"><path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/></symbol>\n      <symbol id=\"te-i-copy\" viewBox=\"0 0 24 24\"><rect x=\"9\" y=\"9\" width=\"11\" height=\"11\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></symbol>\n      <symbol id=\"te-i-chevron-left\" viewBox=\"0 0 24 24\"><path d=\"m15 18-6-6 6-6\"/></symbol>\n      <symbol id=\"te-i-chevron-right\" viewBox=\"0 0 24 24\"><path d=\"m9 18 6-6-6-6\"/></symbol>\n      <symbol id=\"te-i-folder\" viewBox=\"0 0 24 24\"><path d=\"M3 5h7l2 2h9v12H3Z\"/></symbol>\n      <symbol id=\"te-i-wifi\" viewBox=\"0 0 24 24\"><path d=\"M5 12.6a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14 14 0 0 1 20 0\"/><circle cx=\"12\" cy=\"20\" r=\"1\"/></symbol>\n      <symbol id=\"te-i-globe\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18\"/></symbol>\n      <symbol id=\"te-i-phone\" viewBox=\"0 0 24 24\"><path d=\"M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z\"/></symbol>\n      <symbol id=\"te-i-monitor\" viewBox=\"0 0 24 24\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\"/><path d=\"M8 21h8M12 17v4\"/></symbol>\n      <symbol id=\"te-i-wrench\" viewBox=\"0 0 24 24\"><path d=\"M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5L20 16.4a2.1 2.1 0 0 1-3 3l-7.7-7.7\"/></symbol>\n      <symbol id=\"te-i-server\" viewBox=\"0 0 24 24\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"7\" rx=\"2\"/><rect x=\"3\" y=\"14\" width=\"18\" height=\"7\" rx=\"2\"/><path d=\"M7 6h.01M7 17h.01\"/></symbol>\n      <symbol id=\"te-i-wallet\" viewBox=\"0 0 24 24\"><path d=\"M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h16v10H5a3 3 0 0 1-3-3V6\"/><path d=\"M16 13h2\"/></symbol>\n      <symbol id=\"te-i-radio\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"2\"/><path d=\"M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4M19 5a10 10 0 0 1 0 14M5 19A10 10 0 0 1 5 5\"/></symbol>\n      <symbol id=\"te-i-users\" viewBox=\"0 0 24 24\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8\"/></symbol>\n      <symbol id=\"te-i-network\" viewBox=\"0 0 24 24\"><rect x=\"9\" y=\"2\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"2\" y=\"16\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"16\" y=\"16\" width=\"6\" height=\"6\" rx=\"1\"/><path d=\"M12 8v4M5 16v-4h14v4\"/></symbol>\n      <symbol id=\"te-i-layout-grid\" viewBox=\"0 0 24 24\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/></symbol>\n      <symbol id=\"te-i-reply\" viewBox=\"0 0 24 24\"><path d=\"m9 17-5-5 5-5M4 12h10a6 6 0 0 1 6 6v1\"/></symbol>\n      <symbol id=\"te-i-clipboard-list\" viewBox=\"0 0 24 24\"><rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"/><path d=\"M9 4V2h6v2M9 10h6M9 14h6M9 18h4\"/></symbol>\n      <symbol id=\"te-i-alert-triangle\" viewBox=\"0 0 24 24\"><path d=\"M10.3 3.7 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z\"/><path d=\"M12 9v4M12 17h.01\"/></symbol>\n      <symbol id=\"te-i-compass\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m16 8-2.5 5.5L8 16l2.5-5.5Z\"/></symbol>\n      <symbol id=\"te-i-check-circle\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m8 12 3 3 5-6\"/></symbol>\n      <symbol id=\"te-i-play-circle\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m10 8 6 4-6 4Z\"/></symbol>\n      <symbol id=\"te-i-clock\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/></symbol>\n      <symbol id=\"te-i-tag\" viewBox=\"0 0 24 24\"><path d=\"M20 13 13 20l-9-9V4h7Z\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1\"/></symbol>\n      <symbol id=\"te-i-headphones\" viewBox=\"0 0 24 24\"><path d=\"M4 14a8 8 0 0 1 16 0M4 14v5h4v-6H4M20 14v5h-4v-6h4\"/></symbol>\n      <symbol id=\"te-i-shield-check\" viewBox=\"0 0 24 24\"><path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z\"/><path d=\"m9 12 2 2 4-4\"/></symbol>\n      <symbol id=\"te-i-database\" viewBox=\"0 0 24 24\"><ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"/><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6\"/></symbol>\n      <symbol id=\"te-i-smartphone\" viewBox=\"0 0 24 24\"><rect x=\"6\" y=\"2\" width=\"12\" height=\"20\" rx=\"2\"/><path d=\"M10 18h4\"/></symbol>\n      <symbol id=\"te-i-package\" viewBox=\"0 0 24 24\"><path d=\"m12 2 9 5-9 5-9-5Z\"/><path d=\"m3 7 9 5 9-5v10l-9 5-9-5Z\"/></symbol>\n      <symbol id=\"te-i-map-pin\" viewBox=\"0 0 24 24\"><path d=\"M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"2\"/></symbol>\n      <symbol id=\"te-i-bell\" viewBox=\"0 0 24 24\"><path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4\"/></symbol>\n      <symbol id=\"te-i-palette\" viewBox=\"0 0 24 24\"><path d=\"M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 0-4H12a2 2 0 0 1 0-4h3a6 6 0 0 0 0-12Z\"/><circle cx=\"7\" cy=\"10\" r=\"1\"/><circle cx=\"9\" cy=\"6\" r=\"1\"/><circle cx=\"14\" cy=\"6\" r=\"1\"/></symbol>\n      <symbol id=\"te-i-save\" viewBox=\"0 0 24 24\"><path d=\"M5 3h12l2 2v16H5Z\"/><path d=\"M8 3v6h8V3M8 21v-7h8v7\"/></symbol>\n      <symbol id=\"te-i-info\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8h.01\"/></symbol>\n      <symbol id=\"te-i-sliders\" viewBox=\"0 0 24 24\"><path d=\"M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6\"/></symbol>\n      <symbol id=\"te-i-check\" viewBox=\"0 0 24 24\"><path d=\"m5 12 4 4L19 6\"/></symbol>\n      <symbol id=\"te-i-more-horizontal\" viewBox=\"0 0 24 24\"><circle cx=\"5\" cy=\"12\" r=\"1\"/><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/></symbol>\n      <symbol id=\"te-i-activity\" viewBox=\"0 0 24 24\"><path d=\"M3 12h4l2.5-7 5 14 2.5-7H21\"/></symbol>\n    </svg>\n    <section class=\"te-panel te-hidden\" role=\"dialog\" aria-label=\"Text Express\" aria-modal=\"false\">\n      <header class=\"te-header\" data-te-drag-handle>\n        <div class=\"te-brand\">\n          <span class=\"te-brand-icon\" aria-hidden=\"true\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-zap\"></use></svg></span>\n          <div>\n            <strong>Text Express</strong>\n            <span class=\"te-subtitle\">Atendimento, protocolos e produtividade</span>\n          </div>\n        </div>\n\n        <div class=\"te-header-actions\">\n          <span class=\"te-count-badge\" id=\"te-count-badge\" aria-live=\"polite\">0 modelos</span>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"theme\" title=\"Alternar tema\" aria-label=\"Alternar tema\">\n            <span class=\"te-theme-icon\" aria-hidden=\"true\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-moon\"></use></svg></span>\n          </button>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"minimize\" title=\"Recolher para o ícone\" aria-label=\"Recolher para o ícone\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-minus\"></use></svg>\n          </button>\n          <button class=\"te-icon-button te-fullscreen-button\" type=\"button\" data-te-action=\"fullscreen\" title=\"Preencher toda a tela\" aria-label=\"Preencher toda a tela\" aria-pressed=\"false\">\n            <svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-maximize-2\"></use></svg>\n          </button>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"close\" title=\"Fechar painel e manter o ícone\" aria-label=\"Fechar painel e manter o ícone\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg>\n          </button>\n        </div>\n      </header>\n\n      <div class=\"te-expandable\">\n        <nav class=\"te-main-tabs\" aria-label=\"Tipos de modelo\">\n          <button class=\"te-main-tab te-active\" type=\"button\" data-te-type=\"atendimento\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-message-circle\"></use></svg> Atendimento\n          </button>\n          <button class=\"te-main-tab\" type=\"button\" data-te-type=\"protocolo\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-file-text\"></use></svg> Protocolo\n          </button>\n          <button class=\"te-main-tab\" type=\"button\" data-te-type=\"favoritos\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-star\"></use></svg> Favoritos\n          </button>\n          <button class=\"te-main-tab\" type=\"button\" data-te-type=\"produtividade\">\n            <svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-activity\"></use></svg> Produtividade\n          </button>\n        </nav>\n\n        <section class=\"te-toolbar\" aria-label=\"Busca e criação\">\n          <label class=\"te-search-box\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-search\"></use></svg>\n            <input id=\"te-search-input\" type=\"search\" autocomplete=\"off\" placeholder=\"Buscar por nome, atalho ou conteúdo...\" aria-label=\"Buscar modelos\">\n          </label>\n          <button class=\"te-primary-button\" type=\"button\" data-te-action=\"new\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-plus\"></use></svg> Novo\n          </button>\n        </section>\n\n        <nav class=\"te-category-bar\" id=\"te-category-bar\" aria-label=\"Categorias. Arraste horizontalmente para visualizar mais opções.\" tabindex=\"0\"></nav>\n\n        <section class=\"te-content-area\">\n          <div class=\"te-list-pane\">\n            <div class=\"te-list\" id=\"te-snippet-list\" aria-live=\"polite\"></div>\n            <div class=\"te-empty-state te-hidden\" id=\"te-empty-state\">\n              <svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-search\"></use></svg>\n              <strong>Nenhum modelo encontrado</strong>\n              <p>Altere os filtros ou crie um novo modelo.</p>\n            </div>\n          </div>\n\n          <aside class=\"te-detail-pane\" id=\"te-detail-pane\" aria-label=\"Detalhes do modelo\">\n            <div class=\"te-detail-empty\">\n              <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-zap\"></use></svg>\n              <strong>Selecione um modelo</strong>\n              <p>Veja o conteúdo completo, as variáveis e o atalho de ativação.</p>\n            </div>\n          </aside>\n        </section>\n\n        <section class=\"te-productivity-view te-hidden\" id=\"te-productivity-view\" aria-label=\"Produtividade\">\n          <div class=\"te-productivity-heading\">\n            <div>\n              <span class=\"te-productivity-kicker\">Monitor do Genesys</span>\n              <h2>Produtividade</h2>\n            </div>\n            <span class=\"te-productivity-health\" id=\"te-productivity-health\">Aguardando Genesys</span>\n          </div>\n\n          <nav class=\"te-productivity-tabs\" aria-label=\"Seções de produtividade\">\n            <button type=\"button\" class=\"te-productivity-tab te-active\" data-te-productivity-tab=\"resumo\">Resumo</button>\n            <button type=\"button\" class=\"te-productivity-tab\" data-te-productivity-tab=\"historico\">Histórico</button>\n            <button type=\"button\" class=\"te-productivity-tab\" data-te-productivity-tab=\"grafico\">Gráfico</button>\n            <button type=\"button\" class=\"te-productivity-tab\" data-te-productivity-tab=\"configuracoes\">Configurações</button>\n            <button type=\"button\" class=\"te-productivity-tab\" data-te-productivity-tab=\"diagnostico\">Diagnóstico</button>\n          </nav>\n\n          <div class=\"te-productivity-pages\">\n            <section class=\"te-productivity-page te-active\" data-te-productivity-page=\"resumo\">\n              <div class=\"te-productivity-metrics\">\n                <article class=\"te-productivity-metric\"><span>Hoje</span><strong id=\"te-prod-count\">0 / 45</strong><small id=\"te-prod-missing\">Faltam 45</small></article>\n                <article class=\"te-productivity-metric\"><span>TMA</span><strong id=\"te-prod-tma\">00:00</strong><small>tempo médio total</small></article>\n                <article class=\"te-productivity-metric\"><span>TME</span><strong id=\"te-prod-tme\">00:00</strong><small>tempo médio em foco</small></article>\n                <article class=\"te-productivity-metric\"><span>Abertas</span><strong id=\"te-prod-open\">0</strong><small id=\"te-prod-peak\">Pico: 0</small></article>\n              </div>\n              <div class=\"te-productivity-progress\"><div id=\"te-prod-progress-bar\"></div></div>\n\n              <div class=\"te-productivity-section-head\">\n                <div><strong>Interações agora</strong><span>Timers individuais do Genesys</span></div>\n                <div class=\"te-productivity-inline-actions\">\n                  <button type=\"button\" class=\"te-secondary-button te-compact-button\" data-te-productivity-action=\"pause-current\">Pausar atual</button>\n                  <button type=\"button\" class=\"te-secondary-button te-compact-button\" data-te-productivity-action=\"exclude-current\">Não contabilizar</button>\n                </div>\n              </div>\n              <div class=\"te-productivity-current\" id=\"te-productivity-current-list\"></div>\n              <div class=\"te-productivity-alert-summary\" id=\"te-productivity-alert-summary\">Nenhum alerta ativo.</div>\n            </section>\n\n            <section class=\"te-productivity-page\" data-te-productivity-page=\"historico\">\n              <div class=\"te-productivity-section-head\">\n                <div><strong>Histórico de atendimentos</strong><select id=\"te-prod-history-date\" class=\"te-productivity-date-select\" aria-label=\"Dia do histórico\"></select></div>\n                <div class=\"te-productivity-filter-group\">\n                  <button type=\"button\" class=\"te-filter-chip te-active\" data-te-productivity-filter=\"all\">Todos</button>\n                  <button type=\"button\" class=\"te-filter-chip\" data-te-productivity-filter=\"chat\">💬 Chat</button>\n                  <button type=\"button\" class=\"te-filter-chip\" data-te-productivity-filter=\"call\">☎ Ligação</button>\n                </div>\n              </div>\n              <div class=\"te-productivity-history\" id=\"te-productivity-history-list\"></div>\n            </section>\n\n            <section class=\"te-productivity-page\" data-te-productivity-page=\"grafico\">\n              <div class=\"te-productivity-section-head\">\n                <div><strong>Atendimentos por hora</strong><span>Somente interações contabilizadas</span></div>\n                <div class=\"te-productivity-filter-group\">\n                  <button type=\"button\" class=\"te-filter-chip te-active\" data-te-productivity-chart-filter=\"all\">Todos</button>\n                  <button type=\"button\" class=\"te-filter-chip\" data-te-productivity-chart-filter=\"chat\">💬 Chat</button>\n                  <button type=\"button\" class=\"te-filter-chip\" data-te-productivity-chart-filter=\"call\">☎ Ligação</button>\n                </div>\n              </div>\n              <div class=\"te-productivity-chart\" id=\"te-productivity-chart\"></div>\n            </section>\n\n            <section class=\"te-productivity-page\" data-te-productivity-page=\"configuracoes\">\n              <div class=\"te-productivity-settings-grid\">\n                <div class=\"te-productivity-settings-group\">\n                  <h3>Geral</h3>\n                  <label><span>Meta diária</span><input id=\"te-prod-setting-target\" type=\"number\" min=\"1\" max=\"999\" step=\"1\"></label>\n                  <label><span>Modelo do contador</span><select id=\"te-prod-setting-counter-model\"><option value=\"number\">Só número</option><option value=\"progress\">Mini progresso</option><option value=\"dial\">Mini controle + número</option></select></label>\n                  <label><span>Histórico (dias)</span><input id=\"te-prod-setting-retention\" type=\"number\" min=\"1\" max=\"365\" step=\"1\"></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-show-counter\" type=\"checkbox\"><span>Mostrar mini contador</span></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-alerts\" type=\"checkbox\"><span>Alertas visuais ativos</span></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-history\" type=\"checkbox\"><span>Guardar detalhes no histórico</span></label>\n                </div>\n\n                <div class=\"te-productivity-settings-group\">\n                  <h3>💬 Chat</h3>\n                  <label><span>Check verde (seg)</span><input id=\"te-prod-setting-chat-check\" type=\"number\" min=\"1\" max=\"3600\" step=\"1\"></label>\n                  <label><span>Cliente inativo (seg)</span><input id=\"te-prod-setting-client-inactive\" type=\"number\" min=\"1\" max=\"3600\" step=\"1\"></label>\n                  <label><span>Atendente inativo (seg)</span><input id=\"te-prod-setting-operator-inactive\" type=\"number\" min=\"1\" max=\"3600\" step=\"1\"></label>\n                  <label><span>Conversa longa (min)</span><input id=\"te-prod-setting-chat-long\" type=\"number\" min=\"1\" max=\"240\" step=\"1\"></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-count-chat\" type=\"checkbox\"><span>Contabilizar na meta</span></label>\n                </div>\n\n                <div class=\"te-productivity-settings-group\">\n                  <h3>☎ Ligação</h3>\n                  <label><span>Check verde (seg)</span><input id=\"te-prod-setting-call-check\" type=\"number\" min=\"1\" max=\"3600\" step=\"1\"></label>\n                  <label><span>Ligação longa (min)</span><input id=\"te-prod-setting-call-long\" type=\"number\" min=\"1\" max=\"240\" step=\"1\"></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-count-call\" type=\"checkbox\"><span>Contabilizar na meta</span></label>\n                </div>\n              </div>\n              <div class=\"te-productivity-settings-actions\">\n                <button type=\"button\" class=\"te-secondary-button\" data-te-productivity-action=\"restore-settings\">Restaurar parâmetros padrão</button>\n                <button type=\"button\" class=\"te-danger-button\" data-te-productivity-action=\"reset-today\">Zerar dados de hoje</button>\n                <button type=\"button\" class=\"te-primary-button\" data-te-productivity-action=\"save-settings\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-save\"></use></svg> Salvar produtividade</button>\n              </div>\n            </section>\n\n            <section class=\"te-productivity-page\" data-te-productivity-page=\"diagnostico\">\n              <div class=\"te-productivity-diagnostics\" id=\"te-productivity-diagnostics\"></div>\n            </section>\n          </div>\n        </section>\n\n        <footer class=\"te-footer\">\n          <div class=\"te-status\" id=\"te-status-counts\">Atendimento: 0 · Protocolo: 0 · Total: 0</div>\n          <div class=\"te-footer-actions\">\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"settings\" title=\"Configurações\">\n              <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-settings\"></use></svg> Configurações\n            </button>\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"import\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-upload\"></use></svg> Importar</button>\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"export\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-download\"></use></svg> Exportar</button>\n            <button class=\"te-danger-button\" type=\"button\" data-te-action=\"reset\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-rotate-ccw\"></use></svg> Restaurar padrões</button>\n          </div>\n        </footer>\n      </div>\n    </section>\n\n    <button class=\"te-reopen-button\" type=\"button\" data-te-action=\"reopen\" title=\"Clique para abrir ou arraste para mover\" aria-label=\"Abrir ou mover o Text Express\"><span class=\"te-launcher-label\">Abrir Text Express</span>\n      <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-zap\"></use></svg>\n    </button>\n\n    <button class=\"te-productivity-counter te-hidden\" id=\"te-productivity-counter\" type=\"button\" aria-label=\"Contador de interações de hoje\" title=\"Clique para ajustar; arraste para mover\">\n      <span class=\"te-productivity-counter-dial\" aria-hidden=\"true\"></span>\n      <span class=\"te-productivity-counter-progress\" aria-hidden=\"true\"><i></i></span>\n      <strong id=\"te-productivity-counter-value\">0</strong>\n    </button>\n    <div class=\"te-productivity-counter-popover te-hidden\" id=\"te-productivity-counter-popover\">\n      <span>Interações de hoje</span>\n      <div class=\"te-productivity-counter-editor\">\n        <button type=\"button\" data-te-productivity-action=\"counter-minus\" aria-label=\"Diminuir\">−</button>\n        <input id=\"te-productivity-counter-input\" type=\"number\" min=\"0\" max=\"9999\" step=\"1\" aria-label=\"Quantidade de interações\">\n        <button type=\"button\" data-te-productivity-action=\"counter-plus\" aria-label=\"Aumentar\">+</button>\n      </div>\n      <small id=\"te-productivity-counter-meta\">Meta: 45</small>\n      <button type=\"button\" class=\"te-primary-button te-compact-button\" data-te-productivity-action=\"counter-save\">Salvar</button>\n    </div>\n\n    <input class=\"te-hidden\" id=\"te-import-input\" type=\"file\" accept=\"application/json,.json\">\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-snippet-modal\" role=\"presentation\">\n      <section class=\"te-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"te-modal-title\">\n        <header class=\"te-modal-header\">\n          <div>\n            <span class=\"te-modal-kicker te-hidden\" id=\"te-modal-kicker\" aria-hidden=\"true\"></span>\n            <h2 id=\"te-modal-title\">Criar modelo</h2>\n          </div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"modal-close\" aria-label=\"Fechar modal\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n\n        <form id=\"te-snippet-form\" novalidate>\n          <input id=\"te-form-id\" type=\"hidden\">\n\n          <fieldset class=\"te-type-selector\">\n            <legend>Tipo</legend>\n            <label>\n              <input type=\"radio\" name=\"te-type\" value=\"atendimento\" checked>\n              <span><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-message-circle\"></use></svg> Atendimento</span>\n            </label>\n            <label>\n              <input type=\"radio\" name=\"te-type\" value=\"protocolo\">\n              <span><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-file-text\"></use></svg> Protocolo</span>\n            </label>\n          </fieldset>\n\n          <fieldset class=\"te-model-kind-selector te-hidden\" id=\"te-model-kind-selector\">\n            <legend id=\"te-model-kind-legend\">Formato do atendimento</legend>\n            <label>\n              <input type=\"radio\" name=\"te-model-kind\" value=\"unico\" checked>\n              <span><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-message-circle\"></use></svg> <span data-te-kind-label=\"unico\">Fala única</span></span>\n            </label>\n            <label>\n              <input type=\"radio\" name=\"te-model-kind\" value=\"fluxo\">\n              <span><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-clipboard-list\"></use></svg> <span data-te-kind-label=\"fluxo\">Sequência de falas</span></span>\n            </label>\n          </fieldset>\n\n          <div class=\"te-form-grid\">\n            <label class=\"te-field te-field-wide\">\n              <span>Nome do modelo</span>\n              <input id=\"te-form-name\" type=\"text\" maxlength=\"100\" required placeholder=\"Ex.: Solicitar reinício dos equipamentos\">\n              <small class=\"te-field-error\" data-te-error=\"name\"></small>\n            </label>\n\n            <label class=\"te-field te-field-wide\">\n              <span>Atalho de ativação</span>\n              <div class=\"te-input-with-action\">\n                <input id=\"te-form-shortcut\" type=\"text\" maxlength=\"60\" required spellcheck=\"false\" placeholder=\"/reiniciar\">\n                <button type=\"button\" class=\"te-inline-button\" data-te-action=\"suggest-shortcut\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-zap\"></use></svg> Sugerir</button>\n              </div>\n              <small>Você escolhe o comando. Ele sempre começará com “/”.</small>\n              <small class=\"te-field-error\" data-te-error=\"shortcut\"></small>\n            </label>\n\n            <label class=\"te-field\">\n              <span>Expandir ao pressionar</span>\n              <select id=\"te-form-trigger\">\n                <option value=\"space\">Espaço</option>\n                <option value=\"tab\">Tab</option>\n                <option value=\"enter\">Enter</option>\n              </select>\n            </label>\n\n            <div class=\"te-field\">\n              <span>Categoria</span>\n              <div class=\"te-input-with-action te-category-select-row\">\n                <select id=\"te-form-category\" aria-label=\"Categoria do modelo\"></select>\n                <button type=\"button\" class=\"te-inline-icon-button\" data-te-action=\"category-add-from-form\" title=\"Criar categoria\" aria-label=\"Criar categoria\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-plus\"></use></svg></button>\n              </div>\n            </div>\n\n            <label class=\"te-field te-field-wide te-hidden\" id=\"te-protocol-label-field\">\n              <span>Etiqueta automática do protocolo</span>\n              <input id=\"te-form-system-label\" type=\"text\" maxlength=\"180\" list=\"te-system-label-options\" autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Pesquise uma etiqueta ou digite uma nova\">\n              <datalist id=\"te-system-label-options\"></datalist>\n              <small>Opcional. Vale para o cartão inteiro e, em cartões com sequência, é usada uma única vez mesmo ao trocar de opção.</small>\n            </label>\n\n            <label class=\"te-check-field te-field-wide te-hidden te-protocol-external-field\" id=\"te-protocol-external-field\">\n              <input id=\"te-form-external\" type=\"checkbox\">\n              <span><strong>Enviar para o Externo ao executar este protocolo</strong><small>O sistema continua responsável por definir automaticamente a equipe de destino.</small></span>\n            </label>\n\n            <div class=\"te-protocol-external-details te-field-wide te-hidden\" id=\"te-protocol-external-details\">\n              <label class=\"te-field\">\n                <span>Problema externo</span>\n                <input id=\"te-form-external-problem\" type=\"text\" maxlength=\"180\" list=\"te-external-problem-options\" autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Ex.: problema usado em Suporte Externo\">\n                <datalist id=\"te-external-problem-options\"></datalist>\n              </label>\n              <label class=\"te-field\">\n                <span>Serviço</span>\n                <input id=\"te-form-external-service\" type=\"text\" maxlength=\"180\" list=\"te-external-service-options\" autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Serviço selecionado no encaminhamento\">\n                <datalist id=\"te-external-service-options\"></datalist>\n              </label>\n              <small class=\"te-protocol-external-details-help\">Quando houver correspondência na base local importada do Mascara, estes campos são preenchidos automaticamente e continuam editáveis.</small>\n            </div>\n\n            <div class=\"te-field te-field-wide\" id=\"te-single-content-wrap\">\n              <label>\n                <span>Conteúdo do modelo</span>\n                <textarea id=\"te-form-content\" rows=\"7\" placeholder=\"Digite o texto que será inserido...\"></textarea>\n              </label>\n              <small class=\"te-field-error\" data-te-error=\"content\"></small>\n            </div>\n\n            <section class=\"te-flow-editor te-field-wide te-hidden\" id=\"te-flow-editor\" aria-label=\"Editor da sequência de falas\">\n              <div class=\"te-flow-editor-heading\">\n                <div>\n                  <strong id=\"te-flow-editor-title\">Falas da sequência</strong>\n                  <small id=\"te-flow-editor-help\">O atalho principal abre a sequência. Os atalhos numerados inserem uma fala diretamente.</small>\n                </div>\n                <button class=\"te-secondary-button te-compact-button\" type=\"button\" data-te-action=\"flow-step-add\">\n                  <svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-plus\"></use></svg> <span id=\"te-flow-add-label\">Adicionar fala</span>\n                </button>\n              </div>\n              <div class=\"te-flow-editor-steps\" id=\"te-flow-editor-steps\"></div>\n              <small class=\"te-field-error\" id=\"te-flow-error\"></small>\n            </section>\n\n            <div class=\"te-field te-field-wide\">\n              <span>Variáveis detectadas</span>\n              <div class=\"te-variable-tags\" id=\"te-variable-preview\">\n                <span class=\"te-muted\">Nenhuma variável encontrada.</span>\n              </div>\n              <small>Use o formato <code>[nome]</code>, <code>[prazo]</code> ou qualquer outro campo entre colchetes.</small>\n            </div>\n\n            <label class=\"te-check-field te-field-wide\">\n              <input id=\"te-form-favorite\" type=\"checkbox\">\n              <span>Adicionar aos favoritos</span>\n            </label>\n          </div>\n\n          <footer class=\"te-modal-footer te-model-modal-footer\">\n            <span class=\"te-model-save-status\" id=\"te-model-save-status\" role=\"status\" aria-live=\"polite\"></span>\n            <span class=\"te-modal-footer-spacer\"></span>\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"modal-close\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg> Fechar</button>\n            <button class=\"te-primary-button\" type=\"submit\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-save\"></use></svg> Salvar e concluir</button>\n          </footer>\n        </form>\n      </section>\n    </div>\n\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-category-modal\" role=\"presentation\">\n      <section class=\"te-modal te-category-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"te-category-modal-title\">\n        <header class=\"te-modal-header\">\n          <div class=\"te-modal-heading-with-icon\"><span class=\"te-modal-heading-icon\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-palette\"></use></svg></span><div>\n            <span class=\"te-modal-kicker\" id=\"te-category-modal-kicker\">Nova categoria</span>\n            <h2 id=\"te-category-modal-title\">Criar categoria</h2>\n          </div></div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"category-close\" aria-label=\"Fechar\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n        <form id=\"te-category-form\" novalidate>\n          <input id=\"te-category-form-id\" type=\"hidden\">\n          <input id=\"te-category-form-icon\" type=\"hidden\" value=\"folder\">\n          <fieldset class=\"te-type-selector te-category-type-selector\">\n            <legend>Exibir em</legend>\n            <label><input type=\"radio\" name=\"te-category-type\" value=\"atendimento\" checked><span><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-message-circle\"></use></svg> Atendimento</span></label>\n            <label><input type=\"radio\" name=\"te-category-type\" value=\"protocolo\"><span><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-file-text\"></use></svg> Protocolo</span></label>\n          </fieldset>\n          <div class=\"te-form-grid\">\n            <label class=\"te-field te-field-wide\"><span>Nome da categoria</span><input id=\"te-category-form-name\" maxlength=\"48\" placeholder=\"Ex.: Cobranças e pagamentos\" required><small class=\"te-field-error\" id=\"te-category-name-error\"></small></label>\n            <div class=\"te-field te-field-wide\"><span>Ícone</span><div class=\"te-icon-choice-grid\" id=\"te-category-icon-grid\"></div></div>\n            <div class=\"te-field\"><span>Cor da categoria</span><div class=\"te-color-picker-row\"><input id=\"te-category-form-color\" type=\"color\" value=\"#4f7cff\"><div class=\"te-color-choice-grid\" id=\"te-category-color-grid\"></div></div></div>\n            <div class=\"te-field\"><span>Pré-visualização</span><div class=\"te-category-preview\" id=\"te-category-preview\"></div><small id=\"te-category-usage\">A categoria será salva no navegador.</small></div>\n          </div>\n          <div class=\"te-category-order-actions\">\n            <button id=\"te-category-move-left\" class=\"te-secondary-button te-hidden\" type=\"button\" data-te-action=\"category-move-left\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-chevron-left\"></use></svg> Mover à esquerda</button>\n            <button id=\"te-category-move-right\" class=\"te-secondary-button te-hidden\" type=\"button\" data-te-action=\"category-move-right\">Mover à direita <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-chevron-right\"></use></svg></button>\n          </div>\n          <footer class=\"te-modal-footer te-category-modal-footer\">\n            <button id=\"te-category-delete-button\" class=\"te-danger-button te-hidden\" type=\"button\" data-te-action=\"category-delete\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-trash\"></use></svg> Excluir categoria</button>\n            <span class=\"te-modal-footer-spacer\"></span>\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"category-close\">Cancelar</button>\n            <button class=\"te-primary-button\" type=\"submit\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-save\"></use></svg> Salvar categoria</button>\n          </footer>\n        </form>\n      </section>\n    </div>\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-variable-modal\" role=\"presentation\">\n      <section class=\"te-modal te-variable-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"te-variable-title\">\n        <header class=\"te-modal-header\">\n          <div>\n            <span class=\"te-modal-kicker\">Preencher modelo</span>\n            <h2 id=\"te-variable-title\">Informe as variáveis</h2>\n          </div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"variable-cancel\" aria-label=\"Cancelar preenchimento\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n        <form id=\"te-variable-form\">\n          <p class=\"te-variable-help\">Os valores abaixo serão substituídos no texto antes da inserção. O nome informado em <code>[atendente]</code> será lembrado automaticamente neste navegador.</p>\n          <div class=\"te-variable-fields\" id=\"te-variable-fields\"></div>\n          <footer class=\"te-modal-footer\">\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"variable-cancel\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg> Cancelar</button>\n            <button class=\"te-primary-button\" type=\"submit\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-check\"></use></svg> Aplicar e inserir</button>\n          </footer>\n        </form>\n      </section>\n    </div>\n\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-protocol-preview-modal\" role=\"presentation\">\n      <section class=\"te-protocol-preview\" role=\"dialog\" aria-modal=\"false\" aria-labelledby=\"te-protocol-preview-title\">\n        <header class=\"te-protocol-preview-header\" data-te-preview-drag-handle>\n          <div>\n            <h2 id=\"te-protocol-preview-title\">Pré-Visualização</h2>\n          </div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"protocol-preview-cancel\" aria-label=\"Fechar pré-visualização\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n\n        <div class=\"te-protocol-preview-body\">\n          <div class=\"te-preview-contact-toggle\" role=\"group\" aria-label=\"Quem fez o contato?\">\n            <button type=\"button\" class=\"te-preview-contact-button te-active\" data-te-action=\"protocol-preview-role\" data-te-role=\"Titular\">Titular</button>\n            <button type=\"button\" class=\"te-preview-contact-button\" data-te-action=\"protocol-preview-role\" data-te-role=\"Terceiro\">Terceiro</button>\n          </div>\n\n          <div class=\"te-preview-third-party te-hidden\" id=\"te-preview-third-party\">\n            <label class=\"te-field\">\n              <span>Relação com o titular</span>\n              <select id=\"te-preview-relation\">\n                <option value=\"Filho(a) do titular\">Filho(a) do titular</option>\n                <option value=\"Irmão(ã)\">Irmão(ã)</option>\n                <option value=\"Amigo(a)\">Amigo(a)</option>\n                <option value=\"Esposo(a)\">Esposo(a)</option>\n                <option value=\"Funcionário(a)\">Funcionário(a)</option>\n                <option value=\"Outro\">Outro</option>\n              </select>\n            </label>\n            <label class=\"te-field te-hidden\" id=\"te-preview-custom-relation-field\">\n              <span>Outra relação</span>\n              <input id=\"te-preview-custom-relation\" type=\"text\" maxlength=\"80\" autocomplete=\"off\" placeholder=\"Ex.: Vizinho, cunhado, síndico\">\n            </label>\n            <label class=\"te-field\">\n              <span>Nome de quem fez o contato</span>\n              <input id=\"te-preview-contact-name\" type=\"text\" maxlength=\"80\" autocomplete=\"off\" placeholder=\"Ex.: João\">\n            </label>\n          </div>\n\n          <div class=\"te-preview-contact-row\">\n            <label class=\"te-field te-preview-contact-number-field\" id=\"te-preview-contact-number-field\">\n              <span>Número do contato</span>\n              <input id=\"te-preview-contact-number\" type=\"text\" maxlength=\"40\" inputmode=\"tel\" autocomplete=\"off\" placeholder=\"Ex.: 8199999-9999\">\n            </label>\n            <label class=\"te-preview-anonymous\">\n              <input id=\"te-preview-contact-anonymous\" type=\"checkbox\">\n              <span>Anônimo</span>\n            </label>\n          </div>\n\n          <label class=\"te-preview-field\">\n            <span>Protocolo selecionado</span>\n            <input id=\"te-preview-reason\" type=\"text\" readonly>\n          </label>\n\n          <label class=\"te-preview-field te-preview-field-main\">\n            <span>Motivo</span>\n            <textarea id=\"te-preview-content\" rows=\"8\" spellcheck=\"true\"></textarea>\n          </label>\n\n          <div class=\"te-preview-status-grid\">\n            <div class=\"te-preview-status-card\">\n              <span>Etiqueta</span>\n              <strong id=\"te-preview-label\">Sem etiqueta</strong>\n            </div>\n            <div class=\"te-preview-status-card\">\n              <span>Externo</span>\n              <strong id=\"te-preview-external-status\">Não</strong>\n              <small id=\"te-preview-external-help\">Sem encaminhamento externo.</small>\n              <div class=\"te-preview-external-details te-hidden\" id=\"te-preview-external-details\">\n                <small><b>Problema:</b> <span id=\"te-preview-external-problem\">—</span></small>\n                <small><b>Serviço:</b> <span id=\"te-preview-external-service\">—</span></small>\n              </div>\n            </div>\n          </div>\n\n          <label class=\"te-preview-wait-card te-hidden\" id=\"te-preview-wait-field\">\n            <input id=\"te-preview-wait\" type=\"checkbox\">\n            <span>\n              <strong>Aguardar após enviar para o Externo</strong>\n              <small>Quando marcado, o chamado não será finalizado após o encaminhamento.</small>\n            </span>\n          </label>\n\n          <label class=\"te-preview-field\">\n            <span>Observação</span>\n            <textarea id=\"te-preview-observation\" rows=\"3\" maxlength=\"800\" placeholder=\"Opcional. A observação será acrescentada ao protocolo.\"></textarea>\n          </label>\n\n          <p class=\"te-preview-validation\" id=\"te-preview-validation\" role=\"alert\" aria-live=\"polite\"></p>\n        </div>\n\n        <footer class=\"te-protocol-preview-footer\">\n          <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"protocol-preview-cancel\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg> Cancelar</button>\n          <button class=\"te-primary-button te-preview-confirm\" type=\"button\" data-te-action=\"protocol-preview-confirm\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-check\"></use></svg> <span id=\"te-preview-confirm-label\">Registrar e Finalizar</span></button>\n        </footer>\n      </section>\n    </div>\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-settings-modal\" role=\"presentation\">\n      <section class=\"te-modal te-settings-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"te-settings-title\">\n        <header class=\"te-modal-header\">\n          <div>\n            <span class=\"te-modal-kicker\">Preferências</span>\n            <h2 id=\"te-settings-title\">Configurações</h2>\n          </div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"settings-close\" aria-label=\"Fechar configurações\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n        <form id=\"te-settings-form\">\n          <div class=\"te-settings-list\">\n            <div class=\"te-setting-profile\">\n              <label for=\"te-setting-attendant-name\">\n                <span>\n                  <strong>Nome do atendente</strong>\n                  <small>Preenchido automaticamente sempre que um modelo usar <code>[atendente]</code>.</small>\n                </span>\n                <input id=\"te-setting-attendant-name\" type=\"text\" maxlength=\"80\" autocomplete=\"name\" placeholder=\"Digite seu nome\">\n              </label>\n              <button class=\"te-secondary-button te-setting-clear-button\" type=\"button\" data-te-action=\"clear-attendant\">Limpar nome lembrado</button>\n            </div>\n            <label class=\"te-setting-row\">\n              <span>\n                <strong>Expansão automática</strong>\n                <small>Substituir atalhos digitados nos campos de texto.</small>\n              </span>\n              <input id=\"te-setting-auto-expand\" type=\"checkbox\" checked>\n            </label>\n            <label class=\"te-setting-row\">\n              <span>\n                <strong>Manter painel aberto após inserir</strong>\n                <small>Útil para inserir vários textos durante o mesmo atendimento.</small>\n              </span>\n              <input id=\"te-setting-keep-open\" type=\"checkbox\" checked>\n            </label>\n            <label class=\"te-setting-row\">\n              <span>\n                <strong>Confirmar antes de excluir</strong>\n                <small>Evita remoções acidentais.</small>\n              </span>\n              <input id=\"te-setting-confirm-delete\" type=\"checkbox\" checked>\n            </label>\n          </div>\n          <div class=\"te-keyboard-help\">\n            <strong>Atalho global</strong>\n            <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> abre ou reabre o painel.</span>\n          </div>\n          <footer class=\"te-modal-footer\">\n            <button class=\"te-primary-button\" type=\"submit\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-save\"></use></svg> Salvar configurações</button>\n          </footer>\n        </form>\n      </section>\n    </div>\n\n    <div class=\"te-toast-stack\" id=\"te-toast-stack\" aria-live=\"polite\" aria-atomic=\"true\"></div>\n  </div>\n\n  <script src=\"app.js\"></script>\n</body>\n</html>\n",
+        "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"color-scheme\" content=\"light dark\">\n  <title>Text Express</title>\n  <link rel=\"stylesheet\" href=\"styles.css\">\n</head>\n<body class=\"te-page\">\n  <main class=\"te-demo-page\" aria-label=\"Página demonstrativa do Text Express\">\n    <section class=\"te-demo-card\">\n      <span class=\"te-demo-eyebrow\">Demonstração local</span>\n      <h1>Text Express</h1>\n      <p>Use o campo abaixo para testar os atalhos. Por exemplo, digite <strong>/sky</strong> e pressione Espaço.</p>\n      <label for=\"te-demo-message\">Mensagem de atendimento</label>\n      <textarea id=\"te-demo-message\" rows=\"8\" placeholder=\"Digite uma mensagem ou um atalho...\"></textarea>\n      <label for=\"te-demo-protocol\">Registro do protocolo</label>\n      <textarea id=\"te-demo-protocol\" rows=\"8\" placeholder=\"Digite um protocolo ou use o painel...\"></textarea>\n    </section>\n  </main>\n\n  <div id=\"text-express-app\" class=\"te-app\" data-version=\"28.5.0\">\n    <svg class=\"te-icon-sprite\" aria-hidden=\"true\" focusable=\"false\">\n      <symbol id=\"te-i-zap\" viewBox=\"0 0 24 24\"><path d=\"M13 2 3 14h9l-1 8 10-12h-9l1-8Z\"/></symbol>\n      <symbol id=\"te-i-message-circle\" viewBox=\"0 0 24 24\"><path d=\"M21 11.5a8.4 8.4 0 0 1-9 8.5 9.5 9.5 0 0 1-4-.9L3 21l1.6-4.2A8.5 8.5 0 1 1 21 11.5Z\"/><path d=\"M8 12h.01M12 12h.01M16 12h.01\"/></symbol>\n      <symbol id=\"te-i-file-text\" viewBox=\"0 0 24 24\"><path d=\"M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z\"/><path d=\"M14 2v6h6M8 13h8M8 17h8M8 9h2\"/></symbol>\n      <symbol id=\"te-i-star\" viewBox=\"0 0 24 24\"><path d=\"m12 2 3 6.1 6.7 1-4.9 4.7 1.2 6.7-6-3.2-6 3.2 1.2-6.7-4.9-4.7 6.7-1Z\"/></symbol>\n      <symbol id=\"te-i-moon\" viewBox=\"0 0 24 24\"><path d=\"M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z\"/></symbol>\n      <symbol id=\"te-i-sun\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4\"/></symbol>\n      <symbol id=\"te-i-minus\" viewBox=\"0 0 24 24\"><path d=\"M5 12h14\"/></symbol>\n      <symbol id=\"te-i-maximize-2\" viewBox=\"0 0 24 24\"><path d=\"M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7\"/></symbol>\n      <symbol id=\"te-i-minimize-2\" viewBox=\"0 0 24 24\"><path d=\"M4 14h6v6M20 10h-6V4M10 14l-7 7M14 10l7-7\"/></symbol>\n      <symbol id=\"te-i-x\" viewBox=\"0 0 24 24\"><path d=\"m18 6-12 12M6 6l12 12\"/></symbol>\n      <symbol id=\"te-i-search\" viewBox=\"0 0 24 24\"><circle cx=\"11\" cy=\"11\" r=\"7\"/><path d=\"m20 20-4-4\"/></symbol>\n      <symbol id=\"te-i-plus\" viewBox=\"0 0 24 24\"><path d=\"M12 5v14M5 12h14\"/></symbol>\n      <symbol id=\"te-i-settings\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H3v-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.6V3h4v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1H21v4h-.1a1.7 1.7 0 0 0-1.5 1Z\"/></symbol>\n      <symbol id=\"te-i-upload\" viewBox=\"0 0 24 24\"><path d=\"M12 16V4M7 9l5-5 5 5M5 20h14\"/></symbol>\n      <symbol id=\"te-i-download\" viewBox=\"0 0 24 24\"><path d=\"M12 4v12M7 11l5 5 5-5M5 20h14\"/></symbol>\n      <symbol id=\"te-i-rotate-ccw\" viewBox=\"0 0 24 24\"><path d=\"M3 12a9 9 0 1 0 3-6.7L3 8\"/><path d=\"M3 3v5h5\"/></symbol>\n      <symbol id=\"te-i-edit\" viewBox=\"0 0 24 24\"><path d=\"M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z\"/></symbol>\n      <symbol id=\"te-i-trash\" viewBox=\"0 0 24 24\"><path d=\"M3 6h18M8 6V4h8v2M19 6l-1 15H6L5 6M10 11v6M14 11v6\"/></symbol>\n      <symbol id=\"te-i-send\" viewBox=\"0 0 24 24\"><path d=\"m22 2-7 20-4-9-9-4Z\"/><path d=\"M22 2 11 13\"/></symbol>\n      <symbol id=\"te-i-copy\" viewBox=\"0 0 24 24\"><rect x=\"9\" y=\"9\" width=\"11\" height=\"11\" rx=\"2\"/><path d=\"M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\"/></symbol>\n      <symbol id=\"te-i-chevron-left\" viewBox=\"0 0 24 24\"><path d=\"m15 18-6-6 6-6\"/></symbol>\n      <symbol id=\"te-i-chevron-right\" viewBox=\"0 0 24 24\"><path d=\"m9 18 6-6-6-6\"/></symbol>\n      <symbol id=\"te-i-folder\" viewBox=\"0 0 24 24\"><path d=\"M3 5h7l2 2h9v12H3Z\"/></symbol>\n      <symbol id=\"te-i-wifi\" viewBox=\"0 0 24 24\"><path d=\"M5 12.6a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M2 9a14 14 0 0 1 20 0\"/><circle cx=\"12\" cy=\"20\" r=\"1\"/></symbol>\n      <symbol id=\"te-i-globe\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18\"/></symbol>\n      <symbol id=\"te-i-phone\" viewBox=\"0 0 24 24\"><path d=\"M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2Z\"/></symbol>\n      <symbol id=\"te-i-monitor\" viewBox=\"0 0 24 24\"><rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\"/><path d=\"M8 21h8M12 17v4\"/></symbol>\n      <symbol id=\"te-i-wrench\" viewBox=\"0 0 24 24\"><path d=\"M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5L20 16.4a2.1 2.1 0 0 1-3 3l-7.7-7.7\"/></symbol>\n      <symbol id=\"te-i-server\" viewBox=\"0 0 24 24\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"7\" rx=\"2\"/><rect x=\"3\" y=\"14\" width=\"18\" height=\"7\" rx=\"2\"/><path d=\"M7 6h.01M7 17h.01\"/></symbol>\n      <symbol id=\"te-i-wallet\" viewBox=\"0 0 24 24\"><path d=\"M20 7V5a2 2 0 0 0-2-2H5a3 3 0 0 0 0 6h16v10H5a3 3 0 0 1-3-3V6\"/><path d=\"M16 13h2\"/></symbol>\n      <symbol id=\"te-i-radio\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"2\"/><path d=\"M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4M19 5a10 10 0 0 1 0 14M5 19A10 10 0 0 1 5 5\"/></symbol>\n      <symbol id=\"te-i-users\" viewBox=\"0 0 24 24\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8\"/></symbol>\n      <symbol id=\"te-i-network\" viewBox=\"0 0 24 24\"><rect x=\"9\" y=\"2\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"2\" y=\"16\" width=\"6\" height=\"6\" rx=\"1\"/><rect x=\"16\" y=\"16\" width=\"6\" height=\"6\" rx=\"1\"/><path d=\"M12 8v4M5 16v-4h14v4\"/></symbol>\n      <symbol id=\"te-i-layout-grid\" viewBox=\"0 0 24 24\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\"/></symbol>\n      <symbol id=\"te-i-reply\" viewBox=\"0 0 24 24\"><path d=\"m9 17-5-5 5-5M4 12h10a6 6 0 0 1 6 6v1\"/></symbol>\n      <symbol id=\"te-i-clipboard-list\" viewBox=\"0 0 24 24\"><rect x=\"5\" y=\"4\" width=\"14\" height=\"18\" rx=\"2\"/><path d=\"M9 4V2h6v2M9 10h6M9 14h6M9 18h4\"/></symbol>\n      <symbol id=\"te-i-alert-triangle\" viewBox=\"0 0 24 24\"><path d=\"M10.3 3.7 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z\"/><path d=\"M12 9v4M12 17h.01\"/></symbol>\n      <symbol id=\"te-i-compass\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m16 8-2.5 5.5L8 16l2.5-5.5Z\"/></symbol>\n      <symbol id=\"te-i-check-circle\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m8 12 3 3 5-6\"/></symbol>\n      <symbol id=\"te-i-play-circle\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"m10 8 6 4-6 4Z\"/></symbol>\n      <symbol id=\"te-i-clock\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/></symbol>\n      <symbol id=\"te-i-tag\" viewBox=\"0 0 24 24\"><path d=\"M20 13 13 20l-9-9V4h7Z\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1\"/></symbol>\n      <symbol id=\"te-i-headphones\" viewBox=\"0 0 24 24\"><path d=\"M4 14a8 8 0 0 1 16 0M4 14v5h4v-6H4M20 14v5h-4v-6h4\"/></symbol>\n      <symbol id=\"te-i-shield-check\" viewBox=\"0 0 24 24\"><path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z\"/><path d=\"m9 12 2 2 4-4\"/></symbol>\n      <symbol id=\"te-i-database\" viewBox=\"0 0 24 24\"><ellipse cx=\"12\" cy=\"5\" rx=\"8\" ry=\"3\"/><path d=\"M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6\"/></symbol>\n      <symbol id=\"te-i-smartphone\" viewBox=\"0 0 24 24\"><rect x=\"6\" y=\"2\" width=\"12\" height=\"20\" rx=\"2\"/><path d=\"M10 18h4\"/></symbol>\n      <symbol id=\"te-i-package\" viewBox=\"0 0 24 24\"><path d=\"m12 2 9 5-9 5-9-5Z\"/><path d=\"m3 7 9 5 9-5v10l-9 5-9-5Z\"/></symbol>\n      <symbol id=\"te-i-map-pin\" viewBox=\"0 0 24 24\"><path d=\"M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z\"/><circle cx=\"12\" cy=\"10\" r=\"2\"/></symbol>\n      <symbol id=\"te-i-bell\" viewBox=\"0 0 24 24\"><path d=\"M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4\"/></symbol>\n      <symbol id=\"te-i-palette\" viewBox=\"0 0 24 24\"><path d=\"M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 0-4H12a2 2 0 0 1 0-4h3a6 6 0 0 0 0-12Z\"/><circle cx=\"7\" cy=\"10\" r=\"1\"/><circle cx=\"9\" cy=\"6\" r=\"1\"/><circle cx=\"14\" cy=\"6\" r=\"1\"/></symbol>\n      <symbol id=\"te-i-save\" viewBox=\"0 0 24 24\"><path d=\"M5 3h12l2 2v16H5Z\"/><path d=\"M8 3v6h8V3M8 21v-7h8v7\"/></symbol>\n      <symbol id=\"te-i-info\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 11v5M12 8h.01\"/></symbol>\n      <symbol id=\"te-i-sliders\" viewBox=\"0 0 24 24\"><path d=\"M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6\"/></symbol>\n      <symbol id=\"te-i-check\" viewBox=\"0 0 24 24\"><path d=\"m5 12 4 4L19 6\"/></symbol>\n      <symbol id=\"te-i-more-horizontal\" viewBox=\"0 0 24 24\"><circle cx=\"5\" cy=\"12\" r=\"1\"/><circle cx=\"12\" cy=\"12\" r=\"1\"/><circle cx=\"19\" cy=\"12\" r=\"1\"/></symbol>\n      <symbol id=\"te-i-activity\" viewBox=\"0 0 24 24\"><path d=\"M3 12h4l2.5-7 5 14 2.5-7H21\"/></symbol>\n    </svg>\n    <section class=\"te-panel te-hidden\" role=\"dialog\" aria-label=\"Text Express\" aria-modal=\"false\">\n      <header class=\"te-header\" data-te-drag-handle>\n        <div class=\"te-brand\">\n          <span class=\"te-brand-icon\" aria-hidden=\"true\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-zap\"></use></svg></span>\n          <div>\n            <strong>Text Express</strong>\n            <span class=\"te-subtitle\">Atendimento, protocolos e produtividade</span>\n          </div>\n        </div>\n\n        <div class=\"te-header-actions\">\n          <span class=\"te-count-badge\" id=\"te-count-badge\" aria-live=\"polite\">0 modelos</span>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"theme\" title=\"Alternar tema\" aria-label=\"Alternar tema\">\n            <span class=\"te-theme-icon\" aria-hidden=\"true\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-moon\"></use></svg></span>\n          </button>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"minimize\" title=\"Recolher para o ícone\" aria-label=\"Recolher para o ícone\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-minus\"></use></svg>\n          </button>\n          <button class=\"te-icon-button te-fullscreen-button\" type=\"button\" data-te-action=\"fullscreen\" title=\"Preencher toda a tela\" aria-label=\"Preencher toda a tela\" aria-pressed=\"false\">\n            <svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-maximize-2\"></use></svg>\n          </button>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"close\" title=\"Fechar painel e manter o ícone\" aria-label=\"Fechar painel e manter o ícone\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg>\n          </button>\n        </div>\n      </header>\n\n      <div class=\"te-expandable\">\n        <nav class=\"te-main-tabs\" aria-label=\"Tipos de modelo\">\n          <button class=\"te-main-tab te-active\" type=\"button\" data-te-type=\"atendimento\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-message-circle\"></use></svg> Atendimento\n          </button>\n          <button class=\"te-main-tab\" type=\"button\" data-te-type=\"protocolo\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-file-text\"></use></svg> Protocolo\n          </button>\n          <button class=\"te-main-tab\" type=\"button\" data-te-type=\"favoritos\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-star\"></use></svg> Favoritos\n          </button>\n          <button class=\"te-main-tab\" type=\"button\" data-te-type=\"produtividade\">\n            <svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-activity\"></use></svg> Produtividade\n          </button>\n        </nav>\n\n        <section class=\"te-toolbar\" aria-label=\"Busca e criação\">\n          <label class=\"te-search-box\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-search\"></use></svg>\n            <input id=\"te-search-input\" type=\"search\" autocomplete=\"off\" placeholder=\"Buscar por nome, atalho ou conteúdo...\" aria-label=\"Buscar modelos\">\n          </label>\n          <button class=\"te-primary-button\" type=\"button\" data-te-action=\"new\">\n            <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-plus\"></use></svg> Novo\n          </button>\n        </section>\n\n        <nav class=\"te-category-bar\" id=\"te-category-bar\" aria-label=\"Categorias. Arraste horizontalmente para visualizar mais opções.\" tabindex=\"0\"></nav>\n\n        <section class=\"te-content-area\">\n          <div class=\"te-list-pane\">\n            <div class=\"te-list\" id=\"te-snippet-list\" aria-live=\"polite\"></div>\n            <div class=\"te-empty-state te-hidden\" id=\"te-empty-state\">\n              <svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-search\"></use></svg>\n              <strong>Nenhum modelo encontrado</strong>\n              <p>Altere os filtros ou crie um novo modelo.</p>\n            </div>\n          </div>\n\n          <aside class=\"te-detail-pane\" id=\"te-detail-pane\" aria-label=\"Detalhes do modelo\">\n            <div class=\"te-detail-empty\">\n              <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-zap\"></use></svg>\n              <strong>Selecione um modelo</strong>\n              <p>Veja o conteúdo completo, as variáveis e o atalho de ativação.</p>\n            </div>\n          </aside>\n        </section>\n\n        <section class=\"te-productivity-view te-hidden\" id=\"te-productivity-view\" aria-label=\"Produtividade\">\n          <div class=\"te-productivity-heading\">\n            <div>\n              <span class=\"te-productivity-kicker\">Monitor do Genesys</span>\n              <h2>Produtividade</h2>\n            </div>\n            <span class=\"te-productivity-health\" id=\"te-productivity-health\">Aguardando Genesys</span>\n          </div>\n\n          <nav class=\"te-productivity-tabs\" aria-label=\"Seções de produtividade\">\n            <button type=\"button\" class=\"te-productivity-tab te-active\" data-te-productivity-tab=\"resumo\">Resumo</button>\n            <button type=\"button\" class=\"te-productivity-tab\" data-te-productivity-tab=\"historico\">Histórico</button>\n            <button type=\"button\" class=\"te-productivity-tab\" data-te-productivity-tab=\"grafico\">Gráfico</button>\n            <button type=\"button\" class=\"te-productivity-tab\" data-te-productivity-tab=\"configuracoes\">Configurações</button>\n            <button type=\"button\" class=\"te-productivity-tab\" data-te-productivity-tab=\"diagnostico\">Diagnóstico</button>\n          </nav>\n\n          <div class=\"te-productivity-pages\">\n            <section class=\"te-productivity-page te-active\" data-te-productivity-page=\"resumo\">\n              <div class=\"te-productivity-metrics\">\n                <article class=\"te-productivity-metric\"><span>Hoje</span><strong id=\"te-prod-count\">0 / 45</strong><small id=\"te-prod-missing\">Faltam 45</small></article>\n                <article class=\"te-productivity-metric\"><span>TMA</span><strong id=\"te-prod-tma\">00:00</strong><small>tempo médio total</small></article>\n                <article class=\"te-productivity-metric\"><span>TME</span><strong id=\"te-prod-tme\">00:00</strong><small>tempo médio em foco</small></article>\n                <article class=\"te-productivity-metric\"><span>Abertas</span><strong id=\"te-prod-open\">0</strong><small id=\"te-prod-peak\">Pico: 0</small></article>\n              </div>\n              <div class=\"te-productivity-progress\"><div id=\"te-prod-progress-bar\"></div></div>\n\n              <div class=\"te-productivity-section-head\">\n                <div><strong>Interações agora</strong><span>Timers individuais do Genesys</span></div>\n                <div class=\"te-productivity-inline-actions\">\n                  <button type=\"button\" class=\"te-secondary-button te-compact-button\" data-te-productivity-action=\"pause-current\">Pausar atual</button>\n                  <button type=\"button\" class=\"te-secondary-button te-compact-button\" data-te-productivity-action=\"exclude-current\">Não contabilizar</button>\n                </div>\n              </div>\n              <div class=\"te-productivity-current\" id=\"te-productivity-current-list\"></div>\n              <div class=\"te-productivity-alert-summary\" id=\"te-productivity-alert-summary\">Nenhum alerta ativo.</div>\n            </section>\n\n            <section class=\"te-productivity-page\" data-te-productivity-page=\"historico\">\n              <div class=\"te-productivity-section-head\">\n                <div><strong>Histórico de atendimentos</strong><select id=\"te-prod-history-date\" class=\"te-productivity-date-select\" aria-label=\"Dia do histórico\"></select></div>\n                <div class=\"te-productivity-filter-group\">\n                  <button type=\"button\" class=\"te-filter-chip te-active\" data-te-productivity-filter=\"all\">Todos</button>\n                  <button type=\"button\" class=\"te-filter-chip\" data-te-productivity-filter=\"chat\">💬 Chat</button>\n                  <button type=\"button\" class=\"te-filter-chip\" data-te-productivity-filter=\"call\">☎ Ligação</button>\n                </div>\n              </div>\n              <div class=\"te-productivity-history\" id=\"te-productivity-history-list\"></div>\n            </section>\n\n            <section class=\"te-productivity-page\" data-te-productivity-page=\"grafico\">\n              <div class=\"te-productivity-section-head\">\n                <div><strong>Atendimentos por hora</strong><span>Somente interações contabilizadas</span></div>\n                <div class=\"te-productivity-filter-group\">\n                  <button type=\"button\" class=\"te-filter-chip te-active\" data-te-productivity-chart-filter=\"all\">Todos</button>\n                  <button type=\"button\" class=\"te-filter-chip\" data-te-productivity-chart-filter=\"chat\">💬 Chat</button>\n                  <button type=\"button\" class=\"te-filter-chip\" data-te-productivity-chart-filter=\"call\">☎ Ligação</button>\n                </div>\n              </div>\n              <div class=\"te-productivity-chart\" id=\"te-productivity-chart\"></div>\n            </section>\n\n            <section class=\"te-productivity-page\" data-te-productivity-page=\"configuracoes\">\n              <div class=\"te-productivity-settings-grid\">\n                <div class=\"te-productivity-settings-group\">\n                  <h3>Geral</h3>\n                  <label><span>Meta diária</span><input id=\"te-prod-setting-target\" type=\"number\" min=\"1\" max=\"999\" step=\"1\"></label>\n                  <label><span>Modelo do contador</span><select id=\"te-prod-setting-counter-model\"><option value=\"number\">Só número</option><option value=\"progress\">Mini progresso</option><option value=\"dial\">Mini controle + número</option></select></label>\n                  <label><span>Histórico (dias)</span><input id=\"te-prod-setting-retention\" type=\"number\" min=\"1\" max=\"365\" step=\"1\"></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-show-counter\" type=\"checkbox\"><span>Mostrar mini contador</span></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-alerts\" type=\"checkbox\"><span>Alertas visuais ativos</span></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-history\" type=\"checkbox\"><span>Guardar detalhes no histórico</span></label>\n                </div>\n\n                <div class=\"te-productivity-settings-group\">\n                  <h3>💬 Chat</h3>\n                  <label><span>Check verde (seg)</span><input id=\"te-prod-setting-chat-check\" type=\"number\" min=\"1\" max=\"3600\" step=\"1\"></label>\n                  <label><span>Cliente inativo (seg)</span><input id=\"te-prod-setting-client-inactive\" type=\"number\" min=\"1\" max=\"3600\" step=\"1\"></label>\n                  <label><span>Atendente inativo (seg)</span><input id=\"te-prod-setting-operator-inactive\" type=\"number\" min=\"1\" max=\"3600\" step=\"1\"></label>\n                  <label><span>Conversa longa (min)</span><input id=\"te-prod-setting-chat-long\" type=\"number\" min=\"1\" max=\"240\" step=\"1\"></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-count-chat\" type=\"checkbox\"><span>Contabilizar na meta</span></label>\n                </div>\n\n                <div class=\"te-productivity-settings-group\">\n                  <h3>☎ Ligação</h3>\n                  <label><span>Check verde (seg)</span><input id=\"te-prod-setting-call-check\" type=\"number\" min=\"1\" max=\"3600\" step=\"1\"></label>\n                  <label><span>Ligação longa (min)</span><input id=\"te-prod-setting-call-long\" type=\"number\" min=\"1\" max=\"240\" step=\"1\"></label>\n                  <label class=\"te-productivity-check\"><input id=\"te-prod-setting-count-call\" type=\"checkbox\"><span>Contabilizar na meta</span></label>\n                </div>\n              </div>\n              <div class=\"te-productivity-settings-actions\">\n                <button type=\"button\" class=\"te-secondary-button\" data-te-productivity-action=\"restore-settings\">Restaurar parâmetros padrão</button>\n                <button type=\"button\" class=\"te-danger-button\" data-te-productivity-action=\"reset-today\">Zerar dados de hoje</button>\n                <button type=\"button\" class=\"te-primary-button\" data-te-productivity-action=\"save-settings\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-save\"></use></svg> Salvar produtividade</button>\n              </div>\n            </section>\n\n            <section class=\"te-productivity-page\" data-te-productivity-page=\"diagnostico\">\n              <div class=\"te-productivity-diagnostics\" id=\"te-productivity-diagnostics\"></div>\n            </section>\n          </div>\n        </section>\n\n        <footer class=\"te-footer\">\n          <div class=\"te-status\" id=\"te-status-counts\">Atendimento: 0 · Protocolo: 0 · Total: 0</div>\n          <div class=\"te-footer-actions\">\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"settings\" title=\"Configurações\">\n              <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-settings\"></use></svg> Configurações\n            </button>\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"import\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-upload\"></use></svg> Importar</button>\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"export\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-download\"></use></svg> Exportar</button>\n            <button class=\"te-danger-button\" type=\"button\" data-te-action=\"reset\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-rotate-ccw\"></use></svg> Restaurar padrões</button>\n          </div>\n        </footer>\n      </div>\n    </section>\n\n    <button class=\"te-reopen-button\" type=\"button\" data-te-action=\"reopen\" title=\"Clique para abrir ou arraste para mover\" aria-label=\"Abrir ou mover o Text Express\"><span class=\"te-launcher-label\">Abrir Text Express</span>\n      <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-zap\"></use></svg>\n    </button>\n\n    <button class=\"te-productivity-counter te-hidden\" id=\"te-productivity-counter\" type=\"button\" aria-label=\"Contador de interações de hoje\" title=\"Clique para ajustar; arraste para mover\">\n      <span class=\"te-productivity-counter-dial\" aria-hidden=\"true\"></span>\n      <span class=\"te-productivity-counter-progress\" aria-hidden=\"true\"><i></i></span>\n      <strong id=\"te-productivity-counter-value\">0</strong>\n    </button>\n    <div class=\"te-productivity-counter-popover te-hidden\" id=\"te-productivity-counter-popover\">\n      <span>Interações de hoje</span>\n      <div class=\"te-productivity-counter-editor\">\n        <button type=\"button\" data-te-productivity-action=\"counter-minus\" aria-label=\"Diminuir\">−</button>\n        <input id=\"te-productivity-counter-input\" type=\"number\" min=\"0\" max=\"9999\" step=\"1\" aria-label=\"Quantidade de interações\">\n        <button type=\"button\" data-te-productivity-action=\"counter-plus\" aria-label=\"Aumentar\">+</button>\n      </div>\n      <small id=\"te-productivity-counter-meta\">Meta: 45</small>\n      <button type=\"button\" class=\"te-primary-button te-compact-button\" data-te-productivity-action=\"counter-save\">Salvar</button>\n    </div>\n\n    <input class=\"te-hidden\" id=\"te-import-input\" type=\"file\" accept=\"application/json,.json\">\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-snippet-modal\" role=\"presentation\">\n      <section class=\"te-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"te-modal-title\">\n        <header class=\"te-modal-header\">\n          <div>\n            <span class=\"te-modal-kicker te-hidden\" id=\"te-modal-kicker\" aria-hidden=\"true\"></span>\n            <h2 id=\"te-modal-title\">Criar modelo</h2>\n          </div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"modal-close\" aria-label=\"Fechar modal\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n\n        <form id=\"te-snippet-form\" novalidate>\n          <input id=\"te-form-id\" type=\"hidden\">\n\n          <fieldset class=\"te-type-selector\">\n            <legend>Tipo</legend>\n            <label>\n              <input type=\"radio\" name=\"te-type\" value=\"atendimento\" checked>\n              <span><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-message-circle\"></use></svg> Atendimento</span>\n            </label>\n            <label>\n              <input type=\"radio\" name=\"te-type\" value=\"protocolo\">\n              <span><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-file-text\"></use></svg> Protocolo</span>\n            </label>\n          </fieldset>\n\n          <fieldset class=\"te-model-kind-selector te-hidden\" id=\"te-model-kind-selector\">\n            <legend id=\"te-model-kind-legend\">Formato do atendimento</legend>\n            <label>\n              <input type=\"radio\" name=\"te-model-kind\" value=\"unico\" checked>\n              <span><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-message-circle\"></use></svg> <span data-te-kind-label=\"unico\">Fala única</span></span>\n            </label>\n            <label>\n              <input type=\"radio\" name=\"te-model-kind\" value=\"fluxo\">\n              <span><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-clipboard-list\"></use></svg> <span data-te-kind-label=\"fluxo\">Sequência de falas</span></span>\n            </label>\n          </fieldset>\n\n          <div class=\"te-form-grid\">\n            <label class=\"te-field te-field-wide\">\n              <span>Nome do modelo</span>\n              <input id=\"te-form-name\" type=\"text\" maxlength=\"100\" required placeholder=\"Ex.: Solicitar reinício dos equipamentos\">\n              <small class=\"te-field-error\" data-te-error=\"name\"></small>\n            </label>\n\n            <label class=\"te-field te-field-wide\">\n              <span>Atalho de ativação</span>\n              <div class=\"te-input-with-action\">\n                <input id=\"te-form-shortcut\" type=\"text\" maxlength=\"60\" required spellcheck=\"false\" placeholder=\"/reiniciar\">\n                <button type=\"button\" class=\"te-inline-button\" data-te-action=\"suggest-shortcut\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-zap\"></use></svg> Sugerir</button>\n              </div>\n              <small>Você escolhe o comando. Ele sempre começará com “/”.</small>\n              <small class=\"te-field-error\" data-te-error=\"shortcut\"></small>\n            </label>\n\n            <label class=\"te-field\">\n              <span>Expandir ao pressionar</span>\n              <select id=\"te-form-trigger\">\n                <option value=\"space\">Espaço</option>\n                <option value=\"tab\">Tab</option>\n                <option value=\"enter\">Enter</option>\n              </select>\n            </label>\n\n            <div class=\"te-field\">\n              <span>Categoria</span>\n              <div class=\"te-input-with-action te-category-select-row\">\n                <select id=\"te-form-category\" aria-label=\"Categoria do modelo\"></select>\n                <button type=\"button\" class=\"te-inline-icon-button\" data-te-action=\"category-add-from-form\" title=\"Criar categoria\" aria-label=\"Criar categoria\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-plus\"></use></svg></button>\n              </div>\n            </div>\n\n            <label class=\"te-field te-field-wide te-hidden\" id=\"te-protocol-label-field\">\n              <span>Etiqueta automática do protocolo</span>\n              <input id=\"te-form-system-label\" type=\"text\" maxlength=\"180\" list=\"te-system-label-options\" autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Pesquise uma etiqueta ou digite uma nova\">\n              <datalist id=\"te-system-label-options\"></datalist>\n              <small>Opcional. Vale para o cartão inteiro e, em cartões com sequência, é usada uma única vez mesmo ao trocar de opção.</small>\n            </label>\n\n            <label class=\"te-check-field te-field-wide te-hidden te-protocol-external-field\" id=\"te-protocol-external-field\">\n              <input id=\"te-form-external\" type=\"checkbox\">\n              <span><strong>Enviar para o Externo ao executar este protocolo</strong><small>O sistema continua responsável por definir automaticamente a equipe de destino.</small></span>\n            </label>\n\n            <div class=\"te-protocol-external-details te-field-wide te-hidden\" id=\"te-protocol-external-details\">\n              <label class=\"te-field\">\n                <span>Problema externo</span>\n                <input id=\"te-form-external-problem\" type=\"text\" maxlength=\"180\" list=\"te-external-problem-options\" autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Ex.: problema usado em Suporte Externo\">\n                <datalist id=\"te-external-problem-options\"></datalist>\n              </label>\n              <label class=\"te-field\">\n                <span>Serviço</span>\n                <input id=\"te-form-external-service\" type=\"text\" maxlength=\"180\" list=\"te-external-service-options\" autocomplete=\"off\" spellcheck=\"false\" placeholder=\"Serviço selecionado no encaminhamento\">\n                <datalist id=\"te-external-service-options\"></datalist>\n              </label>\n              <small class=\"te-protocol-external-details-help\">Quando houver correspondência na base local importada do Mascara, estes campos são preenchidos automaticamente e continuam editáveis.</small>\n            </div>\n\n            <div class=\"te-field te-field-wide\" id=\"te-single-content-wrap\">\n              <label>\n                <span>Conteúdo do modelo</span>\n                <textarea id=\"te-form-content\" rows=\"7\" placeholder=\"Digite o texto que será inserido...\"></textarea>\n              </label>\n              <small class=\"te-field-error\" data-te-error=\"content\"></small>\n            </div>\n\n            <section class=\"te-flow-editor te-field-wide te-hidden\" id=\"te-flow-editor\" aria-label=\"Editor da sequência de falas\">\n              <div class=\"te-flow-editor-heading\">\n                <div>\n                  <strong id=\"te-flow-editor-title\">Falas da sequência</strong>\n                  <small id=\"te-flow-editor-help\">O atalho principal abre a sequência. Os atalhos numerados inserem uma fala diretamente.</small>\n                </div>\n                <button class=\"te-secondary-button te-compact-button\" type=\"button\" data-te-action=\"flow-step-add\">\n                  <svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-plus\"></use></svg> <span id=\"te-flow-add-label\">Adicionar fala</span>\n                </button>\n              </div>\n              <div class=\"te-flow-editor-steps\" id=\"te-flow-editor-steps\"></div>\n              <small class=\"te-field-error\" id=\"te-flow-error\"></small>\n            </section>\n\n            <div class=\"te-field te-field-wide\">\n              <span>Variáveis detectadas</span>\n              <div class=\"te-variable-tags\" id=\"te-variable-preview\">\n                <span class=\"te-muted\">Nenhuma variável encontrada.</span>\n              </div>\n              <small>Use o formato <code>[nome]</code>, <code>[prazo]</code> ou qualquer outro campo entre colchetes.</small>\n            </div>\n\n            <label class=\"te-check-field te-field-wide\">\n              <input id=\"te-form-favorite\" type=\"checkbox\">\n              <span>Adicionar aos favoritos</span>\n            </label>\n          </div>\n\n          <footer class=\"te-modal-footer te-model-modal-footer\">\n            <span class=\"te-model-save-status\" id=\"te-model-save-status\" role=\"status\" aria-live=\"polite\"></span>\n            <span class=\"te-modal-footer-spacer\"></span>\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"modal-close\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg> Fechar</button>\n            <button class=\"te-primary-button\" type=\"submit\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-save\"></use></svg> Salvar e concluir</button>\n          </footer>\n        </form>\n      </section>\n    </div>\n\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-category-modal\" role=\"presentation\">\n      <section class=\"te-modal te-category-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"te-category-modal-title\">\n        <header class=\"te-modal-header\">\n          <div class=\"te-modal-heading-with-icon\"><span class=\"te-modal-heading-icon\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-palette\"></use></svg></span><div>\n            <span class=\"te-modal-kicker\" id=\"te-category-modal-kicker\">Nova categoria</span>\n            <h2 id=\"te-category-modal-title\">Criar categoria</h2>\n          </div></div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"category-close\" aria-label=\"Fechar\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n        <form id=\"te-category-form\" novalidate>\n          <input id=\"te-category-form-id\" type=\"hidden\">\n          <input id=\"te-category-form-icon\" type=\"hidden\" value=\"folder\">\n          <fieldset class=\"te-type-selector te-category-type-selector\">\n            <legend>Exibir em</legend>\n            <label><input type=\"radio\" name=\"te-category-type\" value=\"atendimento\" checked><span><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-message-circle\"></use></svg> Atendimento</span></label>\n            <label><input type=\"radio\" name=\"te-category-type\" value=\"protocolo\"><span><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-file-text\"></use></svg> Protocolo</span></label>\n          </fieldset>\n          <div class=\"te-form-grid\">\n            <label class=\"te-field te-field-wide\"><span>Nome da categoria</span><input id=\"te-category-form-name\" maxlength=\"48\" placeholder=\"Ex.: Cobranças e pagamentos\" required><small class=\"te-field-error\" id=\"te-category-name-error\"></small></label>\n            <div class=\"te-field te-field-wide\"><span>Ícone</span><div class=\"te-icon-choice-grid\" id=\"te-category-icon-grid\"></div></div>\n            <div class=\"te-field\"><span>Cor da categoria</span><div class=\"te-color-picker-row\"><input id=\"te-category-form-color\" type=\"color\" value=\"#4f7cff\"><div class=\"te-color-choice-grid\" id=\"te-category-color-grid\"></div></div></div>\n            <div class=\"te-field\"><span>Pré-visualização</span><div class=\"te-category-preview\" id=\"te-category-preview\"></div><small id=\"te-category-usage\">A categoria será salva no navegador.</small></div>\n          </div>\n          <div class=\"te-category-order-actions\">\n            <button id=\"te-category-move-left\" class=\"te-secondary-button te-hidden\" type=\"button\" data-te-action=\"category-move-left\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-chevron-left\"></use></svg> Mover à esquerda</button>\n            <button id=\"te-category-move-right\" class=\"te-secondary-button te-hidden\" type=\"button\" data-te-action=\"category-move-right\">Mover à direita <svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-chevron-right\"></use></svg></button>\n          </div>\n          <footer class=\"te-modal-footer te-category-modal-footer\">\n            <button id=\"te-category-delete-button\" class=\"te-danger-button te-hidden\" type=\"button\" data-te-action=\"category-delete\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-trash\"></use></svg> Excluir categoria</button>\n            <span class=\"te-modal-footer-spacer\"></span>\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"category-close\">Cancelar</button>\n            <button class=\"te-primary-button\" type=\"submit\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-save\"></use></svg> Salvar categoria</button>\n          </footer>\n        </form>\n      </section>\n    </div>\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-variable-modal\" role=\"presentation\">\n      <section class=\"te-modal te-variable-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"te-variable-title\">\n        <header class=\"te-modal-header\">\n          <div>\n            <span class=\"te-modal-kicker\">Preencher modelo</span>\n            <h2 id=\"te-variable-title\">Informe as variáveis</h2>\n          </div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"variable-cancel\" aria-label=\"Cancelar preenchimento\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n        <form id=\"te-variable-form\">\n          <p class=\"te-variable-help\">Os valores abaixo serão substituídos no texto antes da inserção. O nome informado em <code>[atendente]</code> será lembrado automaticamente neste navegador.</p>\n          <div class=\"te-variable-fields\" id=\"te-variable-fields\"></div>\n          <footer class=\"te-modal-footer\">\n            <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"variable-cancel\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg> Cancelar</button>\n            <button class=\"te-primary-button\" type=\"submit\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-check\"></use></svg> Aplicar e inserir</button>\n          </footer>\n        </form>\n      </section>\n    </div>\n\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-protocol-preview-modal\" role=\"presentation\">\n      <section class=\"te-protocol-preview\" role=\"dialog\" aria-modal=\"false\" aria-labelledby=\"te-protocol-preview-title\">\n        <header class=\"te-protocol-preview-header\" data-te-preview-drag-handle>\n          <div>\n            <h2 id=\"te-protocol-preview-title\">Pré-Visualização</h2>\n          </div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"protocol-preview-cancel\" aria-label=\"Fechar pré-visualização\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n\n        <div class=\"te-protocol-preview-body\">\n          <div class=\"te-preview-contact-toggle\" role=\"group\" aria-label=\"Quem fez o contato?\">\n            <button type=\"button\" class=\"te-preview-contact-button te-active\" data-te-action=\"protocol-preview-role\" data-te-role=\"Titular\">Titular</button>\n            <button type=\"button\" class=\"te-preview-contact-button\" data-te-action=\"protocol-preview-role\" data-te-role=\"Terceiro\">Terceiro</button>\n          </div>\n\n          <div class=\"te-preview-third-party te-hidden\" id=\"te-preview-third-party\">\n            <label class=\"te-field\">\n              <span>Relação com o titular</span>\n              <select id=\"te-preview-relation\">\n                <option value=\"Filho(a) do titular\">Filho(a) do titular</option>\n                <option value=\"Irmão(ã)\">Irmão(ã)</option>\n                <option value=\"Amigo(a)\">Amigo(a)</option>\n                <option value=\"Esposo(a)\">Esposo(a)</option>\n                <option value=\"Funcionário(a)\">Funcionário(a)</option>\n                <option value=\"Outro\">Outro</option>\n              </select>\n            </label>\n            <label class=\"te-field te-hidden\" id=\"te-preview-custom-relation-field\">\n              <span>Outra relação</span>\n              <input id=\"te-preview-custom-relation\" type=\"text\" maxlength=\"80\" autocomplete=\"off\" placeholder=\"Ex.: Vizinho, cunhado, síndico\">\n            </label>\n            <label class=\"te-field\">\n              <span>Nome de quem fez o contato</span>\n              <input id=\"te-preview-contact-name\" type=\"text\" maxlength=\"80\" autocomplete=\"off\" placeholder=\"Ex.: João\">\n            </label>\n          </div>\n\n          <div class=\"te-preview-contact-row\">\n            <label class=\"te-field te-preview-contact-number-field\" id=\"te-preview-contact-number-field\">\n              <span>Número do contato</span>\n              <input id=\"te-preview-contact-number\" type=\"text\" maxlength=\"40\" inputmode=\"tel\" autocomplete=\"off\" placeholder=\"Ex.: 8199999-9999\">\n            </label>\n            <label class=\"te-preview-anonymous\">\n              <input id=\"te-preview-contact-anonymous\" type=\"checkbox\">\n              <span>Anônimo</span>\n            </label>\n          </div>\n\n          <label class=\"te-preview-field\">\n            <span>Protocolo selecionado</span>\n            <input id=\"te-preview-reason\" type=\"text\" readonly>\n          </label>\n\n          <label class=\"te-preview-field te-preview-field-main\">\n            <span>Motivo</span>\n            <textarea id=\"te-preview-content\" rows=\"8\" spellcheck=\"true\"></textarea>\n          </label>\n\n          <div class=\"te-preview-status-grid\">\n            <div class=\"te-preview-status-card\">\n              <span>Etiqueta</span>\n              <strong id=\"te-preview-label\">Sem etiqueta</strong>\n            </div>\n            <div class=\"te-preview-status-card\">\n              <span>Externo</span>\n              <strong id=\"te-preview-external-status\">Não</strong>\n              <small id=\"te-preview-external-help\">Sem encaminhamento externo.</small>\n              <div class=\"te-preview-external-details te-hidden\" id=\"te-preview-external-details\">\n                <small><b>Problema:</b> <span id=\"te-preview-external-problem\">—</span></small>\n                <small><b>Serviço:</b> <span id=\"te-preview-external-service\">—</span></small>\n              </div>\n            </div>\n          </div>\n\n          <label class=\"te-preview-wait-card te-hidden\" id=\"te-preview-wait-field\">\n            <input id=\"te-preview-wait\" type=\"checkbox\">\n            <span>\n              <strong>Aguardar após enviar para o Externo</strong>\n              <small>Quando marcado, o chamado não será finalizado após o encaminhamento.</small>\n            </span>\n          </label>\n\n          <label class=\"te-preview-field\">\n            <span>Observação</span>\n            <textarea id=\"te-preview-observation\" rows=\"3\" maxlength=\"800\" placeholder=\"Opcional. A observação será acrescentada ao protocolo.\"></textarea>\n          </label>\n\n          <p class=\"te-preview-validation\" id=\"te-preview-validation\" role=\"alert\" aria-live=\"polite\"></p>\n        </div>\n\n        <footer class=\"te-protocol-preview-footer\">\n          <button class=\"te-secondary-button\" type=\"button\" data-te-action=\"protocol-preview-cancel\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg> Cancelar</button>\n          <button class=\"te-primary-button te-preview-confirm\" type=\"button\" data-te-action=\"protocol-preview-confirm\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-check\"></use></svg> <span id=\"te-preview-confirm-label\">Registrar e Finalizar</span></button>\n        </footer>\n      </section>\n    </div>\n\n    <div class=\"te-modal-backdrop te-hidden\" id=\"te-settings-modal\" role=\"presentation\">\n      <section class=\"te-modal te-settings-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"te-settings-title\">\n        <header class=\"te-modal-header\">\n          <div>\n            <span class=\"te-modal-kicker\">Preferências</span>\n            <h2 id=\"te-settings-title\">Configurações</h2>\n          </div>\n          <button class=\"te-icon-button\" type=\"button\" data-te-action=\"settings-close\" aria-label=\"Fechar configurações\"><svg class=\"te-icon \" aria-hidden=\"true\"><use href=\"#te-i-x\"></use></svg></button>\n        </header>\n        <form id=\"te-settings-form\">\n          <div class=\"te-settings-list\">\n            <div class=\"te-setting-profile\">\n              <label for=\"te-setting-attendant-name\">\n                <span>\n                  <strong>Nome do atendente</strong>\n                  <small>Preenchido automaticamente sempre que um modelo usar <code>[atendente]</code>.</small>\n                </span>\n                <input id=\"te-setting-attendant-name\" type=\"text\" maxlength=\"80\" autocomplete=\"name\" placeholder=\"Digite seu nome\">\n              </label>\n              <button class=\"te-secondary-button te-setting-clear-button\" type=\"button\" data-te-action=\"clear-attendant\">Limpar nome lembrado</button>\n            </div>\n            <label class=\"te-setting-row\">\n              <span>\n                <strong>Expansão automática</strong>\n                <small>Substituir atalhos digitados nos campos de texto.</small>\n              </span>\n              <input id=\"te-setting-auto-expand\" type=\"checkbox\" checked>\n            </label>\n            <label class=\"te-setting-row\">\n              <span>\n                <strong>Manter painel aberto após inserir</strong>\n                <small>Útil para inserir vários textos durante o mesmo atendimento.</small>\n              </span>\n              <input id=\"te-setting-keep-open\" type=\"checkbox\" checked>\n            </label>\n            <label class=\"te-setting-row\">\n              <span>\n                <strong>Confirmar antes de excluir</strong>\n                <small>Evita remoções acidentais.</small>\n              </span>\n              <input id=\"te-setting-confirm-delete\" type=\"checkbox\" checked>\n            </label>\n          </div>\n          <div class=\"te-keyboard-help\">\n            <strong>Atalho global</strong>\n            <span><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> abre ou reabre o painel.</span>\n          </div>\n          <footer class=\"te-modal-footer\">\n            <button class=\"te-primary-button\" type=\"submit\"><svg class=\"te-icon\" aria-hidden=\"true\"><use href=\"#te-i-save\"></use></svg> Salvar configurações</button>\n          </footer>\n        </form>\n      </section>\n    </div>\n\n    <div class=\"te-toast-stack\" id=\"te-toast-stack\" aria-live=\"polite\" aria-atomic=\"true\"></div>\n  </div>\n\n  <script src=\"app.js\"></script>\n</body>\n</html>\n",
         "text/html"
       );
       const interfaceRoot = parsed.getElementById("text-express-app");
@@ -102,14 +102,14 @@
 if (!window.__textExpressStandaloneSkipBundle) {
   try {
 /*
- * Text Express 28.4.0
+ * Text Express 28.5.0
  * Expansor de textos, protocolos e produtividade para atendimento.
  * Sem dependências externas.
  */
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.4.0";
+  const APP_VERSION = "28.5.0";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -13558,12 +13558,56 @@ if (!window.__textExpressStandaloneSkipBundle) {
     return true;
   };
 
+  TextExpressApp.prototype.findProtocolSendButton = function (textarea = null, options = {}) {
+    const enabledOnly = Boolean(options.enabledOnly);
+    let buttons = this.getVisibleExternalElements("button#send_button");
+    if (enabledOnly) {
+      buttons = buttons.filter((button) => !button.disabled && !button.hasAttribute("disabled"));
+    }
+    if (!buttons.length) return null;
+    if (!textarea) return buttons[0];
+
+    // Em SPAs podem existir instâncias antigas do mesmo #send_button no DOM.
+    // Primeiro preferimos o botão ligado ao mesmo <form>; depois, o elemento
+    // estruturalmente mais próximo do textarea atual do protocolo.
+    if (textarea.form) {
+      const sameForm = buttons.find((button) => button.form === textarea.form);
+      if (sameForm) return sameForm;
+    }
+
+    const ancestry = (element) => {
+      const chain = [];
+      let current = element;
+      while (current && current !== document) {
+        chain.push(current);
+        current = current.parentElement;
+      }
+      return chain;
+    };
+    const textareaChain = ancestry(textarea);
+    const textareaDepth = new Map(textareaChain.map((node, index) => [node, index]));
+    const distance = (button) => {
+      const buttonChain = ancestry(button);
+      for (let index = 0; index < buttonChain.length; index += 1) {
+        const sharedDepth = textareaDepth.get(buttonChain[index]);
+        if (sharedDepth !== undefined) return sharedDepth + index;
+      }
+      return Number.MAX_SAFE_INTEGER;
+    };
+
+    return [...buttons].sort((left, right) => distance(left) - distance(right))[0] || null;
+  };
+
   TextExpressApp.prototype.preflightProtocolRealSystem = async function (pending, waiting) {
     const textarea = await this.waitForExternalCondition?.(() => this.getVisibleExternalElements("textarea.text-area")[0] || null, 2200);
     if (!textarea) throw new Error("O campo real de registro do protocolo (textarea.text-area) não foi localizado.");
-    const send = document.querySelector("button#send_button");
-    if (!send || this.root.contains(send)) throw new Error("O botão real de registrar protocolo (#send_button) não foi localizado.");
-    if (send.disabled || send.hasAttribute("disabled")) throw new Error("O botão de registrar protocolo está desabilitado no momento.");
+
+    // Importante: o Mascara pode manter #send_button desabilitado enquanto o
+    // textarea está vazio. Por isso, o preflight valida apenas a existência do
+    // botão visível; a condição habilitada é verificada DEPOIS do preenchimento.
+    const send = this.findProtocolSendButton(textarea);
+    if (!send) throw new Error("O botão real de registrar protocolo (#send_button) não foi localizado.");
+
     if (pending.etiquetaSistema && !this.externalProtocolLabelAlreadyPresent(pending.etiquetaSistema)) {
       const plus = this.getVisibleExternalElements("#tags .anticon.anticon-plus")[0] || this.getVisibleExternalElements(".anticon.anticon-plus")[0];
       if (!plus) throw new Error("A área real de etiquetas não está disponível neste chamado.");
@@ -13577,12 +13621,16 @@ if (!window.__textExpressStandaloneSkipBundle) {
         if (!block) throw new Error("O controle Aguardar (#blocking) não foi localizado no sistema.");
       }
     }
-    return { textarea, send };
+    return { textarea };
   };
 
   TextExpressApp.prototype.registerProtocolTextRealSystem = async function (content, preflight = null) {
-    const textarea = preflight?.textarea || await this.waitForExternalCondition?.(() => this.getVisibleExternalElements("textarea.text-area")[0] || null, 3000);
+    let textarea = preflight?.textarea || null;
+    if (!textarea || !textarea.isConnected || !this.isExternalElementVisible(textarea)) {
+      textarea = await this.waitForExternalCondition?.(() => this.getVisibleExternalElements("textarea.text-area")[0] || null, 3000);
+    }
     if (!textarea) throw new Error("O campo de protocolo não foi localizado.");
+
     textarea.focus?.();
     if (this.setExternalInputValue) this.setExternalInputValue(textarea, content);
     else {
@@ -13590,8 +13638,31 @@ if (!window.__textExpressStandaloneSkipBundle) {
       textarea.dispatchEvent(new Event("input", { bubbles: true }));
       textarea.dispatchEvent(new Event("change", { bubbles: true }));
     }
-    const send = preflight?.send || document.querySelector("button#send_button");
-    if (!send || send.disabled || send.hasAttribute("disabled")) throw new Error("O botão de registrar protocolo não está disponível.");
+
+    // O sistema habilita o Registrar de forma assíncrona após receber o evento
+    // input. Não reutilizamos o botão capturado no preflight porque o Angular
+    // pode rerenderizá-lo e substituir o nó durante essa atualização.
+    let send = await this.waitForExternalCondition?.(
+      () => this.findProtocolSendButton(textarea, { enabledOnly: true }),
+      5000
+    );
+
+    // Pulso de eventos de segurança para casos em que o primeiro ciclo de
+    // detecção do Angular tenha sido perdido durante uma rerenderização.
+    if (!send) {
+      const view = textarea.ownerDocument?.defaultView || window;
+      textarea.dispatchEvent(new view.Event("input", { bubbles: true, composed: true }));
+      textarea.dispatchEvent(new view.Event("change", { bubbles: true, composed: true }));
+      send = await this.waitForExternalCondition?.(
+        () => this.findProtocolSendButton(textarea, { enabledOnly: true }),
+        2500
+      );
+    }
+
+    if (!send) {
+      throw new Error("O botão de registrar protocolo não foi habilitado após o preenchimento do protocolo.");
+    }
+
     send.click();
     await new Promise((resolve) => window.setTimeout(resolve, 450));
     return true;
@@ -13894,7 +13965,7 @@ if (!window.__textExpressStandaloneSkipBundle) {
 
 
   /* ==========================================================
-   * Text Express 28.4.0 — Produtividade Genesys
+   * Text Express 28.5.0 — Produtividade Genesys (camada Genesys endurecida)
    * Monitor independente de interações, histórico e métricas.
    * ========================================================== */
   const TE_PRODUCTIVITY_KEYS = Object.freeze({
@@ -15275,7 +15346,7 @@ if (!window.__textExpressStandaloneSkipBundle) {
     const payload = {
       app: "Text Express",
       backupType: "complete",
-      schemaVersion: 10,
+      schemaVersion: 11,
       appVersion: APP_VERSION,
       exportedAt: new Date().toISOString(),
       total: this.snippets.length,
@@ -15290,7 +15361,8 @@ if (!window.__textExpressStandaloneSkipBundle) {
       productivityHistory: this.productivityHistory || [],
       productivityState: {
         manualAdjustments: this.productivityState?.manualAdjustments || {},
-        peakOpenByDate: this.productivityState?.peakOpenByDate || {}
+        peakOpenByDate: this.productivityState?.peakOpenByDate || {},
+        linkTemplate: this.productivityState?.linkTemplate || ""
       }
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
@@ -15311,6 +15383,7 @@ if (!window.__textExpressStandaloneSkipBundle) {
     if (parsed?.productivityState && typeof parsed.productivityState === "object") {
       this.productivityState.manualAdjustments = parsed.productivityState.manualAdjustments && typeof parsed.productivityState.manualAdjustments === "object" ? parsed.productivityState.manualAdjustments : this.productivityState.manualAdjustments;
       this.productivityState.peakOpenByDate = parsed.productivityState.peakOpenByDate && typeof parsed.productivityState.peakOpenByDate === "object" ? parsed.productivityState.peakOpenByDate : this.productivityState.peakOpenByDate;
+      this.productivityState.linkTemplate = typeof parsed.productivityState.linkTemplate === "string" ? parsed.productivityState.linkTemplate : (this.productivityState.linkTemplate || "");
     }
     this.saveProductivitySettings();
     this.saveProductivityHistory();
@@ -15329,6 +15402,983 @@ if (!window.__textExpressStandaloneSkipBundle) {
     const result = teProductivityOriginal.mergeImportedBackup.call(this, parsed, source, rawCategories);
     if (parsed?.productivitySettings || parsed?.productivityHistory || parsed?.productivityState) this.restoreProductivityBackup(parsed);
     return result;
+  };
+
+
+  /* ==========================================================
+   * Text Express 28.5.0 — Hardening da Produtividade Genesys
+   * Corrige identidade, duplicidade, posicionamento, check de
+   * 70 s, links, Shadow DOM, reconciliação e finalização.
+   * ========================================================== */
+  const teProductivityV284Init = TextExpressApp.prototype.initProductivity;
+  const teProductivityV284Destroy = TextExpressApp.prototype.destroyProductivity;
+
+  TextExpressApp.prototype.isGenesysElementVisible = function (element) {
+    if (!element || element.isConnected === false) return false;
+    try {
+      const style = getComputedStyle(element);
+      if (style.display === "none" || style.visibility === "hidden") return false;
+    } catch {}
+    try {
+      const rect = element.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) return true;
+      if (element.getClientRects?.().length) return true;
+    } catch {}
+    return false;
+  };
+
+  TextExpressApp.prototype.findGenesysElement = function (selectors, root = document) {
+    const list = Array.isArray(selectors) ? selectors : [selectors];
+    const searchShadow = (scope, selector, visited = new Set()) => {
+      if (!scope || visited.has(scope)) return null;
+      visited.add(scope);
+      try {
+        const direct = scope.querySelector?.(selector);
+        if (direct) return direct;
+      } catch {}
+      let nodes = [];
+      try { nodes = scope.querySelectorAll?.("*") || []; } catch {}
+      for (const node of nodes) {
+        const shadow = node?.shadowRoot;
+        if (!shadow) continue;
+        try {
+          const found = shadow.querySelector?.(selector);
+          if (found) return found;
+        } catch {}
+        const nested = searchShadow(shadow, selector, visited);
+        if (nested) return nested;
+      }
+      return null;
+    };
+    for (const selector of list) {
+      try {
+        const direct = root?.querySelector?.(selector);
+        if (direct) return direct;
+      } catch {}
+      const shadowFound = searchShadow(root, selector);
+      if (shadowFound) return shadowFound;
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.findAllGenesysElements = function (selectors, root = document) {
+    const list = Array.isArray(selectors) ? selectors : [selectors];
+    const seen = new Set();
+    const output = [];
+    const pushMatches = (scope) => {
+      if (!scope) return;
+      for (const selector of list) {
+        try {
+          scope.querySelectorAll?.(selector)?.forEach?.((element) => {
+            if (!seen.has(element)) { seen.add(element); output.push(element); }
+          });
+        } catch {}
+      }
+    };
+    pushMatches(root);
+    // O Genesys normalmente expõe a lista no documento principal. Só percorremos
+    // Shadow DOM quando a consulta normal não encontrou nada, evitando custo alto.
+    if (output.length) return output;
+    const visited = new Set();
+    const walk = (scope) => {
+      if (!scope || visited.has(scope)) return;
+      visited.add(scope);
+      let nodes = [];
+      try { nodes = scope.querySelectorAll?.("*") || []; } catch {}
+      for (const node of nodes) {
+        const shadow = node?.shadowRoot;
+        if (!shadow) continue;
+        pushMatches(shadow);
+        walk(shadow);
+      }
+    };
+    walk(root);
+    return output;
+  };
+
+  TextExpressApp.prototype.getCanonicalGenesysConversation = function (element) {
+    if (!element) return null;
+    try {
+      if (element.matches?.("div.interaction-group")) return element;
+      const outer = element.closest?.("div.interaction-group");
+      if (outer) return outer;
+      if (element.matches?.('div[data-qa-id="interaction-group-list-item"]')) return element;
+      return element.closest?.('div[data-qa-id="interaction-group-list-item"]') || element;
+    } catch { return element; }
+  };
+
+  TextExpressApp.prototype.getGenesysConversationElements = function () {
+    const raw = this.findAllGenesysElements(TE_GENESYS_SELECTORS.groups, document);
+    const canonical = [];
+    const seenElements = new Set();
+    for (const candidate of raw) {
+      const element = this.getCanonicalGenesysConversation(candidate);
+      if (!element || seenElements.has(element) || !this.isGenesysElementVisible(element)) continue;
+      seenElements.add(element);
+      canonical.push(element);
+    }
+    canonical.sort((a, b) => {
+      try { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; } catch { return 0; }
+    });
+
+    // Se o Genesys mantiver duas representações visíveis da mesma interação,
+    // preserva apenas uma quando existe um ID confiável.
+    const byId = new Map();
+    const result = [];
+    for (const element of canonical) {
+      const selected = this.isGenesysConversationSelected(element);
+      const id = this.getGenesysInteractionId(element, selected);
+      if (!id) { result.push(element); continue; }
+      const previousIndex = byId.get(id);
+      if (previousIndex === undefined) {
+        byId.set(id, result.length);
+        result.push(element);
+      } else if (selected && !this.isGenesysConversationSelected(result[previousIndex])) {
+        result[previousIndex] = element;
+      }
+    }
+    return result;
+  };
+
+  TextExpressApp.prototype.extractInteractionIdentifier = function (value) {
+    const text = String(value || "").trim();
+    if (!text) return "";
+    const uuid = text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i);
+    if (uuid) return uuid[0];
+    const numeric = text.match(/\b\d{8,20}\b/);
+    if (numeric) return numeric[0];
+    return "";
+  };
+
+  TextExpressApp.prototype.extractInteractionIdFromConversationText = function (conversation) {
+    const snippets = [];
+    try {
+      const participant = this.findGenesysElement(TE_GENESYS_SELECTORS.participant, conversation);
+      if (participant?.textContent) snippets.push(participant.textContent);
+    } catch {}
+    try {
+      const text = String(conversation?.innerText || conversation?.textContent || "");
+      if (text) snippets.push(text.slice(0, 800));
+    } catch {}
+    for (const raw of snippets) {
+      const text = String(raw || "");
+      const pipe = text.match(/\|\s*(\d{8,20})\b/);
+      if (pipe) return pipe[1];
+      const labelled = text.match(/(?:intera(?:ç|c)[aã]o|interaction|protocolo|id)\s*[:#-]?\s*([0-9a-f]{8}-[0-9a-f-]{20,}|\d{8,20})\b/i);
+      if (labelled) {
+        const parsed = this.extractInteractionIdentifier(labelled[1]);
+        if (parsed) return parsed;
+      }
+    }
+    return "";
+  };
+
+  TextExpressApp.prototype.getGenesysInteractionId = function (conversation, isSelected = false) {
+    const trustedAttrs = ["data-conversation-id", "data-interaction-id"];
+    const inspectNode = (node) => {
+      if (!node) return "";
+      for (const attr of trustedAttrs) {
+        const parsed = this.extractInteractionIdentifier(node.getAttribute?.(attr));
+        if (parsed) return parsed;
+      }
+      return "";
+    };
+
+    let direct = inspectNode(conversation);
+    if (direct) return direct;
+    try {
+      const nodes = conversation?.querySelectorAll?.("[data-conversation-id],[data-interaction-id]") || [];
+      for (const node of nodes) {
+        direct = inspectNode(node);
+        if (direct) return direct;
+      }
+    } catch {}
+
+    // Só aceita texto de elementos destinados ao ID — não varre mais atributos
+    // genéricos `id`/`data-id`, que geravam falsos positivos.
+    try {
+      const localIdEl = this.findGenesysElement([
+        ".interaction-id-display",
+        '[data-automation-id="active-interaction-id"]',
+        'span[data-qa-id="interaction-id-display"]'
+      ], conversation);
+      const localId = this.extractInteractionIdentifier(localIdEl?.textContent || localIdEl?.innerText || "");
+      if (localId) return localId;
+    } catch {}
+
+    try {
+      const anchor = conversation?.querySelector?.('a[href*="/interactions/"]');
+      const hrefId = this.extractInteractionIdentifier(anchor?.href || anchor?.getAttribute?.("href"));
+      if (hrefId) return hrefId;
+    } catch {}
+
+    const visibleId = this.extractInteractionIdFromConversationText(conversation);
+    if (visibleId) return visibleId;
+
+    if (isSelected) {
+      const element = this.findGenesysElement([
+        ".interaction-id-display",
+        '[data-automation-id="active-interaction-id"]',
+        'span[data-qa-id="interaction-id-display"]'
+      ], document);
+      const selectedId = this.extractInteractionIdentifier(
+        element?.textContent || element?.innerText || element?.getAttribute?.("data-conversation-id") || element?.getAttribute?.("data-interaction-id") || ""
+      );
+      if (selectedId) return selectedId;
+    }
+    return "";
+  };
+
+  TextExpressApp.prototype.getGenesysParticipantName = function (conversation) {
+    const clean = (value) => {
+      let text = String(value || "").replace(/\s+/g, " ").trim();
+      if (!text) return "";
+      text = text.replace(/\s*\|\s*\d{8,20}\s*$/, "").trim();
+      text = text.replace(/\s*[·•-]\s*(?:intera(?:ç|c)[aã]o|interaction|id)\s*[:#-]?\s*[0-9a-f-]{8,}\s*$/i, "").trim();
+      return text.slice(0, 120);
+    };
+    const local = this.findGenesysElement(TE_GENESYS_SELECTORS.participant, conversation);
+    const value = clean(local?.textContent || local?.innerText || "");
+    if (value) return value;
+    const aria = clean(conversation?.getAttribute?.("aria-label") || conversation?.getAttribute?.("title") || "");
+    if (aria) return aria;
+    return "Cliente";
+  };
+
+  TextExpressApp.prototype.normalizeProductivityFingerprintPart = function (value) {
+    try {
+      return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().slice(0, 120);
+    } catch {
+      return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().slice(0, 120);
+    }
+  };
+
+  TextExpressApp.prototype.getProductivityConversationFingerprint = function (conversation, isSelected = false) {
+    const name = this.normalizeProductivityFingerprintPart(this.getGenesysParticipantName(conversation));
+    const channel = this.detectGenesysChannel(conversation, isSelected) || "chat";
+    let aria = "";
+    try { aria = this.normalizeProductivityFingerprintPart(conversation?.getAttribute?.("aria-label") || ""); } catch {}
+    // data-qa-id costuma ser idêntico para todas as linhas; portanto só o usa
+    // quando contém algo além do nome genérico do componente.
+    let stable = "";
+    try {
+      const candidate = String(conversation?.getAttribute?.("data-automation-id") || conversation?.getAttribute?.("data-testid") || "").trim();
+      if (candidate && !/interaction-group-list-item/i.test(candidate)) stable = this.normalizeProductivityFingerprintPart(candidate);
+    } catch {}
+    return [channel, name || "cliente", stable || aria].filter(Boolean).join("|");
+  };
+
+  TextExpressApp.prototype.getProductivityElementToken = function (conversation) {
+    if (!this.productivityElementKeys) this.productivityElementKeys = new WeakMap();
+    if (!this.productivityElementKeySequence) this.productivityElementKeySequence = 0;
+    let token = this.productivityElementKeys.get(conversation);
+    if (!token) {
+      token = `e${++this.productivityElementKeySequence}-${Date.now().toString(36)}`;
+      this.productivityElementKeys.set(conversation, token);
+    }
+    return token;
+  };
+
+  TextExpressApp.prototype.getProductivityConversationKey = function (conversation, index, isSelected) {
+    const interactionId = this.getGenesysInteractionId(conversation, isSelected);
+    const fingerprint = this.getProductivityConversationFingerprint(conversation, isSelected);
+    if (interactionId) return { key: `id:${interactionId}`, interactionId, fingerprint, confidence: "trusted" };
+    const token = this.getProductivityElementToken(conversation);
+    return { key: `dom:${token}`, interactionId: "", fingerprint, confidence: "fallback" };
+  };
+
+  TextExpressApp.prototype.getRestoredProductivitySession = function (key, interactionId = "", fingerprint = "") {
+    const list = this.productivityState?.activeSessions || [];
+    const fresh = (item) => {
+      const savedAt = Number(item?.savedAt || 0);
+      return !savedAt || Date.now() - savedAt <= 12 * 60 * 60 * 1000;
+    };
+    let match = list.find((item) => item?.key === key && fresh(item));
+    if (match) return match;
+    if (interactionId) {
+      match = list.find((item) => item?.interactionId === interactionId && fresh(item));
+      if (match) return match;
+    }
+    if (fingerprint) {
+      const matches = list.filter((item) => item?.fingerprint === fingerprint && fresh(item));
+      if (matches.length === 1) return matches[0];
+      // Migração das sessões 28.4.x, que ainda não armazenavam fingerprint.
+      const [channel, normalizedName] = String(fingerprint).split("|");
+      const legacyMatches = list.filter((item) =>
+        fresh(item)
+        && !item?.fingerprint
+        && (!channel || String(item?.channel || "chat") === channel)
+        && (!normalizedName || this.normalizeProductivityFingerprintPart(item?.participantName || "") === normalizedName)
+      );
+      if (legacyMatches.length === 1) return legacyMatches[0];
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.parseGenesysNativeElapsedMs = function (value) {
+    const text = String(value || "").trim().toLowerCase();
+    if (!text || /^(agora|now)$/.test(text)) return 0;
+    const clock = text.match(/\b(\d{1,2}):(\d{2})(?::(\d{2}))?\b/);
+    if (clock) {
+      const a = Number(clock[1]);
+      const b = Number(clock[2]);
+      const c = clock[3] == null ? null : Number(clock[3]);
+      const seconds = c == null ? (a * 60 + b) : (a * 3600 + b * 60 + c);
+      return Math.min(seconds * 1000, 24 * 60 * 60 * 1000);
+    }
+    const hours = Number(text.match(/(\d+)\s*(?:h|hr|hora)/)?.[1] || 0);
+    const minutes = Number(text.match(/(\d+)\s*(?:m|min|minuto)/)?.[1] || 0);
+    const seconds = Number(text.match(/(\d+)\s*(?:s|seg|segundo)/)?.[1] || 0);
+    const total = hours * 3600 + minutes * 60 + seconds;
+    return Math.min(total * 1000, 24 * 60 * 60 * 1000);
+  };
+
+  TextExpressApp.prototype.getGenesysNativeElapsedMs = function (conversation) {
+    const selectors = [".duration", 'span[data-bind*="elapsedTimeString"]'];
+    for (const selector of selectors) {
+      let nodes = [];
+      try { nodes = conversation?.querySelectorAll?.(selector) || []; } catch {}
+      for (const node of nodes) {
+        const ms = this.parseGenesysNativeElapsedMs(node?.textContent || node?.innerText || "");
+        if (ms > 0) return ms;
+      }
+    }
+    return 0;
+  };
+
+  TextExpressApp.prototype.learnProductivityLinkTemplate = function (link, interactionId = "") {
+    const safe = this.normalizeProductivityInteractionUrl?.(link) || "";
+    if (!safe) return "";
+    const id = interactionId || this.extractInteractionIdentifier(safe);
+    if (!id) return safe;
+    let template = "";
+    try {
+      const encoded = encodeURIComponent(id);
+      if (safe.includes(id)) template = safe.replace(id, "__TE_INTERACTION_ID__");
+      else if (safe.includes(encoded)) template = safe.replace(encoded, "__TE_INTERACTION_ID__");
+    } catch {}
+    if (template) {
+      if (!this.productivityState) this.productivityState = { manualAdjustments: {}, peakOpenByDate: {}, activeSessions: [] };
+      this.productivityState.linkTemplate = template;
+    }
+    return safe;
+  };
+
+  TextExpressApp.prototype.deriveGenesysInteractionLink = function (interactionId) {
+    if (!interactionId) return "";
+    const template = String(this.productivityState?.linkTemplate || "");
+    if (template.includes("__TE_INTERACTION_ID__")) {
+      const candidate = template.replace("__TE_INTERACTION_ID__", encodeURIComponent(interactionId));
+      const safe = this.normalizeProductivityInteractionUrl?.(candidate) || "";
+      if (safe) return safe;
+    }
+    const current = String(window.location?.href || "");
+    if (!current.includes("/interactions/")) return "";
+    const pattern = /(\/interactions\/)([^/?#]+)/i;
+    if (!pattern.test(current)) return "";
+    return current.replace(pattern, `$1${encodeURIComponent(interactionId)}`);
+  };
+
+  TextExpressApp.prototype.getGenesysInteractionLink = function (conversation, interactionId = "", isSelected = false) {
+    const accept = (value) => {
+      const safe = this.normalizeProductivityInteractionUrl?.(value) || "";
+      if (!safe) return "";
+      this.learnProductivityLinkTemplate(safe, interactionId);
+      return safe;
+    };
+    try {
+      const anchor = conversation?.querySelector?.('a[href*="/interactions/"]');
+      const direct = accept(anchor?.href || anchor?.getAttribute?.("href"));
+      if (direct) return direct;
+    } catch {}
+    try {
+      const candidates = conversation?.querySelectorAll?.("[data-url],[data-href],[data-clipboard-text],[data-copy-text],[href]") || [];
+      for (const element of candidates) {
+        const direct = accept(element.href || element.getAttribute?.("data-clipboard-text") || element.getAttribute?.("data-copy-text") || element.getAttribute?.("data-url") || element.getAttribute?.("data-href") || element.getAttribute?.("href") || "");
+        if (direct) return direct;
+      }
+    } catch {}
+    if (isSelected) {
+      const copyButton = this.findGenesysElement(TE_GENESYS_SELECTORS.nativeCopy, document);
+      const direct = accept(copyButton?.href || copyButton?.getAttribute?.("data-clipboard-text") || copyButton?.getAttribute?.("data-copy-text") || copyButton?.getAttribute?.("data-url") || copyButton?.getAttribute?.("data-href") || "");
+      if (direct) return direct;
+      const current = String(window.location?.href || "");
+      if (current.includes("/interactions/") && (!interactionId || current.includes(interactionId))) {
+        const currentSafe = accept(current);
+        if (currentSafe) return currentSafe;
+      }
+    }
+    return this.deriveGenesysInteractionLink(interactionId);
+  };
+
+  TextExpressApp.prototype.dedupeProductivityHistory = function () {
+    const source = Array.isArray(this.productivityHistory) ? this.productivityHistory : [];
+    const output = [];
+    const byIdentity = new Map();
+    const normalizeName = (record) => this.normalizeProductivityFingerprintPart(record?.participantName || "");
+    const merge = (base, incoming) => {
+      const start = Math.min(Number(base.startedAt || Infinity), Number(incoming.startedAt || Infinity));
+      const end = Math.max(Number(base.endedAt || 0), Number(incoming.endedAt || 0));
+      if (Number.isFinite(start)) base.startedAt = start;
+      if (end) base.endedAt = end;
+      const span = Number.isFinite(start) && end ? Math.max(0, end - start) : 0;
+      base.totalDurationMs = Math.max(Number(base.totalDurationMs || 0), Number(incoming.totalDurationMs || 0), span);
+      base.activeDurationMs = Math.max(Number(base.activeDurationMs || 0), Number(incoming.activeDurationMs || 0));
+      base.link = base.link || incoming.link || "";
+      base.interactionId = base.interactionId || incoming.interactionId || "";
+      base.sessionKey = base.sessionKey || incoming.sessionKey || "";
+      base.fingerprint = base.fingerprint || incoming.fingerprint || "";
+      base.excluded = Boolean(base.excluded && incoming.excluded);
+      const threshold = (base.channel === "call" ? this.productivitySettings?.call?.checkSeconds : this.productivitySettings?.chat?.checkSeconds) || 70;
+      base.qualified = base.totalDurationMs >= threshold * 1000;
+      return base;
+    };
+
+    for (const rawRecord of source) {
+      if (!rawRecord || typeof rawRecord !== "object") continue;
+      // Migra registros 28.4.x em que o nome vinha como "Cliente | Interaction ID".
+      const migrated = { ...rawRecord };
+      const embedded = String(migrated.participantName || "").match(/\|\s*(\d{8,20})\s*$/);
+      if (embedded) {
+        migrated.interactionId = embedded[1];
+        migrated.participantName = String(migrated.participantName || "").replace(/\s*\|\s*\d{8,20}\s*$/, "").trim() || "Cliente";
+      }
+      const record = migrated;
+      const date = this.getProductivityDateKey(new Date(Number(record.endedAt || record.startedAt || Date.now())));
+      let identity = "";
+      if (record.interactionId) identity = `id:${date}:${record.interactionId}`;
+      else if (record.sessionKey) identity = `session:${date}:${record.sessionKey}`;
+      if (identity && byIdentity.has(identity)) {
+        merge(output[byIdentity.get(identity)], record);
+        continue;
+      }
+      if (!identity) {
+        const candidateIndex = output.findIndex((other) => {
+          if (other.interactionId || other.sessionKey) return false;
+          if ((other.channel || "chat") !== (record.channel || "chat")) return false;
+          if (normalizeName(other) !== normalizeName(record)) return false;
+          const startDiff = Math.abs(Number(other.startedAt || 0) - Number(record.startedAt || 0));
+          const endDiff = Math.abs(Number(other.endedAt || 0) - Number(record.endedAt || 0));
+          return startDiff <= 1500 && endDiff <= 5000;
+        });
+        if (candidateIndex >= 0) {
+          merge(output[candidateIndex], record);
+          continue;
+        }
+      }
+      const clone = { ...record };
+      output.push(clone);
+      if (identity) byIdentity.set(identity, output.length - 1);
+    }
+    this.productivityHistory = output;
+    return output;
+  };
+
+  TextExpressApp.prototype.loadProductivityData = function () {
+    this.productivitySettings = this.cloneProductivityDefaults();
+    this.productivityHistory = [];
+    this.productivityState = { manualAdjustments: {}, peakOpenByDate: {}, activeSessions: [], linkTemplate: "" };
+    const settingsRaw = this.storageGet(TE_PRODUCTIVITY_KEYS.settings);
+    if (settingsRaw) {
+      try { this.productivitySettings = this.normalizeProductivitySettings(JSON.parse(settingsRaw)); } catch {}
+    }
+    const historyRaw = this.storageGet(TE_PRODUCTIVITY_KEYS.history);
+    if (historyRaw) {
+      try {
+        const parsed = JSON.parse(historyRaw);
+        if (Array.isArray(parsed)) this.productivityHistory = parsed.filter((item) => item && typeof item === "object");
+      } catch {}
+    }
+    const stateRaw = this.storageGet(TE_PRODUCTIVITY_KEYS.state);
+    if (stateRaw) {
+      try {
+        const parsed = JSON.parse(stateRaw);
+        if (parsed && typeof parsed === "object") {
+          this.productivityState = {
+            manualAdjustments: parsed.manualAdjustments && typeof parsed.manualAdjustments === "object" ? parsed.manualAdjustments : {},
+            peakOpenByDate: parsed.peakOpenByDate && typeof parsed.peakOpenByDate === "object" ? parsed.peakOpenByDate : {},
+            activeSessions: Array.isArray(parsed.activeSessions) ? parsed.activeSessions : [],
+            linkTemplate: typeof parsed.linkTemplate === "string" ? parsed.linkTemplate : ""
+          };
+        }
+      } catch {}
+    }
+    this.pruneProductivityHistory();
+    const before = this.productivityHistory.length;
+    this.dedupeProductivityHistory();
+    if (this.productivityHistory.length !== before) this.saveProductivityHistory();
+  };
+
+  TextExpressApp.prototype.serializeActiveProductivitySessions = function () {
+    const now = Date.now();
+    return [...(this.productivityTimers?.values?.() || [])].map((timer) => {
+      let activeDurationMs = Number(timer.activeDurationMs || 0);
+      if (timer.isSelected && !timer.manualPaused && timer.activeSessionStart) activeDurationMs += Math.max(0, now - timer.activeSessionStart);
+      return {
+        key: timer.key,
+        interactionId: timer.interactionId || "",
+        fingerprint: timer.fingerprint || "",
+        participantName: timer.participantName || "",
+        channel: timer.channel || "chat",
+        startedAt: timer.startedAt || now,
+        activeDurationMs,
+        lastCustomerReplyTimestamp: timer.lastCustomerReplyTimestamp || now,
+        lastOperatorActivityTimestamp: timer.lastOperatorActivityTimestamp || now,
+        manualPaused: Boolean(timer.manualPaused),
+        excluded: Boolean(timer.excluded),
+        link: timer.link || "",
+        lastSeenAt: timer.lastSeenAt || now,
+        savedAt: now
+      };
+    });
+  };
+
+  TextExpressApp.prototype.saveProductivityState = function () {
+    if (!this.productivityState) return;
+    this.productivityState.activeSessions = this.serializeActiveProductivitySessions();
+    this.productivityState.linkTemplate = String(this.productivityState.linkTemplate || "");
+    this.storageSet(TE_PRODUCTIVITY_KEYS.state, JSON.stringify(this.productivityState));
+  };
+
+  TextExpressApp.prototype.ensureGenesysProductivityStyles = function () {
+    let style = document.getElementById("te-productivity-genesys-style");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "te-productivity-genesys-style";
+      (document.head || document.documentElement).appendChild(style);
+    }
+    style.textContent = `
+      .te-gx-host{position:relative!important}
+      .te-gx-host>.interaction-content,.te-gx-host>[data-qa-id="interaction-content"]{padding-bottom:25px!important}
+      .te-gx-host .duration,.te-gx-host span[data-bind*="elapsedTimeString"]{display:none!important}
+      .te-gx-bubbles{position:absolute!important;left:10px!important;right:auto!important;bottom:4px!important;top:auto!important;transform:none!important;margin:0!important;z-index:10!important;display:flex;align-items:center;gap:4px;pointer-events:none;user-select:none;width:auto!important;max-width:calc(100% - 20px);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:11px;line-height:1;box-sizing:border-box}
+      .te-gx-pill{display:inline-flex;align-items:center;justify-content:center;min-height:18px;height:18px;padding:2px 5px;border:1px solid var(--te-gx-border,#dce3ed);border-radius:999px;background:var(--te-gx-bg,#fff);color:var(--te-gx-text,#172033);box-shadow:0 1px 3px rgba(15,32,61,.10);font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
+      .te-gx-channel{min-width:20px;padding:2px 4px;font-size:11px}
+      .te-gx-timer.te-gx-paused{color:var(--te-gx-muted,#65728a)}
+      .te-gx-timer.te-gx-client-inactive{color:#b77900;border-color:#e4bd5e}
+      .te-gx-timer.te-gx-operator-inactive{color:var(--te-gx-primary,#2563eb);border-color:var(--te-gx-primary,#2563eb)}
+      .te-gx-timer.te-gx-long{color:var(--te-gx-danger,#d52b2b);border-color:var(--te-gx-danger,#d52b2b)}
+      .te-gx-check{min-width:20px;padding:2px 4px;color:var(--te-gx-success,#16803d);border-color:color-mix(in srgb,var(--te-gx-success,#16803d) 45%,var(--te-gx-border,#dce3ed));background:color-mix(in srgb,var(--te-gx-success,#16803d) 9%,var(--te-gx-bg,#fff));font-weight:950}
+      .te-gx-check[hidden]{display:none!important}
+      .te-gx-bubbles.te-gx-excluded{opacity:.55}
+    `;
+  };
+
+  TextExpressApp.prototype.attachProductivityBubbles = function (timer) {
+    const conversation = this.getCanonicalGenesysConversation(timer.element);
+    if (!conversation?.isConnected) return;
+    timer.element = conversation;
+    conversation.classList.add("te-gx-host");
+    let container = null;
+    try { container = [...conversation.children].find((child) => child?.classList?.contains("te-gx-bubbles")) || null; } catch {}
+    if (!container) {
+      container = document.createElement("div");
+      container.className = "te-gx-bubbles";
+      container.innerHTML = '<span class="te-gx-pill te-gx-channel"></span><span class="te-gx-pill te-gx-timer">00:00</span><span class="te-gx-pill te-gx-check" hidden>✓</span>';
+      conversation.appendChild(container);
+    }
+    container.dataset.teProductivityOwner = timer.key;
+    timer.bubbles = container;
+    timer.channelEl = container.querySelector(".te-gx-channel");
+    timer.timerEl = container.querySelector(".te-gx-timer");
+    timer.checkEl = container.querySelector(".te-gx-check");
+    if (timer.checkEl && !timer.checkEl.dataset.teQualified) timer.checkEl.hidden = true;
+    this.applyGenesysProductivityTheme(container);
+  };
+
+  TextExpressApp.prototype.createProductivityTimer = function (conversation, index, keyInfo, isSelected) {
+    const now = Date.now();
+    const restored = this.getRestoredProductivitySession(keyInfo.key, keyInfo.interactionId, keyInfo.fingerprint);
+    const channel = restored?.channel || this.detectGenesysChannel(conversation, isSelected);
+    const nativeElapsedMs = restored ? 0 : this.getGenesysNativeElapsedMs(conversation);
+    const startedAt = Number(restored?.startedAt || (nativeElapsedMs > 0 ? now - nativeElapsedMs : now));
+    const timer = {
+      key: keyInfo.key,
+      interactionId: keyInfo.interactionId || restored?.interactionId || "",
+      fingerprint: keyInfo.fingerprint || restored?.fingerprint || this.getProductivityConversationFingerprint(conversation, isSelected),
+      participantName: restored?.participantName || this.getGenesysParticipantName(conversation),
+      channel,
+      element: this.getCanonicalGenesysConversation(conversation),
+      startedAt,
+      activeDurationMs: Number(restored?.activeDurationMs || 0),
+      activeSessionStart: null,
+      isSelected: false,
+      manualPaused: Boolean(restored?.manualPaused),
+      excluded: Boolean(restored?.excluded),
+      lastCustomerReplyTimestamp: Number(restored?.lastCustomerReplyTimestamp || now),
+      lastOperatorActivityTimestamp: Number(restored?.lastOperatorActivityTimestamp || now),
+      link: restored?.link || "",
+      longNotified: false,
+      missingSince: 0,
+      lastSeenAt: now,
+      finalized: false,
+      bubbles: null,
+      channelEl: null,
+      timerEl: null,
+      checkEl: null
+    };
+    if (!timer.link) timer.link = this.getGenesysInteractionLink(timer.element, timer.interactionId, isSelected);
+    this.attachProductivityBubbles(timer);
+    this.productivityTimers.set(timer.key, timer);
+    this.updateProductivitySelection(timer, isSelected, now);
+    return timer;
+  };
+
+  TextExpressApp.prototype.rekeyProductivityTimer = function (timer, newKey) {
+    if (!timer || !newKey || timer.key === newKey) return timer;
+    const existing = this.productivityTimers.get(newKey);
+    if (existing && existing !== timer) return this.mergeProductivityTimers(existing, timer);
+    this.productivityTimers.delete(timer.key);
+    timer.key = newKey;
+    this.productivityTimers.set(newKey, timer);
+    if (timer.bubbles) timer.bubbles.dataset.teProductivityOwner = newKey;
+    if (this.productivityObservedKey && this.productivityObservedKey !== newKey && this.productivityObservedKey.startsWith("dom:")) this.productivityObservedKey = newKey;
+    return timer;
+  };
+
+  TextExpressApp.prototype.mergeProductivityTimers = function (primary, duplicate) {
+    if (!primary) return duplicate;
+    if (!duplicate || primary === duplicate) return primary;
+    primary.startedAt = Math.min(Number(primary.startedAt || Date.now()), Number(duplicate.startedAt || Date.now()));
+    primary.activeDurationMs = Math.max(Number(primary.activeDurationMs || 0), Number(duplicate.activeDurationMs || 0));
+    primary.interactionId = primary.interactionId || duplicate.interactionId || "";
+    primary.fingerprint = primary.fingerprint || duplicate.fingerprint || "";
+    primary.participantName = primary.participantName !== "Cliente" ? primary.participantName : duplicate.participantName;
+    primary.link = primary.link || duplicate.link || "";
+    primary.excluded = Boolean(primary.excluded || duplicate.excluded);
+    primary.lastCustomerReplyTimestamp = Math.max(Number(primary.lastCustomerReplyTimestamp || 0), Number(duplicate.lastCustomerReplyTimestamp || 0));
+    primary.lastOperatorActivityTimestamp = Math.max(Number(primary.lastOperatorActivityTimestamp || 0), Number(duplicate.lastOperatorActivityTimestamp || 0));
+    primary.lastSeenAt = Math.max(Number(primary.lastSeenAt || 0), Number(duplicate.lastSeenAt || 0));
+    if (duplicate.isSelected && !primary.isSelected) {
+      primary.element = duplicate.element;
+      this.updateProductivitySelection(primary, true, Date.now());
+    }
+    try { duplicate.bubbles?.remove?.(); } catch {}
+    try { duplicate.element?.classList?.remove?.("te-gx-host"); } catch {}
+    this.productivityTimers.delete(duplicate.key);
+    return primary;
+  };
+
+  TextExpressApp.prototype.findProductivityTimerForConversation = function (conversation, keyInfo, assignedKeys = new Set()) {
+    let timer = this.productivityTimers.get(keyInfo.key);
+    if (timer && !assignedKeys.has(timer.key)) return timer;
+    for (const candidate of this.productivityTimers.values()) {
+      if (assignedKeys.has(candidate.key)) continue;
+      if (candidate.element === conversation) return candidate;
+    }
+    if (keyInfo.interactionId) {
+      for (const candidate of this.productivityTimers.values()) {
+        if (assignedKeys.has(candidate.key)) continue;
+        if (candidate.interactionId && candidate.interactionId === keyInfo.interactionId) return candidate;
+      }
+    }
+    if (keyInfo.fingerprint) {
+      const candidates = [...this.productivityTimers.values()].filter((candidate) =>
+        !assignedKeys.has(candidate.key) && candidate.fingerprint === keyInfo.fingerprint && (candidate.missingSince || candidate.element?.isConnected === false)
+      );
+      if (candidates.length === 1) return candidates[0];
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.getProductivityActiveDuration = function (timer, now = Date.now()) {
+    let value = Number(timer?.activeDurationMs || 0);
+    if (timer?.isSelected && !timer?.manualPaused && timer?.activeSessionStart) value += Math.max(0, now - timer.activeSessionStart);
+    return Math.max(0, value);
+  };
+
+  TextExpressApp.prototype.getProductivityTotalDuration = function (timer, now = Date.now()) {
+    return Math.max(0, now - Number(timer?.startedAt || now));
+  };
+
+  TextExpressApp.prototype.updateProductivityTimerVisual = function (timer, now = Date.now()) {
+    if (!timer?.element?.isConnected) return;
+    if (!timer.bubbles?.isConnected || timer.bubbles?.parentElement !== timer.element) this.attachProductivityBubbles(timer);
+    if (!timer.bubbles || !timer.timerEl || !timer.checkEl || !timer.channelEl) return;
+    const activeMs = this.getProductivityActiveDuration(timer, now);
+    const thresholdMs = this.getProductivityThreshold(timer) * 1000;
+    // O check visual acompanha o cronômetro efetivamente exibido (tempo em foco),
+    // como no userscript Genesys de referência. A contagem diária usa TMA total.
+    const visualQualified = activeMs >= thresholdMs;
+    timer.channelEl.textContent = timer.channel === "call" ? "☎" : "💬";
+    timer.timerEl.textContent = this.formatProductivityTime(activeMs);
+    timer.checkEl.hidden = !visualQualified;
+    timer.checkEl.dataset.teQualified = visualQualified ? "true" : "";
+    timer.bubbles.classList.toggle("te-gx-excluded", Boolean(timer.excluded));
+    timer.timerEl.classList.remove("te-gx-paused", "te-gx-client-inactive", "te-gx-operator-inactive", "te-gx-long");
+    if (timer.manualPaused || !timer.isSelected) {
+      timer.timerEl.classList.add("te-gx-paused");
+      return;
+    }
+    const channelSettings = timer.channel === "call" ? this.productivitySettings.call : this.productivitySettings.chat;
+    const longMs = Number(channelSettings.longMinutes || 15) * 60000;
+    if (activeMs >= longMs) {
+      timer.timerEl.classList.add("te-gx-long");
+      if (!timer.longNotified && this.productivitySettings.alertsEnabled) {
+        timer.longNotified = true;
+        this.showToast(`${timer.channel === "call" ? "Ligação" : "Conversa"} com ${timer.participantName || "cliente"} ultrapassou ${channelSettings.longMinutes} min.`, "error", 4800);
+      }
+      return;
+    }
+    if (timer.channel === "chat") {
+      const operatorInactive = (now - Number(timer.lastOperatorActivityTimestamp || now)) / 1000;
+      const clientInactive = (now - Number(timer.lastCustomerReplyTimestamp || now)) / 1000;
+      if (operatorInactive >= this.productivitySettings.chat.operatorInactivitySeconds) timer.timerEl.classList.add("te-gx-operator-inactive");
+      else if (clientInactive >= this.productivitySettings.chat.clientInactivitySeconds) timer.timerEl.classList.add("te-gx-client-inactive");
+    }
+  };
+
+  TextExpressApp.prototype.upsertProductivityHistoryRecord = function (record) {
+    const sameIdentity = (candidate) => {
+      if (!candidate) return false;
+      if (record.interactionId && candidate.interactionId) return record.interactionId === candidate.interactionId;
+      if (record.sessionKey && candidate.sessionKey) return record.sessionKey === candidate.sessionKey;
+      return false;
+    };
+    const existing = this.productivityHistory.find(sameIdentity);
+    if (!existing) {
+      this.productivityHistory.push(record);
+      return record;
+    }
+    const earliest = Math.min(Number(existing.startedAt || record.startedAt), Number(record.startedAt || existing.startedAt));
+    const latest = Math.max(Number(existing.endedAt || 0), Number(record.endedAt || 0));
+    existing.startedAt = earliest;
+    existing.endedAt = latest;
+    existing.totalDurationMs = Math.max(Number(existing.totalDurationMs || 0), Number(record.totalDurationMs || 0), Math.max(0, latest - earliest));
+    existing.activeDurationMs = Math.max(Number(existing.activeDurationMs || 0), Number(record.activeDurationMs || 0));
+    existing.participantName = existing.participantName || record.participantName;
+    existing.channel = existing.channel || record.channel;
+    existing.interactionId = existing.interactionId || record.interactionId;
+    existing.link = existing.link || record.link;
+    existing.fingerprint = existing.fingerprint || record.fingerprint;
+    existing.excluded = Boolean(existing.excluded && record.excluded);
+    const thresholdMs = (existing.channel === "call" ? this.productivitySettings.call.checkSeconds : this.productivitySettings.chat.checkSeconds) * 1000;
+    existing.qualified = existing.totalDurationMs >= thresholdMs;
+    return existing;
+  };
+
+  TextExpressApp.prototype.finalizeProductivityTimer = function (timer) {
+    if (!timer || timer.finalized) return;
+    timer.finalized = true;
+    const now = Date.now();
+    if (timer.isSelected && timer.activeSessionStart && !timer.manualPaused) {
+      timer.activeDurationMs += Math.max(0, now - timer.activeSessionStart);
+      timer.activeSessionStart = null;
+    }
+    const activeDurationMs = Math.max(0, Number(timer.activeDurationMs || 0));
+    const totalDurationMs = Math.max(activeDurationMs, this.getProductivityTotalDuration(timer, now));
+    const thresholdMs = this.getProductivityThreshold(timer) * 1000;
+    const record = {
+      id: `prod-${now}-${Math.random().toString(36).slice(2, 8)}`,
+      sessionKey: timer.key,
+      fingerprint: timer.fingerprint || "",
+      interactionId: timer.interactionId || "",
+      participantName: timer.participantName || "Cliente",
+      channel: timer.channel === "call" ? "call" : "chat",
+      startedAt: timer.startedAt || (now - totalDurationMs),
+      endedAt: now,
+      totalDurationMs,
+      activeDurationMs,
+      // Igual ao script Genesys de referência: os 70 s que contam para a meta
+      // são avaliados sobre a duração total (TMA), não só sobre o tempo em foco.
+      qualified: totalDurationMs >= thresholdMs,
+      excluded: Boolean(timer.excluded),
+      link: timer.link || this.getGenesysInteractionLink(timer.element, timer.interactionId, false) || ""
+    };
+    if (record.link) this.learnProductivityLinkTemplate(record.link, record.interactionId);
+    if (totalDurationMs >= 2000) {
+      if (!this.productivitySettings.historyEnabled) {
+        record.participantName = "Atendimento";
+        record.interactionId = "";
+        record.link = "";
+      }
+      this.upsertProductivityHistoryRecord(record);
+      this.dedupeProductivityHistory();
+      this.saveProductivityHistory();
+    }
+    try { timer.bubbles?.remove?.(); } catch {}
+    try { timer.element?.classList?.remove?.("te-gx-host"); } catch {}
+    this.productivityTimers.delete(timer.key);
+    if (this.productivityObservedKey === timer.key) this.disconnectProductivityActivityObserver();
+    this.saveProductivityState();
+    this.renderProductivity();
+  };
+
+  TextExpressApp.prototype.monitorGenesysProductivity = function () {
+    if (!this.productivityInitialized || !this.productivitySettings.enabled) return;
+    const now = Date.now();
+    const conversations = this.getGenesysConversationElements();
+    const assignedKeys = new Set();
+    let selectedTimer = null;
+
+    conversations.forEach((conversation, index) => {
+      const selected = this.isGenesysConversationSelected(conversation);
+      const keyInfo = this.getProductivityConversationKey(conversation, index, selected);
+      let timer = this.findProductivityTimerForConversation(conversation, keyInfo, assignedKeys);
+      if (!timer) timer = this.createProductivityTimer(conversation, index, keyInfo, selected);
+      else {
+        if (keyInfo.interactionId && timer.key !== keyInfo.key) timer = this.rekeyProductivityTimer(timer, keyInfo.key);
+        if (timer.element !== conversation) {
+          try { timer.bubbles?.remove?.(); } catch {}
+          try { timer.element?.classList?.remove?.("te-gx-host"); } catch {}
+          timer.element = conversation;
+          this.attachProductivityBubbles(timer);
+        }
+        timer.interactionId = keyInfo.interactionId || timer.interactionId || "";
+        timer.fingerprint = keyInfo.fingerprint || timer.fingerprint || "";
+        timer.participantName = this.getGenesysParticipantName(conversation) || timer.participantName;
+        timer.channel = this.detectGenesysChannel(conversation, selected) || timer.channel;
+        if (!timer.link) timer.link = this.getGenesysInteractionLink(conversation, timer.interactionId, selected);
+        timer.missingSince = 0;
+        timer.lastSeenAt = now;
+        timer.finalized = false;
+        this.updateProductivitySelection(timer, selected, now);
+      }
+      assignedKeys.add(timer.key);
+      this.updateProductivityTimerVisual(timer, now);
+      if (selected) selectedTimer = timer;
+    });
+
+    for (const timer of [...this.productivityTimers.values()]) {
+      if (assignedKeys.has(timer.key)) continue;
+      if (!timer.missingSince) timer.missingSince = now;
+      // O Genesys rerenderiza/reordena a lista ao receber chat ou ligação. Um
+      // desaparecimento curto não significa encerramento. A tolerância maior
+      // evita históricos duplicados por remount do Angular.
+      if (now - timer.missingSince >= 15000) this.finalizeProductivityTimer(timer);
+    }
+
+    this.bindSelectedProductivityActivity(selectedTimer);
+    const dateKey = this.getProductivityDateKey();
+    const open = conversations.length;
+    const currentPeak = Number(this.productivityState.peakOpenByDate[dateKey] || 0);
+    if (open > currentPeak) {
+      this.productivityState.peakOpenByDate[dateKey] = open;
+      this.saveProductivityState();
+    }
+    if (now - Number(this.productivityLastPersistAt || 0) >= 3000) {
+      this.productivityLastPersistAt = now;
+      this.saveProductivityState();
+    }
+    if (now - Number(this.productivityLastRenderAt || 0) >= 1000) {
+      this.productivityLastRenderAt = now;
+      this.renderProductivityCounter();
+      if (this.activeType === "produtividade") this.renderProductivity();
+    }
+  };
+
+  TextExpressApp.prototype.renderProductivityCurrent = function (current) {
+    const container = this.root.querySelector("#te-productivity-current-list");
+    const alerts = this.root.querySelector("#te-productivity-alert-summary");
+    if (!container) return;
+    if (!current.length) {
+      container.innerHTML = '<div class="te-productivity-empty">Nenhuma interação aberta detectada no momento.</div>';
+      if (alerts) { alerts.textContent = "Nenhum alerta ativo."; alerts.classList.remove("te-has-alert"); }
+      return;
+    }
+    const now = Date.now();
+    const sorted = [...current].sort((a, b) => Number(b.isSelected) - Number(a.isSelected) || a.startedAt - b.startedAt);
+    const alertLabels = [];
+    container.innerHTML = sorted.map((timer) => {
+      const active = this.getProductivityActiveDuration(timer, now);
+      const qualifiedVisual = active >= this.getProductivityThreshold(timer) * 1000;
+      const alert = this.getTimerAlertLabel(timer, now);
+      if (!["Normal", "Em espera", "Pausado"].includes(alert)) alertLabels.push(`${timer.participantName}: ${alert}`);
+      return `<div class="te-productivity-current-row ${timer.excluded ? "te-excluded" : ""}">
+        <span class="te-productivity-row-channel">${timer.channel === "call" ? "☎" : "💬"}</span>
+        <div class="te-productivity-row-main"><strong>${this.escapeHtml(timer.participantName || "Cliente")}</strong><small>${this.escapeHtml(alert)}${timer.interactionId ? ` · ${this.escapeHtml(timer.interactionId)}` : ""}${timer.excluded ? " · fora das métricas" : ""}</small></div>
+        <span class="te-productivity-row-time">${this.formatProductivityTime(active)}</span>
+        <span class="te-productivity-row-check">${qualifiedVisual ? "✓" : ""}</span>
+      </div>`;
+    }).join("");
+    if (alerts) {
+      alerts.textContent = alertLabels.length ? alertLabels.join(" · ") : "Nenhum alerta ativo.";
+      alerts.classList.toggle("te-has-alert", alertLabels.length > 0);
+    }
+  };
+
+  TextExpressApp.prototype.setupGenesysNativeCopyCapture = function () {
+    if (this.productivityNativeCopyCaptureHandler) return;
+    this.productivityNativeCopyCaptureHandler = (event) => {
+      const path = typeof event.composedPath === "function" ? event.composedPath() : [event.target];
+      const selectors = TE_GENESYS_SELECTORS.nativeCopy;
+      const matched = path.some((node) => {
+        if (!node?.matches) return false;
+        return selectors.some((selector) => { try { return node.matches(selector); } catch { return false; } });
+      });
+      if (!matched) return;
+      const selected = [...(this.productivityTimers?.values?.() || [])].find((timer) => timer.isSelected);
+      window.setTimeout(async () => {
+        try {
+          const clipboard = await navigator.clipboard?.readText?.();
+          const link = this.normalizeProductivityInteractionUrl(clipboard);
+          if (!link) return;
+          const interactionId = selected?.interactionId || this.extractInteractionIdentifier(link);
+          this.learnProductivityLinkTemplate(link, interactionId);
+          if (selected) selected.link = link;
+          this.saveProductivityState();
+        } catch {}
+      }, 220);
+    };
+    document.addEventListener("click", this.productivityNativeCopyCaptureHandler, true);
+  };
+
+  TextExpressApp.prototype.captureGenesysLinkWithNativeButton = async function (expectedInteractionId = "") {
+    const button = this.findGenesysElement(TE_GENESYS_SELECTORS.nativeCopy, document);
+    if (!button || !this.isGenesysElementVisible(button)) return "";
+    const selectedConversation = this.getGenesysConversationElements().find((conversation) => this.isGenesysConversationSelected(conversation));
+    const selectedId = selectedConversation ? this.getGenesysInteractionId(selectedConversation, true) : "";
+    if (expectedInteractionId && expectedInteractionId !== selectedId) return "";
+    try {
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 220));
+      const text = await navigator.clipboard.readText();
+      const safe = this.normalizeProductivityInteractionUrl(text);
+      if (!safe) return "";
+      this.learnProductivityLinkTemplate(safe, expectedInteractionId || selectedId);
+      this.saveProductivityState();
+      return safe;
+    } catch { return ""; }
+  };
+
+  TextExpressApp.prototype.captureHistoryLink = async function (id) {
+    const record = this.productivityHistory.find((item) => item.id === id);
+    if (!record) return;
+    let link = this.normalizeProductivityInteractionUrl(record.link || this.deriveGenesysInteractionLink(record.interactionId));
+    if (!link) {
+      const selectedConversation = this.getGenesysConversationElements().find((conversation) => this.isGenesysConversationSelected(conversation));
+      const selectedId = selectedConversation ? this.getGenesysInteractionId(selectedConversation, true) : "";
+      if (record.interactionId && selectedId && selectedId !== record.interactionId) {
+        this.showToast(`Selecione no Genesys a interação ${record.interactionId} e tente novamente.`, "error", 5600);
+        return;
+      }
+      link = this.normalizeProductivityInteractionUrl(await this.captureGenesysLinkWithNativeButton(record.interactionId || selectedId));
+    }
+    if (!link) {
+      this.showToast(record.interactionId
+        ? `Não foi possível recuperar o link da interação ${record.interactionId}. Selecione essa interação no Genesys e tente novamente.`
+        : "Não foi possível recuperar o link porque o Genesys não forneceu um ID confiável para este registro.", "error", 6000);
+      return;
+    }
+    record.link = link;
+    this.learnProductivityLinkTemplate(link, record.interactionId);
+    this.saveProductivityHistory();
+    this.saveProductivityState();
+    this.renderProductivityHistory();
+    this.showToast("Link da interação recuperado.", "success");
+  };
+
+  TextExpressApp.prototype.initProductivity = function () {
+    teProductivityV284Init.call(this);
+    this.setupGenesysNativeCopyCapture();
+  };
+
+  TextExpressApp.prototype.destroyProductivity = function () {
+    if (this.productivityNativeCopyCaptureHandler) {
+      try { document.removeEventListener("click", this.productivityNativeCopyCaptureHandler, true); } catch {}
+      this.productivityNativeCopyCaptureHandler = null;
+    }
+    return teProductivityV284Destroy.call(this);
   };
 
   TextExpressApp.prototype.init = function () {

@@ -1,12 +1,12 @@
 /*
- * Text Express 28.4.0
+ * Text Express 28.5.0
  * Expansor de textos, protocolos e produtividade para atendimento.
  * Sem dependências externas.
  */
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.4.0";
+  const APP_VERSION = "28.5.0";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -13455,12 +13455,56 @@
     return true;
   };
 
+  TextExpressApp.prototype.findProtocolSendButton = function (textarea = null, options = {}) {
+    const enabledOnly = Boolean(options.enabledOnly);
+    let buttons = this.getVisibleExternalElements("button#send_button");
+    if (enabledOnly) {
+      buttons = buttons.filter((button) => !button.disabled && !button.hasAttribute("disabled"));
+    }
+    if (!buttons.length) return null;
+    if (!textarea) return buttons[0];
+
+    // Em SPAs podem existir instâncias antigas do mesmo #send_button no DOM.
+    // Primeiro preferimos o botão ligado ao mesmo <form>; depois, o elemento
+    // estruturalmente mais próximo do textarea atual do protocolo.
+    if (textarea.form) {
+      const sameForm = buttons.find((button) => button.form === textarea.form);
+      if (sameForm) return sameForm;
+    }
+
+    const ancestry = (element) => {
+      const chain = [];
+      let current = element;
+      while (current && current !== document) {
+        chain.push(current);
+        current = current.parentElement;
+      }
+      return chain;
+    };
+    const textareaChain = ancestry(textarea);
+    const textareaDepth = new Map(textareaChain.map((node, index) => [node, index]));
+    const distance = (button) => {
+      const buttonChain = ancestry(button);
+      for (let index = 0; index < buttonChain.length; index += 1) {
+        const sharedDepth = textareaDepth.get(buttonChain[index]);
+        if (sharedDepth !== undefined) return sharedDepth + index;
+      }
+      return Number.MAX_SAFE_INTEGER;
+    };
+
+    return [...buttons].sort((left, right) => distance(left) - distance(right))[0] || null;
+  };
+
   TextExpressApp.prototype.preflightProtocolRealSystem = async function (pending, waiting) {
     const textarea = await this.waitForExternalCondition?.(() => this.getVisibleExternalElements("textarea.text-area")[0] || null, 2200);
     if (!textarea) throw new Error("O campo real de registro do protocolo (textarea.text-area) não foi localizado.");
-    const send = document.querySelector("button#send_button");
-    if (!send || this.root.contains(send)) throw new Error("O botão real de registrar protocolo (#send_button) não foi localizado.");
-    if (send.disabled || send.hasAttribute("disabled")) throw new Error("O botão de registrar protocolo está desabilitado no momento.");
+
+    // Importante: o Mascara pode manter #send_button desabilitado enquanto o
+    // textarea está vazio. Por isso, o preflight valida apenas a existência do
+    // botão visível; a condição habilitada é verificada DEPOIS do preenchimento.
+    const send = this.findProtocolSendButton(textarea);
+    if (!send) throw new Error("O botão real de registrar protocolo (#send_button) não foi localizado.");
+
     if (pending.etiquetaSistema && !this.externalProtocolLabelAlreadyPresent(pending.etiquetaSistema)) {
       const plus = this.getVisibleExternalElements("#tags .anticon.anticon-plus")[0] || this.getVisibleExternalElements(".anticon.anticon-plus")[0];
       if (!plus) throw new Error("A área real de etiquetas não está disponível neste chamado.");
@@ -13474,12 +13518,16 @@
         if (!block) throw new Error("O controle Aguardar (#blocking) não foi localizado no sistema.");
       }
     }
-    return { textarea, send };
+    return { textarea };
   };
 
   TextExpressApp.prototype.registerProtocolTextRealSystem = async function (content, preflight = null) {
-    const textarea = preflight?.textarea || await this.waitForExternalCondition?.(() => this.getVisibleExternalElements("textarea.text-area")[0] || null, 3000);
+    let textarea = preflight?.textarea || null;
+    if (!textarea || !textarea.isConnected || !this.isExternalElementVisible(textarea)) {
+      textarea = await this.waitForExternalCondition?.(() => this.getVisibleExternalElements("textarea.text-area")[0] || null, 3000);
+    }
     if (!textarea) throw new Error("O campo de protocolo não foi localizado.");
+
     textarea.focus?.();
     if (this.setExternalInputValue) this.setExternalInputValue(textarea, content);
     else {
@@ -13487,8 +13535,31 @@
       textarea.dispatchEvent(new Event("input", { bubbles: true }));
       textarea.dispatchEvent(new Event("change", { bubbles: true }));
     }
-    const send = preflight?.send || document.querySelector("button#send_button");
-    if (!send || send.disabled || send.hasAttribute("disabled")) throw new Error("O botão de registrar protocolo não está disponível.");
+
+    // O sistema habilita o Registrar de forma assíncrona após receber o evento
+    // input. Não reutilizamos o botão capturado no preflight porque o Angular
+    // pode rerenderizá-lo e substituir o nó durante essa atualização.
+    let send = await this.waitForExternalCondition?.(
+      () => this.findProtocolSendButton(textarea, { enabledOnly: true }),
+      5000
+    );
+
+    // Pulso de eventos de segurança para casos em que o primeiro ciclo de
+    // detecção do Angular tenha sido perdido durante uma rerenderização.
+    if (!send) {
+      const view = textarea.ownerDocument?.defaultView || window;
+      textarea.dispatchEvent(new view.Event("input", { bubbles: true, composed: true }));
+      textarea.dispatchEvent(new view.Event("change", { bubbles: true, composed: true }));
+      send = await this.waitForExternalCondition?.(
+        () => this.findProtocolSendButton(textarea, { enabledOnly: true }),
+        2500
+      );
+    }
+
+    if (!send) {
+      throw new Error("O botão de registrar protocolo não foi habilitado após o preenchimento do protocolo.");
+    }
+
     send.click();
     await new Promise((resolve) => window.setTimeout(resolve, 450));
     return true;
@@ -13791,7 +13862,7 @@
 
 
   /* ==========================================================
-   * Text Express 28.4.0 — Produtividade Genesys
+   * Text Express 28.5.0 — Produtividade Genesys (camada Genesys endurecida)
    * Monitor independente de interações, histórico e métricas.
    * ========================================================== */
   const TE_PRODUCTIVITY_KEYS = Object.freeze({
@@ -15172,7 +15243,7 @@
     const payload = {
       app: "Text Express",
       backupType: "complete",
-      schemaVersion: 10,
+      schemaVersion: 11,
       appVersion: APP_VERSION,
       exportedAt: new Date().toISOString(),
       total: this.snippets.length,
@@ -15187,7 +15258,8 @@
       productivityHistory: this.productivityHistory || [],
       productivityState: {
         manualAdjustments: this.productivityState?.manualAdjustments || {},
-        peakOpenByDate: this.productivityState?.peakOpenByDate || {}
+        peakOpenByDate: this.productivityState?.peakOpenByDate || {},
+        linkTemplate: this.productivityState?.linkTemplate || ""
       }
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
@@ -15208,6 +15280,7 @@
     if (parsed?.productivityState && typeof parsed.productivityState === "object") {
       this.productivityState.manualAdjustments = parsed.productivityState.manualAdjustments && typeof parsed.productivityState.manualAdjustments === "object" ? parsed.productivityState.manualAdjustments : this.productivityState.manualAdjustments;
       this.productivityState.peakOpenByDate = parsed.productivityState.peakOpenByDate && typeof parsed.productivityState.peakOpenByDate === "object" ? parsed.productivityState.peakOpenByDate : this.productivityState.peakOpenByDate;
+      this.productivityState.linkTemplate = typeof parsed.productivityState.linkTemplate === "string" ? parsed.productivityState.linkTemplate : (this.productivityState.linkTemplate || "");
     }
     this.saveProductivitySettings();
     this.saveProductivityHistory();
@@ -15226,6 +15299,983 @@
     const result = teProductivityOriginal.mergeImportedBackup.call(this, parsed, source, rawCategories);
     if (parsed?.productivitySettings || parsed?.productivityHistory || parsed?.productivityState) this.restoreProductivityBackup(parsed);
     return result;
+  };
+
+
+  /* ==========================================================
+   * Text Express 28.5.0 — Hardening da Produtividade Genesys
+   * Corrige identidade, duplicidade, posicionamento, check de
+   * 70 s, links, Shadow DOM, reconciliação e finalização.
+   * ========================================================== */
+  const teProductivityV284Init = TextExpressApp.prototype.initProductivity;
+  const teProductivityV284Destroy = TextExpressApp.prototype.destroyProductivity;
+
+  TextExpressApp.prototype.isGenesysElementVisible = function (element) {
+    if (!element || element.isConnected === false) return false;
+    try {
+      const style = getComputedStyle(element);
+      if (style.display === "none" || style.visibility === "hidden") return false;
+    } catch {}
+    try {
+      const rect = element.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) return true;
+      if (element.getClientRects?.().length) return true;
+    } catch {}
+    return false;
+  };
+
+  TextExpressApp.prototype.findGenesysElement = function (selectors, root = document) {
+    const list = Array.isArray(selectors) ? selectors : [selectors];
+    const searchShadow = (scope, selector, visited = new Set()) => {
+      if (!scope || visited.has(scope)) return null;
+      visited.add(scope);
+      try {
+        const direct = scope.querySelector?.(selector);
+        if (direct) return direct;
+      } catch {}
+      let nodes = [];
+      try { nodes = scope.querySelectorAll?.("*") || []; } catch {}
+      for (const node of nodes) {
+        const shadow = node?.shadowRoot;
+        if (!shadow) continue;
+        try {
+          const found = shadow.querySelector?.(selector);
+          if (found) return found;
+        } catch {}
+        const nested = searchShadow(shadow, selector, visited);
+        if (nested) return nested;
+      }
+      return null;
+    };
+    for (const selector of list) {
+      try {
+        const direct = root?.querySelector?.(selector);
+        if (direct) return direct;
+      } catch {}
+      const shadowFound = searchShadow(root, selector);
+      if (shadowFound) return shadowFound;
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.findAllGenesysElements = function (selectors, root = document) {
+    const list = Array.isArray(selectors) ? selectors : [selectors];
+    const seen = new Set();
+    const output = [];
+    const pushMatches = (scope) => {
+      if (!scope) return;
+      for (const selector of list) {
+        try {
+          scope.querySelectorAll?.(selector)?.forEach?.((element) => {
+            if (!seen.has(element)) { seen.add(element); output.push(element); }
+          });
+        } catch {}
+      }
+    };
+    pushMatches(root);
+    // O Genesys normalmente expõe a lista no documento principal. Só percorremos
+    // Shadow DOM quando a consulta normal não encontrou nada, evitando custo alto.
+    if (output.length) return output;
+    const visited = new Set();
+    const walk = (scope) => {
+      if (!scope || visited.has(scope)) return;
+      visited.add(scope);
+      let nodes = [];
+      try { nodes = scope.querySelectorAll?.("*") || []; } catch {}
+      for (const node of nodes) {
+        const shadow = node?.shadowRoot;
+        if (!shadow) continue;
+        pushMatches(shadow);
+        walk(shadow);
+      }
+    };
+    walk(root);
+    return output;
+  };
+
+  TextExpressApp.prototype.getCanonicalGenesysConversation = function (element) {
+    if (!element) return null;
+    try {
+      if (element.matches?.("div.interaction-group")) return element;
+      const outer = element.closest?.("div.interaction-group");
+      if (outer) return outer;
+      if (element.matches?.('div[data-qa-id="interaction-group-list-item"]')) return element;
+      return element.closest?.('div[data-qa-id="interaction-group-list-item"]') || element;
+    } catch { return element; }
+  };
+
+  TextExpressApp.prototype.getGenesysConversationElements = function () {
+    const raw = this.findAllGenesysElements(TE_GENESYS_SELECTORS.groups, document);
+    const canonical = [];
+    const seenElements = new Set();
+    for (const candidate of raw) {
+      const element = this.getCanonicalGenesysConversation(candidate);
+      if (!element || seenElements.has(element) || !this.isGenesysElementVisible(element)) continue;
+      seenElements.add(element);
+      canonical.push(element);
+    }
+    canonical.sort((a, b) => {
+      try { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; } catch { return 0; }
+    });
+
+    // Se o Genesys mantiver duas representações visíveis da mesma interação,
+    // preserva apenas uma quando existe um ID confiável.
+    const byId = new Map();
+    const result = [];
+    for (const element of canonical) {
+      const selected = this.isGenesysConversationSelected(element);
+      const id = this.getGenesysInteractionId(element, selected);
+      if (!id) { result.push(element); continue; }
+      const previousIndex = byId.get(id);
+      if (previousIndex === undefined) {
+        byId.set(id, result.length);
+        result.push(element);
+      } else if (selected && !this.isGenesysConversationSelected(result[previousIndex])) {
+        result[previousIndex] = element;
+      }
+    }
+    return result;
+  };
+
+  TextExpressApp.prototype.extractInteractionIdentifier = function (value) {
+    const text = String(value || "").trim();
+    if (!text) return "";
+    const uuid = text.match(/\b[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\b/i);
+    if (uuid) return uuid[0];
+    const numeric = text.match(/\b\d{8,20}\b/);
+    if (numeric) return numeric[0];
+    return "";
+  };
+
+  TextExpressApp.prototype.extractInteractionIdFromConversationText = function (conversation) {
+    const snippets = [];
+    try {
+      const participant = this.findGenesysElement(TE_GENESYS_SELECTORS.participant, conversation);
+      if (participant?.textContent) snippets.push(participant.textContent);
+    } catch {}
+    try {
+      const text = String(conversation?.innerText || conversation?.textContent || "");
+      if (text) snippets.push(text.slice(0, 800));
+    } catch {}
+    for (const raw of snippets) {
+      const text = String(raw || "");
+      const pipe = text.match(/\|\s*(\d{8,20})\b/);
+      if (pipe) return pipe[1];
+      const labelled = text.match(/(?:intera(?:ç|c)[aã]o|interaction|protocolo|id)\s*[:#-]?\s*([0-9a-f]{8}-[0-9a-f-]{20,}|\d{8,20})\b/i);
+      if (labelled) {
+        const parsed = this.extractInteractionIdentifier(labelled[1]);
+        if (parsed) return parsed;
+      }
+    }
+    return "";
+  };
+
+  TextExpressApp.prototype.getGenesysInteractionId = function (conversation, isSelected = false) {
+    const trustedAttrs = ["data-conversation-id", "data-interaction-id"];
+    const inspectNode = (node) => {
+      if (!node) return "";
+      for (const attr of trustedAttrs) {
+        const parsed = this.extractInteractionIdentifier(node.getAttribute?.(attr));
+        if (parsed) return parsed;
+      }
+      return "";
+    };
+
+    let direct = inspectNode(conversation);
+    if (direct) return direct;
+    try {
+      const nodes = conversation?.querySelectorAll?.("[data-conversation-id],[data-interaction-id]") || [];
+      for (const node of nodes) {
+        direct = inspectNode(node);
+        if (direct) return direct;
+      }
+    } catch {}
+
+    // Só aceita texto de elementos destinados ao ID — não varre mais atributos
+    // genéricos `id`/`data-id`, que geravam falsos positivos.
+    try {
+      const localIdEl = this.findGenesysElement([
+        ".interaction-id-display",
+        '[data-automation-id="active-interaction-id"]',
+        'span[data-qa-id="interaction-id-display"]'
+      ], conversation);
+      const localId = this.extractInteractionIdentifier(localIdEl?.textContent || localIdEl?.innerText || "");
+      if (localId) return localId;
+    } catch {}
+
+    try {
+      const anchor = conversation?.querySelector?.('a[href*="/interactions/"]');
+      const hrefId = this.extractInteractionIdentifier(anchor?.href || anchor?.getAttribute?.("href"));
+      if (hrefId) return hrefId;
+    } catch {}
+
+    const visibleId = this.extractInteractionIdFromConversationText(conversation);
+    if (visibleId) return visibleId;
+
+    if (isSelected) {
+      const element = this.findGenesysElement([
+        ".interaction-id-display",
+        '[data-automation-id="active-interaction-id"]',
+        'span[data-qa-id="interaction-id-display"]'
+      ], document);
+      const selectedId = this.extractInteractionIdentifier(
+        element?.textContent || element?.innerText || element?.getAttribute?.("data-conversation-id") || element?.getAttribute?.("data-interaction-id") || ""
+      );
+      if (selectedId) return selectedId;
+    }
+    return "";
+  };
+
+  TextExpressApp.prototype.getGenesysParticipantName = function (conversation) {
+    const clean = (value) => {
+      let text = String(value || "").replace(/\s+/g, " ").trim();
+      if (!text) return "";
+      text = text.replace(/\s*\|\s*\d{8,20}\s*$/, "").trim();
+      text = text.replace(/\s*[·•-]\s*(?:intera(?:ç|c)[aã]o|interaction|id)\s*[:#-]?\s*[0-9a-f-]{8,}\s*$/i, "").trim();
+      return text.slice(0, 120);
+    };
+    const local = this.findGenesysElement(TE_GENESYS_SELECTORS.participant, conversation);
+    const value = clean(local?.textContent || local?.innerText || "");
+    if (value) return value;
+    const aria = clean(conversation?.getAttribute?.("aria-label") || conversation?.getAttribute?.("title") || "");
+    if (aria) return aria;
+    return "Cliente";
+  };
+
+  TextExpressApp.prototype.normalizeProductivityFingerprintPart = function (value) {
+    try {
+      return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().slice(0, 120);
+    } catch {
+      return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().slice(0, 120);
+    }
+  };
+
+  TextExpressApp.prototype.getProductivityConversationFingerprint = function (conversation, isSelected = false) {
+    const name = this.normalizeProductivityFingerprintPart(this.getGenesysParticipantName(conversation));
+    const channel = this.detectGenesysChannel(conversation, isSelected) || "chat";
+    let aria = "";
+    try { aria = this.normalizeProductivityFingerprintPart(conversation?.getAttribute?.("aria-label") || ""); } catch {}
+    // data-qa-id costuma ser idêntico para todas as linhas; portanto só o usa
+    // quando contém algo além do nome genérico do componente.
+    let stable = "";
+    try {
+      const candidate = String(conversation?.getAttribute?.("data-automation-id") || conversation?.getAttribute?.("data-testid") || "").trim();
+      if (candidate && !/interaction-group-list-item/i.test(candidate)) stable = this.normalizeProductivityFingerprintPart(candidate);
+    } catch {}
+    return [channel, name || "cliente", stable || aria].filter(Boolean).join("|");
+  };
+
+  TextExpressApp.prototype.getProductivityElementToken = function (conversation) {
+    if (!this.productivityElementKeys) this.productivityElementKeys = new WeakMap();
+    if (!this.productivityElementKeySequence) this.productivityElementKeySequence = 0;
+    let token = this.productivityElementKeys.get(conversation);
+    if (!token) {
+      token = `e${++this.productivityElementKeySequence}-${Date.now().toString(36)}`;
+      this.productivityElementKeys.set(conversation, token);
+    }
+    return token;
+  };
+
+  TextExpressApp.prototype.getProductivityConversationKey = function (conversation, index, isSelected) {
+    const interactionId = this.getGenesysInteractionId(conversation, isSelected);
+    const fingerprint = this.getProductivityConversationFingerprint(conversation, isSelected);
+    if (interactionId) return { key: `id:${interactionId}`, interactionId, fingerprint, confidence: "trusted" };
+    const token = this.getProductivityElementToken(conversation);
+    return { key: `dom:${token}`, interactionId: "", fingerprint, confidence: "fallback" };
+  };
+
+  TextExpressApp.prototype.getRestoredProductivitySession = function (key, interactionId = "", fingerprint = "") {
+    const list = this.productivityState?.activeSessions || [];
+    const fresh = (item) => {
+      const savedAt = Number(item?.savedAt || 0);
+      return !savedAt || Date.now() - savedAt <= 12 * 60 * 60 * 1000;
+    };
+    let match = list.find((item) => item?.key === key && fresh(item));
+    if (match) return match;
+    if (interactionId) {
+      match = list.find((item) => item?.interactionId === interactionId && fresh(item));
+      if (match) return match;
+    }
+    if (fingerprint) {
+      const matches = list.filter((item) => item?.fingerprint === fingerprint && fresh(item));
+      if (matches.length === 1) return matches[0];
+      // Migração das sessões 28.4.x, que ainda não armazenavam fingerprint.
+      const [channel, normalizedName] = String(fingerprint).split("|");
+      const legacyMatches = list.filter((item) =>
+        fresh(item)
+        && !item?.fingerprint
+        && (!channel || String(item?.channel || "chat") === channel)
+        && (!normalizedName || this.normalizeProductivityFingerprintPart(item?.participantName || "") === normalizedName)
+      );
+      if (legacyMatches.length === 1) return legacyMatches[0];
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.parseGenesysNativeElapsedMs = function (value) {
+    const text = String(value || "").trim().toLowerCase();
+    if (!text || /^(agora|now)$/.test(text)) return 0;
+    const clock = text.match(/\b(\d{1,2}):(\d{2})(?::(\d{2}))?\b/);
+    if (clock) {
+      const a = Number(clock[1]);
+      const b = Number(clock[2]);
+      const c = clock[3] == null ? null : Number(clock[3]);
+      const seconds = c == null ? (a * 60 + b) : (a * 3600 + b * 60 + c);
+      return Math.min(seconds * 1000, 24 * 60 * 60 * 1000);
+    }
+    const hours = Number(text.match(/(\d+)\s*(?:h|hr|hora)/)?.[1] || 0);
+    const minutes = Number(text.match(/(\d+)\s*(?:m|min|minuto)/)?.[1] || 0);
+    const seconds = Number(text.match(/(\d+)\s*(?:s|seg|segundo)/)?.[1] || 0);
+    const total = hours * 3600 + minutes * 60 + seconds;
+    return Math.min(total * 1000, 24 * 60 * 60 * 1000);
+  };
+
+  TextExpressApp.prototype.getGenesysNativeElapsedMs = function (conversation) {
+    const selectors = [".duration", 'span[data-bind*="elapsedTimeString"]'];
+    for (const selector of selectors) {
+      let nodes = [];
+      try { nodes = conversation?.querySelectorAll?.(selector) || []; } catch {}
+      for (const node of nodes) {
+        const ms = this.parseGenesysNativeElapsedMs(node?.textContent || node?.innerText || "");
+        if (ms > 0) return ms;
+      }
+    }
+    return 0;
+  };
+
+  TextExpressApp.prototype.learnProductivityLinkTemplate = function (link, interactionId = "") {
+    const safe = this.normalizeProductivityInteractionUrl?.(link) || "";
+    if (!safe) return "";
+    const id = interactionId || this.extractInteractionIdentifier(safe);
+    if (!id) return safe;
+    let template = "";
+    try {
+      const encoded = encodeURIComponent(id);
+      if (safe.includes(id)) template = safe.replace(id, "__TE_INTERACTION_ID__");
+      else if (safe.includes(encoded)) template = safe.replace(encoded, "__TE_INTERACTION_ID__");
+    } catch {}
+    if (template) {
+      if (!this.productivityState) this.productivityState = { manualAdjustments: {}, peakOpenByDate: {}, activeSessions: [] };
+      this.productivityState.linkTemplate = template;
+    }
+    return safe;
+  };
+
+  TextExpressApp.prototype.deriveGenesysInteractionLink = function (interactionId) {
+    if (!interactionId) return "";
+    const template = String(this.productivityState?.linkTemplate || "");
+    if (template.includes("__TE_INTERACTION_ID__")) {
+      const candidate = template.replace("__TE_INTERACTION_ID__", encodeURIComponent(interactionId));
+      const safe = this.normalizeProductivityInteractionUrl?.(candidate) || "";
+      if (safe) return safe;
+    }
+    const current = String(window.location?.href || "");
+    if (!current.includes("/interactions/")) return "";
+    const pattern = /(\/interactions\/)([^/?#]+)/i;
+    if (!pattern.test(current)) return "";
+    return current.replace(pattern, `$1${encodeURIComponent(interactionId)}`);
+  };
+
+  TextExpressApp.prototype.getGenesysInteractionLink = function (conversation, interactionId = "", isSelected = false) {
+    const accept = (value) => {
+      const safe = this.normalizeProductivityInteractionUrl?.(value) || "";
+      if (!safe) return "";
+      this.learnProductivityLinkTemplate(safe, interactionId);
+      return safe;
+    };
+    try {
+      const anchor = conversation?.querySelector?.('a[href*="/interactions/"]');
+      const direct = accept(anchor?.href || anchor?.getAttribute?.("href"));
+      if (direct) return direct;
+    } catch {}
+    try {
+      const candidates = conversation?.querySelectorAll?.("[data-url],[data-href],[data-clipboard-text],[data-copy-text],[href]") || [];
+      for (const element of candidates) {
+        const direct = accept(element.href || element.getAttribute?.("data-clipboard-text") || element.getAttribute?.("data-copy-text") || element.getAttribute?.("data-url") || element.getAttribute?.("data-href") || element.getAttribute?.("href") || "");
+        if (direct) return direct;
+      }
+    } catch {}
+    if (isSelected) {
+      const copyButton = this.findGenesysElement(TE_GENESYS_SELECTORS.nativeCopy, document);
+      const direct = accept(copyButton?.href || copyButton?.getAttribute?.("data-clipboard-text") || copyButton?.getAttribute?.("data-copy-text") || copyButton?.getAttribute?.("data-url") || copyButton?.getAttribute?.("data-href") || "");
+      if (direct) return direct;
+      const current = String(window.location?.href || "");
+      if (current.includes("/interactions/") && (!interactionId || current.includes(interactionId))) {
+        const currentSafe = accept(current);
+        if (currentSafe) return currentSafe;
+      }
+    }
+    return this.deriveGenesysInteractionLink(interactionId);
+  };
+
+  TextExpressApp.prototype.dedupeProductivityHistory = function () {
+    const source = Array.isArray(this.productivityHistory) ? this.productivityHistory : [];
+    const output = [];
+    const byIdentity = new Map();
+    const normalizeName = (record) => this.normalizeProductivityFingerprintPart(record?.participantName || "");
+    const merge = (base, incoming) => {
+      const start = Math.min(Number(base.startedAt || Infinity), Number(incoming.startedAt || Infinity));
+      const end = Math.max(Number(base.endedAt || 0), Number(incoming.endedAt || 0));
+      if (Number.isFinite(start)) base.startedAt = start;
+      if (end) base.endedAt = end;
+      const span = Number.isFinite(start) && end ? Math.max(0, end - start) : 0;
+      base.totalDurationMs = Math.max(Number(base.totalDurationMs || 0), Number(incoming.totalDurationMs || 0), span);
+      base.activeDurationMs = Math.max(Number(base.activeDurationMs || 0), Number(incoming.activeDurationMs || 0));
+      base.link = base.link || incoming.link || "";
+      base.interactionId = base.interactionId || incoming.interactionId || "";
+      base.sessionKey = base.sessionKey || incoming.sessionKey || "";
+      base.fingerprint = base.fingerprint || incoming.fingerprint || "";
+      base.excluded = Boolean(base.excluded && incoming.excluded);
+      const threshold = (base.channel === "call" ? this.productivitySettings?.call?.checkSeconds : this.productivitySettings?.chat?.checkSeconds) || 70;
+      base.qualified = base.totalDurationMs >= threshold * 1000;
+      return base;
+    };
+
+    for (const rawRecord of source) {
+      if (!rawRecord || typeof rawRecord !== "object") continue;
+      // Migra registros 28.4.x em que o nome vinha como "Cliente | Interaction ID".
+      const migrated = { ...rawRecord };
+      const embedded = String(migrated.participantName || "").match(/\|\s*(\d{8,20})\s*$/);
+      if (embedded) {
+        migrated.interactionId = embedded[1];
+        migrated.participantName = String(migrated.participantName || "").replace(/\s*\|\s*\d{8,20}\s*$/, "").trim() || "Cliente";
+      }
+      const record = migrated;
+      const date = this.getProductivityDateKey(new Date(Number(record.endedAt || record.startedAt || Date.now())));
+      let identity = "";
+      if (record.interactionId) identity = `id:${date}:${record.interactionId}`;
+      else if (record.sessionKey) identity = `session:${date}:${record.sessionKey}`;
+      if (identity && byIdentity.has(identity)) {
+        merge(output[byIdentity.get(identity)], record);
+        continue;
+      }
+      if (!identity) {
+        const candidateIndex = output.findIndex((other) => {
+          if (other.interactionId || other.sessionKey) return false;
+          if ((other.channel || "chat") !== (record.channel || "chat")) return false;
+          if (normalizeName(other) !== normalizeName(record)) return false;
+          const startDiff = Math.abs(Number(other.startedAt || 0) - Number(record.startedAt || 0));
+          const endDiff = Math.abs(Number(other.endedAt || 0) - Number(record.endedAt || 0));
+          return startDiff <= 1500 && endDiff <= 5000;
+        });
+        if (candidateIndex >= 0) {
+          merge(output[candidateIndex], record);
+          continue;
+        }
+      }
+      const clone = { ...record };
+      output.push(clone);
+      if (identity) byIdentity.set(identity, output.length - 1);
+    }
+    this.productivityHistory = output;
+    return output;
+  };
+
+  TextExpressApp.prototype.loadProductivityData = function () {
+    this.productivitySettings = this.cloneProductivityDefaults();
+    this.productivityHistory = [];
+    this.productivityState = { manualAdjustments: {}, peakOpenByDate: {}, activeSessions: [], linkTemplate: "" };
+    const settingsRaw = this.storageGet(TE_PRODUCTIVITY_KEYS.settings);
+    if (settingsRaw) {
+      try { this.productivitySettings = this.normalizeProductivitySettings(JSON.parse(settingsRaw)); } catch {}
+    }
+    const historyRaw = this.storageGet(TE_PRODUCTIVITY_KEYS.history);
+    if (historyRaw) {
+      try {
+        const parsed = JSON.parse(historyRaw);
+        if (Array.isArray(parsed)) this.productivityHistory = parsed.filter((item) => item && typeof item === "object");
+      } catch {}
+    }
+    const stateRaw = this.storageGet(TE_PRODUCTIVITY_KEYS.state);
+    if (stateRaw) {
+      try {
+        const parsed = JSON.parse(stateRaw);
+        if (parsed && typeof parsed === "object") {
+          this.productivityState = {
+            manualAdjustments: parsed.manualAdjustments && typeof parsed.manualAdjustments === "object" ? parsed.manualAdjustments : {},
+            peakOpenByDate: parsed.peakOpenByDate && typeof parsed.peakOpenByDate === "object" ? parsed.peakOpenByDate : {},
+            activeSessions: Array.isArray(parsed.activeSessions) ? parsed.activeSessions : [],
+            linkTemplate: typeof parsed.linkTemplate === "string" ? parsed.linkTemplate : ""
+          };
+        }
+      } catch {}
+    }
+    this.pruneProductivityHistory();
+    const before = this.productivityHistory.length;
+    this.dedupeProductivityHistory();
+    if (this.productivityHistory.length !== before) this.saveProductivityHistory();
+  };
+
+  TextExpressApp.prototype.serializeActiveProductivitySessions = function () {
+    const now = Date.now();
+    return [...(this.productivityTimers?.values?.() || [])].map((timer) => {
+      let activeDurationMs = Number(timer.activeDurationMs || 0);
+      if (timer.isSelected && !timer.manualPaused && timer.activeSessionStart) activeDurationMs += Math.max(0, now - timer.activeSessionStart);
+      return {
+        key: timer.key,
+        interactionId: timer.interactionId || "",
+        fingerprint: timer.fingerprint || "",
+        participantName: timer.participantName || "",
+        channel: timer.channel || "chat",
+        startedAt: timer.startedAt || now,
+        activeDurationMs,
+        lastCustomerReplyTimestamp: timer.lastCustomerReplyTimestamp || now,
+        lastOperatorActivityTimestamp: timer.lastOperatorActivityTimestamp || now,
+        manualPaused: Boolean(timer.manualPaused),
+        excluded: Boolean(timer.excluded),
+        link: timer.link || "",
+        lastSeenAt: timer.lastSeenAt || now,
+        savedAt: now
+      };
+    });
+  };
+
+  TextExpressApp.prototype.saveProductivityState = function () {
+    if (!this.productivityState) return;
+    this.productivityState.activeSessions = this.serializeActiveProductivitySessions();
+    this.productivityState.linkTemplate = String(this.productivityState.linkTemplate || "");
+    this.storageSet(TE_PRODUCTIVITY_KEYS.state, JSON.stringify(this.productivityState));
+  };
+
+  TextExpressApp.prototype.ensureGenesysProductivityStyles = function () {
+    let style = document.getElementById("te-productivity-genesys-style");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "te-productivity-genesys-style";
+      (document.head || document.documentElement).appendChild(style);
+    }
+    style.textContent = `
+      .te-gx-host{position:relative!important}
+      .te-gx-host>.interaction-content,.te-gx-host>[data-qa-id="interaction-content"]{padding-bottom:25px!important}
+      .te-gx-host .duration,.te-gx-host span[data-bind*="elapsedTimeString"]{display:none!important}
+      .te-gx-bubbles{position:absolute!important;left:10px!important;right:auto!important;bottom:4px!important;top:auto!important;transform:none!important;margin:0!important;z-index:10!important;display:flex;align-items:center;gap:4px;pointer-events:none;user-select:none;width:auto!important;max-width:calc(100% - 20px);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:11px;line-height:1;box-sizing:border-box}
+      .te-gx-pill{display:inline-flex;align-items:center;justify-content:center;min-height:18px;height:18px;padding:2px 5px;border:1px solid var(--te-gx-border,#dce3ed);border-radius:999px;background:var(--te-gx-bg,#fff);color:var(--te-gx-text,#172033);box-shadow:0 1px 3px rgba(15,32,61,.10);font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
+      .te-gx-channel{min-width:20px;padding:2px 4px;font-size:11px}
+      .te-gx-timer.te-gx-paused{color:var(--te-gx-muted,#65728a)}
+      .te-gx-timer.te-gx-client-inactive{color:#b77900;border-color:#e4bd5e}
+      .te-gx-timer.te-gx-operator-inactive{color:var(--te-gx-primary,#2563eb);border-color:var(--te-gx-primary,#2563eb)}
+      .te-gx-timer.te-gx-long{color:var(--te-gx-danger,#d52b2b);border-color:var(--te-gx-danger,#d52b2b)}
+      .te-gx-check{min-width:20px;padding:2px 4px;color:var(--te-gx-success,#16803d);border-color:color-mix(in srgb,var(--te-gx-success,#16803d) 45%,var(--te-gx-border,#dce3ed));background:color-mix(in srgb,var(--te-gx-success,#16803d) 9%,var(--te-gx-bg,#fff));font-weight:950}
+      .te-gx-check[hidden]{display:none!important}
+      .te-gx-bubbles.te-gx-excluded{opacity:.55}
+    `;
+  };
+
+  TextExpressApp.prototype.attachProductivityBubbles = function (timer) {
+    const conversation = this.getCanonicalGenesysConversation(timer.element);
+    if (!conversation?.isConnected) return;
+    timer.element = conversation;
+    conversation.classList.add("te-gx-host");
+    let container = null;
+    try { container = [...conversation.children].find((child) => child?.classList?.contains("te-gx-bubbles")) || null; } catch {}
+    if (!container) {
+      container = document.createElement("div");
+      container.className = "te-gx-bubbles";
+      container.innerHTML = '<span class="te-gx-pill te-gx-channel"></span><span class="te-gx-pill te-gx-timer">00:00</span><span class="te-gx-pill te-gx-check" hidden>✓</span>';
+      conversation.appendChild(container);
+    }
+    container.dataset.teProductivityOwner = timer.key;
+    timer.bubbles = container;
+    timer.channelEl = container.querySelector(".te-gx-channel");
+    timer.timerEl = container.querySelector(".te-gx-timer");
+    timer.checkEl = container.querySelector(".te-gx-check");
+    if (timer.checkEl && !timer.checkEl.dataset.teQualified) timer.checkEl.hidden = true;
+    this.applyGenesysProductivityTheme(container);
+  };
+
+  TextExpressApp.prototype.createProductivityTimer = function (conversation, index, keyInfo, isSelected) {
+    const now = Date.now();
+    const restored = this.getRestoredProductivitySession(keyInfo.key, keyInfo.interactionId, keyInfo.fingerprint);
+    const channel = restored?.channel || this.detectGenesysChannel(conversation, isSelected);
+    const nativeElapsedMs = restored ? 0 : this.getGenesysNativeElapsedMs(conversation);
+    const startedAt = Number(restored?.startedAt || (nativeElapsedMs > 0 ? now - nativeElapsedMs : now));
+    const timer = {
+      key: keyInfo.key,
+      interactionId: keyInfo.interactionId || restored?.interactionId || "",
+      fingerprint: keyInfo.fingerprint || restored?.fingerprint || this.getProductivityConversationFingerprint(conversation, isSelected),
+      participantName: restored?.participantName || this.getGenesysParticipantName(conversation),
+      channel,
+      element: this.getCanonicalGenesysConversation(conversation),
+      startedAt,
+      activeDurationMs: Number(restored?.activeDurationMs || 0),
+      activeSessionStart: null,
+      isSelected: false,
+      manualPaused: Boolean(restored?.manualPaused),
+      excluded: Boolean(restored?.excluded),
+      lastCustomerReplyTimestamp: Number(restored?.lastCustomerReplyTimestamp || now),
+      lastOperatorActivityTimestamp: Number(restored?.lastOperatorActivityTimestamp || now),
+      link: restored?.link || "",
+      longNotified: false,
+      missingSince: 0,
+      lastSeenAt: now,
+      finalized: false,
+      bubbles: null,
+      channelEl: null,
+      timerEl: null,
+      checkEl: null
+    };
+    if (!timer.link) timer.link = this.getGenesysInteractionLink(timer.element, timer.interactionId, isSelected);
+    this.attachProductivityBubbles(timer);
+    this.productivityTimers.set(timer.key, timer);
+    this.updateProductivitySelection(timer, isSelected, now);
+    return timer;
+  };
+
+  TextExpressApp.prototype.rekeyProductivityTimer = function (timer, newKey) {
+    if (!timer || !newKey || timer.key === newKey) return timer;
+    const existing = this.productivityTimers.get(newKey);
+    if (existing && existing !== timer) return this.mergeProductivityTimers(existing, timer);
+    this.productivityTimers.delete(timer.key);
+    timer.key = newKey;
+    this.productivityTimers.set(newKey, timer);
+    if (timer.bubbles) timer.bubbles.dataset.teProductivityOwner = newKey;
+    if (this.productivityObservedKey && this.productivityObservedKey !== newKey && this.productivityObservedKey.startsWith("dom:")) this.productivityObservedKey = newKey;
+    return timer;
+  };
+
+  TextExpressApp.prototype.mergeProductivityTimers = function (primary, duplicate) {
+    if (!primary) return duplicate;
+    if (!duplicate || primary === duplicate) return primary;
+    primary.startedAt = Math.min(Number(primary.startedAt || Date.now()), Number(duplicate.startedAt || Date.now()));
+    primary.activeDurationMs = Math.max(Number(primary.activeDurationMs || 0), Number(duplicate.activeDurationMs || 0));
+    primary.interactionId = primary.interactionId || duplicate.interactionId || "";
+    primary.fingerprint = primary.fingerprint || duplicate.fingerprint || "";
+    primary.participantName = primary.participantName !== "Cliente" ? primary.participantName : duplicate.participantName;
+    primary.link = primary.link || duplicate.link || "";
+    primary.excluded = Boolean(primary.excluded || duplicate.excluded);
+    primary.lastCustomerReplyTimestamp = Math.max(Number(primary.lastCustomerReplyTimestamp || 0), Number(duplicate.lastCustomerReplyTimestamp || 0));
+    primary.lastOperatorActivityTimestamp = Math.max(Number(primary.lastOperatorActivityTimestamp || 0), Number(duplicate.lastOperatorActivityTimestamp || 0));
+    primary.lastSeenAt = Math.max(Number(primary.lastSeenAt || 0), Number(duplicate.lastSeenAt || 0));
+    if (duplicate.isSelected && !primary.isSelected) {
+      primary.element = duplicate.element;
+      this.updateProductivitySelection(primary, true, Date.now());
+    }
+    try { duplicate.bubbles?.remove?.(); } catch {}
+    try { duplicate.element?.classList?.remove?.("te-gx-host"); } catch {}
+    this.productivityTimers.delete(duplicate.key);
+    return primary;
+  };
+
+  TextExpressApp.prototype.findProductivityTimerForConversation = function (conversation, keyInfo, assignedKeys = new Set()) {
+    let timer = this.productivityTimers.get(keyInfo.key);
+    if (timer && !assignedKeys.has(timer.key)) return timer;
+    for (const candidate of this.productivityTimers.values()) {
+      if (assignedKeys.has(candidate.key)) continue;
+      if (candidate.element === conversation) return candidate;
+    }
+    if (keyInfo.interactionId) {
+      for (const candidate of this.productivityTimers.values()) {
+        if (assignedKeys.has(candidate.key)) continue;
+        if (candidate.interactionId && candidate.interactionId === keyInfo.interactionId) return candidate;
+      }
+    }
+    if (keyInfo.fingerprint) {
+      const candidates = [...this.productivityTimers.values()].filter((candidate) =>
+        !assignedKeys.has(candidate.key) && candidate.fingerprint === keyInfo.fingerprint && (candidate.missingSince || candidate.element?.isConnected === false)
+      );
+      if (candidates.length === 1) return candidates[0];
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.getProductivityActiveDuration = function (timer, now = Date.now()) {
+    let value = Number(timer?.activeDurationMs || 0);
+    if (timer?.isSelected && !timer?.manualPaused && timer?.activeSessionStart) value += Math.max(0, now - timer.activeSessionStart);
+    return Math.max(0, value);
+  };
+
+  TextExpressApp.prototype.getProductivityTotalDuration = function (timer, now = Date.now()) {
+    return Math.max(0, now - Number(timer?.startedAt || now));
+  };
+
+  TextExpressApp.prototype.updateProductivityTimerVisual = function (timer, now = Date.now()) {
+    if (!timer?.element?.isConnected) return;
+    if (!timer.bubbles?.isConnected || timer.bubbles?.parentElement !== timer.element) this.attachProductivityBubbles(timer);
+    if (!timer.bubbles || !timer.timerEl || !timer.checkEl || !timer.channelEl) return;
+    const activeMs = this.getProductivityActiveDuration(timer, now);
+    const thresholdMs = this.getProductivityThreshold(timer) * 1000;
+    // O check visual acompanha o cronômetro efetivamente exibido (tempo em foco),
+    // como no userscript Genesys de referência. A contagem diária usa TMA total.
+    const visualQualified = activeMs >= thresholdMs;
+    timer.channelEl.textContent = timer.channel === "call" ? "☎" : "💬";
+    timer.timerEl.textContent = this.formatProductivityTime(activeMs);
+    timer.checkEl.hidden = !visualQualified;
+    timer.checkEl.dataset.teQualified = visualQualified ? "true" : "";
+    timer.bubbles.classList.toggle("te-gx-excluded", Boolean(timer.excluded));
+    timer.timerEl.classList.remove("te-gx-paused", "te-gx-client-inactive", "te-gx-operator-inactive", "te-gx-long");
+    if (timer.manualPaused || !timer.isSelected) {
+      timer.timerEl.classList.add("te-gx-paused");
+      return;
+    }
+    const channelSettings = timer.channel === "call" ? this.productivitySettings.call : this.productivitySettings.chat;
+    const longMs = Number(channelSettings.longMinutes || 15) * 60000;
+    if (activeMs >= longMs) {
+      timer.timerEl.classList.add("te-gx-long");
+      if (!timer.longNotified && this.productivitySettings.alertsEnabled) {
+        timer.longNotified = true;
+        this.showToast(`${timer.channel === "call" ? "Ligação" : "Conversa"} com ${timer.participantName || "cliente"} ultrapassou ${channelSettings.longMinutes} min.`, "error", 4800);
+      }
+      return;
+    }
+    if (timer.channel === "chat") {
+      const operatorInactive = (now - Number(timer.lastOperatorActivityTimestamp || now)) / 1000;
+      const clientInactive = (now - Number(timer.lastCustomerReplyTimestamp || now)) / 1000;
+      if (operatorInactive >= this.productivitySettings.chat.operatorInactivitySeconds) timer.timerEl.classList.add("te-gx-operator-inactive");
+      else if (clientInactive >= this.productivitySettings.chat.clientInactivitySeconds) timer.timerEl.classList.add("te-gx-client-inactive");
+    }
+  };
+
+  TextExpressApp.prototype.upsertProductivityHistoryRecord = function (record) {
+    const sameIdentity = (candidate) => {
+      if (!candidate) return false;
+      if (record.interactionId && candidate.interactionId) return record.interactionId === candidate.interactionId;
+      if (record.sessionKey && candidate.sessionKey) return record.sessionKey === candidate.sessionKey;
+      return false;
+    };
+    const existing = this.productivityHistory.find(sameIdentity);
+    if (!existing) {
+      this.productivityHistory.push(record);
+      return record;
+    }
+    const earliest = Math.min(Number(existing.startedAt || record.startedAt), Number(record.startedAt || existing.startedAt));
+    const latest = Math.max(Number(existing.endedAt || 0), Number(record.endedAt || 0));
+    existing.startedAt = earliest;
+    existing.endedAt = latest;
+    existing.totalDurationMs = Math.max(Number(existing.totalDurationMs || 0), Number(record.totalDurationMs || 0), Math.max(0, latest - earliest));
+    existing.activeDurationMs = Math.max(Number(existing.activeDurationMs || 0), Number(record.activeDurationMs || 0));
+    existing.participantName = existing.participantName || record.participantName;
+    existing.channel = existing.channel || record.channel;
+    existing.interactionId = existing.interactionId || record.interactionId;
+    existing.link = existing.link || record.link;
+    existing.fingerprint = existing.fingerprint || record.fingerprint;
+    existing.excluded = Boolean(existing.excluded && record.excluded);
+    const thresholdMs = (existing.channel === "call" ? this.productivitySettings.call.checkSeconds : this.productivitySettings.chat.checkSeconds) * 1000;
+    existing.qualified = existing.totalDurationMs >= thresholdMs;
+    return existing;
+  };
+
+  TextExpressApp.prototype.finalizeProductivityTimer = function (timer) {
+    if (!timer || timer.finalized) return;
+    timer.finalized = true;
+    const now = Date.now();
+    if (timer.isSelected && timer.activeSessionStart && !timer.manualPaused) {
+      timer.activeDurationMs += Math.max(0, now - timer.activeSessionStart);
+      timer.activeSessionStart = null;
+    }
+    const activeDurationMs = Math.max(0, Number(timer.activeDurationMs || 0));
+    const totalDurationMs = Math.max(activeDurationMs, this.getProductivityTotalDuration(timer, now));
+    const thresholdMs = this.getProductivityThreshold(timer) * 1000;
+    const record = {
+      id: `prod-${now}-${Math.random().toString(36).slice(2, 8)}`,
+      sessionKey: timer.key,
+      fingerprint: timer.fingerprint || "",
+      interactionId: timer.interactionId || "",
+      participantName: timer.participantName || "Cliente",
+      channel: timer.channel === "call" ? "call" : "chat",
+      startedAt: timer.startedAt || (now - totalDurationMs),
+      endedAt: now,
+      totalDurationMs,
+      activeDurationMs,
+      // Igual ao script Genesys de referência: os 70 s que contam para a meta
+      // são avaliados sobre a duração total (TMA), não só sobre o tempo em foco.
+      qualified: totalDurationMs >= thresholdMs,
+      excluded: Boolean(timer.excluded),
+      link: timer.link || this.getGenesysInteractionLink(timer.element, timer.interactionId, false) || ""
+    };
+    if (record.link) this.learnProductivityLinkTemplate(record.link, record.interactionId);
+    if (totalDurationMs >= 2000) {
+      if (!this.productivitySettings.historyEnabled) {
+        record.participantName = "Atendimento";
+        record.interactionId = "";
+        record.link = "";
+      }
+      this.upsertProductivityHistoryRecord(record);
+      this.dedupeProductivityHistory();
+      this.saveProductivityHistory();
+    }
+    try { timer.bubbles?.remove?.(); } catch {}
+    try { timer.element?.classList?.remove?.("te-gx-host"); } catch {}
+    this.productivityTimers.delete(timer.key);
+    if (this.productivityObservedKey === timer.key) this.disconnectProductivityActivityObserver();
+    this.saveProductivityState();
+    this.renderProductivity();
+  };
+
+  TextExpressApp.prototype.monitorGenesysProductivity = function () {
+    if (!this.productivityInitialized || !this.productivitySettings.enabled) return;
+    const now = Date.now();
+    const conversations = this.getGenesysConversationElements();
+    const assignedKeys = new Set();
+    let selectedTimer = null;
+
+    conversations.forEach((conversation, index) => {
+      const selected = this.isGenesysConversationSelected(conversation);
+      const keyInfo = this.getProductivityConversationKey(conversation, index, selected);
+      let timer = this.findProductivityTimerForConversation(conversation, keyInfo, assignedKeys);
+      if (!timer) timer = this.createProductivityTimer(conversation, index, keyInfo, selected);
+      else {
+        if (keyInfo.interactionId && timer.key !== keyInfo.key) timer = this.rekeyProductivityTimer(timer, keyInfo.key);
+        if (timer.element !== conversation) {
+          try { timer.bubbles?.remove?.(); } catch {}
+          try { timer.element?.classList?.remove?.("te-gx-host"); } catch {}
+          timer.element = conversation;
+          this.attachProductivityBubbles(timer);
+        }
+        timer.interactionId = keyInfo.interactionId || timer.interactionId || "";
+        timer.fingerprint = keyInfo.fingerprint || timer.fingerprint || "";
+        timer.participantName = this.getGenesysParticipantName(conversation) || timer.participantName;
+        timer.channel = this.detectGenesysChannel(conversation, selected) || timer.channel;
+        if (!timer.link) timer.link = this.getGenesysInteractionLink(conversation, timer.interactionId, selected);
+        timer.missingSince = 0;
+        timer.lastSeenAt = now;
+        timer.finalized = false;
+        this.updateProductivitySelection(timer, selected, now);
+      }
+      assignedKeys.add(timer.key);
+      this.updateProductivityTimerVisual(timer, now);
+      if (selected) selectedTimer = timer;
+    });
+
+    for (const timer of [...this.productivityTimers.values()]) {
+      if (assignedKeys.has(timer.key)) continue;
+      if (!timer.missingSince) timer.missingSince = now;
+      // O Genesys rerenderiza/reordena a lista ao receber chat ou ligação. Um
+      // desaparecimento curto não significa encerramento. A tolerância maior
+      // evita históricos duplicados por remount do Angular.
+      if (now - timer.missingSince >= 15000) this.finalizeProductivityTimer(timer);
+    }
+
+    this.bindSelectedProductivityActivity(selectedTimer);
+    const dateKey = this.getProductivityDateKey();
+    const open = conversations.length;
+    const currentPeak = Number(this.productivityState.peakOpenByDate[dateKey] || 0);
+    if (open > currentPeak) {
+      this.productivityState.peakOpenByDate[dateKey] = open;
+      this.saveProductivityState();
+    }
+    if (now - Number(this.productivityLastPersistAt || 0) >= 3000) {
+      this.productivityLastPersistAt = now;
+      this.saveProductivityState();
+    }
+    if (now - Number(this.productivityLastRenderAt || 0) >= 1000) {
+      this.productivityLastRenderAt = now;
+      this.renderProductivityCounter();
+      if (this.activeType === "produtividade") this.renderProductivity();
+    }
+  };
+
+  TextExpressApp.prototype.renderProductivityCurrent = function (current) {
+    const container = this.root.querySelector("#te-productivity-current-list");
+    const alerts = this.root.querySelector("#te-productivity-alert-summary");
+    if (!container) return;
+    if (!current.length) {
+      container.innerHTML = '<div class="te-productivity-empty">Nenhuma interação aberta detectada no momento.</div>';
+      if (alerts) { alerts.textContent = "Nenhum alerta ativo."; alerts.classList.remove("te-has-alert"); }
+      return;
+    }
+    const now = Date.now();
+    const sorted = [...current].sort((a, b) => Number(b.isSelected) - Number(a.isSelected) || a.startedAt - b.startedAt);
+    const alertLabels = [];
+    container.innerHTML = sorted.map((timer) => {
+      const active = this.getProductivityActiveDuration(timer, now);
+      const qualifiedVisual = active >= this.getProductivityThreshold(timer) * 1000;
+      const alert = this.getTimerAlertLabel(timer, now);
+      if (!["Normal", "Em espera", "Pausado"].includes(alert)) alertLabels.push(`${timer.participantName}: ${alert}`);
+      return `<div class="te-productivity-current-row ${timer.excluded ? "te-excluded" : ""}">
+        <span class="te-productivity-row-channel">${timer.channel === "call" ? "☎" : "💬"}</span>
+        <div class="te-productivity-row-main"><strong>${this.escapeHtml(timer.participantName || "Cliente")}</strong><small>${this.escapeHtml(alert)}${timer.interactionId ? ` · ${this.escapeHtml(timer.interactionId)}` : ""}${timer.excluded ? " · fora das métricas" : ""}</small></div>
+        <span class="te-productivity-row-time">${this.formatProductivityTime(active)}</span>
+        <span class="te-productivity-row-check">${qualifiedVisual ? "✓" : ""}</span>
+      </div>`;
+    }).join("");
+    if (alerts) {
+      alerts.textContent = alertLabels.length ? alertLabels.join(" · ") : "Nenhum alerta ativo.";
+      alerts.classList.toggle("te-has-alert", alertLabels.length > 0);
+    }
+  };
+
+  TextExpressApp.prototype.setupGenesysNativeCopyCapture = function () {
+    if (this.productivityNativeCopyCaptureHandler) return;
+    this.productivityNativeCopyCaptureHandler = (event) => {
+      const path = typeof event.composedPath === "function" ? event.composedPath() : [event.target];
+      const selectors = TE_GENESYS_SELECTORS.nativeCopy;
+      const matched = path.some((node) => {
+        if (!node?.matches) return false;
+        return selectors.some((selector) => { try { return node.matches(selector); } catch { return false; } });
+      });
+      if (!matched) return;
+      const selected = [...(this.productivityTimers?.values?.() || [])].find((timer) => timer.isSelected);
+      window.setTimeout(async () => {
+        try {
+          const clipboard = await navigator.clipboard?.readText?.();
+          const link = this.normalizeProductivityInteractionUrl(clipboard);
+          if (!link) return;
+          const interactionId = selected?.interactionId || this.extractInteractionIdentifier(link);
+          this.learnProductivityLinkTemplate(link, interactionId);
+          if (selected) selected.link = link;
+          this.saveProductivityState();
+        } catch {}
+      }, 220);
+    };
+    document.addEventListener("click", this.productivityNativeCopyCaptureHandler, true);
+  };
+
+  TextExpressApp.prototype.captureGenesysLinkWithNativeButton = async function (expectedInteractionId = "") {
+    const button = this.findGenesysElement(TE_GENESYS_SELECTORS.nativeCopy, document);
+    if (!button || !this.isGenesysElementVisible(button)) return "";
+    const selectedConversation = this.getGenesysConversationElements().find((conversation) => this.isGenesysConversationSelected(conversation));
+    const selectedId = selectedConversation ? this.getGenesysInteractionId(selectedConversation, true) : "";
+    if (expectedInteractionId && expectedInteractionId !== selectedId) return "";
+    try {
+      button.click();
+      await new Promise((resolve) => setTimeout(resolve, 220));
+      const text = await navigator.clipboard.readText();
+      const safe = this.normalizeProductivityInteractionUrl(text);
+      if (!safe) return "";
+      this.learnProductivityLinkTemplate(safe, expectedInteractionId || selectedId);
+      this.saveProductivityState();
+      return safe;
+    } catch { return ""; }
+  };
+
+  TextExpressApp.prototype.captureHistoryLink = async function (id) {
+    const record = this.productivityHistory.find((item) => item.id === id);
+    if (!record) return;
+    let link = this.normalizeProductivityInteractionUrl(record.link || this.deriveGenesysInteractionLink(record.interactionId));
+    if (!link) {
+      const selectedConversation = this.getGenesysConversationElements().find((conversation) => this.isGenesysConversationSelected(conversation));
+      const selectedId = selectedConversation ? this.getGenesysInteractionId(selectedConversation, true) : "";
+      if (record.interactionId && selectedId && selectedId !== record.interactionId) {
+        this.showToast(`Selecione no Genesys a interação ${record.interactionId} e tente novamente.`, "error", 5600);
+        return;
+      }
+      link = this.normalizeProductivityInteractionUrl(await this.captureGenesysLinkWithNativeButton(record.interactionId || selectedId));
+    }
+    if (!link) {
+      this.showToast(record.interactionId
+        ? `Não foi possível recuperar o link da interação ${record.interactionId}. Selecione essa interação no Genesys e tente novamente.`
+        : "Não foi possível recuperar o link porque o Genesys não forneceu um ID confiável para este registro.", "error", 6000);
+      return;
+    }
+    record.link = link;
+    this.learnProductivityLinkTemplate(link, record.interactionId);
+    this.saveProductivityHistory();
+    this.saveProductivityState();
+    this.renderProductivityHistory();
+    this.showToast("Link da interação recuperado.", "success");
+  };
+
+  TextExpressApp.prototype.initProductivity = function () {
+    teProductivityV284Init.call(this);
+    this.setupGenesysNativeCopyCapture();
+  };
+
+  TextExpressApp.prototype.destroyProductivity = function () {
+    if (this.productivityNativeCopyCaptureHandler) {
+      try { document.removeEventListener("click", this.productivityNativeCopyCaptureHandler, true); } catch {}
+      this.productivityNativeCopyCaptureHandler = null;
+    }
+    return teProductivityV284Destroy.call(this);
   };
 
   TextExpressApp.prototype.init = function () {
