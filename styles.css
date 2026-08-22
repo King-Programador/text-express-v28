@@ -5496,6 +5496,14 @@
   text-align: center;
 }
 
+#text-express-app .te-productivity-row-check.te-not-counted {
+  color: #c62828;
+}
+
+#text-express-app .te-productivity-row-check.te-counted {
+  color: #218838;
+}
+
 #text-express-app .te-productivity-row-actions {
   display: flex;
   gap: 4px;

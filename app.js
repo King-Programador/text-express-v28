@@ -1,12 +1,12 @@
 /*
- * Text Express 28.5.0
+ * Text Express 28.6.0
  * Expansor de textos, protocolos e produtividade para atendimento.
  * Sem dependências externas.
  */
 (() => {
   "use strict";
 
-  const APP_VERSION = "28.5.0";
+  const APP_VERSION = "28.6.0";
   const STORAGE_KEYS = Object.freeze({
     snippets: "text_express_snippets",
     darkMode: "te_dark_mode",
@@ -7699,20 +7699,10 @@
       const current = window.localStorage.getItem(TE_V23_BASE_STORAGE_KEY);
       if (current === TE_V23_BASE_VERSION) return false;
 
-      const keysToReset = [
-        STORAGE_KEYS.snippets,
-        STORAGE_KEYS.categories,
-        STORAGE_KEYS.settings,
-        STORAGE_KEYS.rememberedVariables,
-        STORAGE_KEYS.uiState,
-        STORAGE_KEYS.darkMode,
-        STORAGE_KEYS.position,
-        STORAGE_KEYS.launcherPosition
-      ];
-
-      for (const key of keysToReset) window.localStorage.removeItem(key);
+      // 28.6.0: migrações de metadados nunca mais apagam cartões, categorias,
+      // preferências ou rascunhos já existentes. A base padrão é apenas fallback.
       window.localStorage.setItem(TE_V23_BASE_STORAGE_KEY, TE_V23_BASE_VERSION);
-      return true;
+      return false;
     } catch (error) {
       return false;
     }
@@ -10520,23 +10510,56 @@
         return false;
       }
 
-      const previousSnippets = storage.getItem(STORAGE_KEYS.snippets);
-      const previousCategories = storage.getItem(STORAGE_KEYS.categories);
-      if (previousSnippets || previousCategories) {
-        storage.setItem(TE_V273_PREVIOUS_DECK_BACKUP_KEY, JSON.stringify({
-          app: "Text Express",
-          backupType: "automatic-before-default-deck-update",
-          createdAt: new Date().toISOString(),
-          targetVersion: APP_VERSION,
-          snippetsPayload: previousSnippets,
-          categoriesPayload: previousCategories
-        }));
+      const isValidPayload = (raw, field) => {
+        if (!raw) return false;
+        try {
+          const parsed = JSON.parse(raw);
+          const list = Array.isArray(parsed) ? parsed : parsed?.[field];
+          return Array.isArray(list) && list.length > 0;
+        } catch { return false; }
+      };
+
+      let snippetsPayload = storage.getItem(STORAGE_KEYS.snippets);
+      let categoriesPayload = storage.getItem(STORAGE_KEYS.categories);
+      const hasSnippets = isValidPayload(snippetsPayload, "snippets");
+      const hasCategories = isValidPayload(categoriesPayload, "categories");
+
+      // Nunca substitui um baralho válido só porque o marcador de versão sumiu.
+      // Se os dados principais estiverem ausentes, tenta primeiro recuperar o
+      // backup interno criado pelas versões anteriores.
+      let restored = false;
+      if (!hasSnippets || !hasCategories) {
+        try {
+          const backup = JSON.parse(storage.getItem(TE_V273_PREVIOUS_DECK_BACKUP_KEY) || "null");
+          if (!hasSnippets && isValidPayload(backup?.snippetsPayload, "snippets")) {
+            storage.setItem(STORAGE_KEYS.snippets, backup.snippetsPayload);
+            snippetsPayload = backup.snippetsPayload;
+            restored = true;
+          }
+          if (!hasCategories && isValidPayload(backup?.categoriesPayload, "categories")) {
+            storage.setItem(STORAGE_KEYS.categories, backup.categoriesPayload);
+            categoriesPayload = backup.categoriesPayload;
+            restored = true;
+          }
+        } catch {}
       }
 
-      storage.removeItem(STORAGE_KEYS.snippets);
-      storage.removeItem(STORAGE_KEYS.categories);
+      if (isValidPayload(snippetsPayload, "snippets") || isValidPayload(categoriesPayload, "categories")) {
+        // Mantém uma cópia de segurança compatível com as versões anteriores.
+        if (!storage.getItem(TE_V273_PREVIOUS_DECK_BACKUP_KEY)) {
+          storage.setItem(TE_V273_PREVIOUS_DECK_BACKUP_KEY, JSON.stringify({
+            app: "Text Express",
+            backupType: "automatic-preserved-deck",
+            createdAt: new Date().toISOString(),
+            targetVersion: APP_VERSION,
+            snippetsPayload,
+            categoriesPayload
+          }));
+        }
+      }
+
       storage.setItem(TE_V273_DEFAULT_DECK_STORAGE_KEY, TE_V273_DEFAULT_DECK_VERSION);
-      return true;
+      return false;
     } catch (error) {
       return false;
     }
@@ -13513,10 +13536,6 @@
       if (!pending.problemaExterno || !pending.servicoExterno) throw new Error("Este protocolo está marcado para Externo, mas falta Problema externo ou Serviço.");
       const enviar = this.findExternalExactText(".icon-label", "Enviar");
       if (!enviar) throw new Error("O comando Enviar do sistema não foi localizado para o encaminhamento externo.");
-      if (waiting) {
-        const block = document.querySelector("nz-switch#blocking button.ant-switch");
-        if (!block) throw new Error("O controle Aguardar (#blocking) não foi localizado no sistema.");
-      }
     }
     return { textarea };
   };
@@ -13609,12 +13628,17 @@
     const service = this.normalizeProtocolLabel(pending.servicoExterno || pending.servico || "");
     if (!problem || !service) throw new Error("Problema externo e Serviço são obrigatórios para o encaminhamento.");
 
-    await this.setMascaraBlockingState(waiting);
-
+    // O #blocking só passa a existir depois que o fluxo de encaminhamento é
+    // aberto. A ordem precisa seguir o Mascara de referência: Enviar -> Aguardar.
     const enviar = await this.waitExternalExactText(".icon-label", "Enviar", 5000, false);
     if (!enviar) throw new Error("O comando Enviar não foi localizado.");
     this.clickMascaraElement(enviar);
-    await new Promise((resolve) => window.setTimeout(resolve, 700));
+    await new Promise((resolve) => window.setTimeout(resolve, 450));
+
+    if (waiting) {
+      await this.setMascaraBlockingState(true);
+      await new Promise((resolve) => window.setTimeout(resolve, 220));
+    }
 
     const pesquisar = await this.waitExternalExactText(".ant-select-selection__placeholder", "Pesquisar...", 5000, false);
     if (!pesquisar) throw new Error("O seletor Pesquisar... do envio não foi localizado.");
@@ -14615,6 +14639,15 @@
     const adjustment = Number(this.productivityState?.manualAdjustments?.[dateKey] || 0);
     const count = Math.max(0, automaticCount + adjustment);
     const avg = (field) => counted.length ? counted.reduce((sum, record) => sum + Number(record[field] || 0), 0) / counted.length : 0;
+    // TME = Tempo Médio de Espera. Neste monitor, a espera corresponde ao período
+    // em que a interação permaneceu aberta sem estar ativa/selecionada.
+    const avgWait = counted.length
+      ? counted.reduce((sum, record) => {
+          const total = Math.max(0, Number(record.totalDurationMs || 0));
+          const active = Math.max(0, Number(record.activeDurationMs || 0));
+          return sum + Math.max(0, total - active);
+        }, 0) / counted.length
+      : 0;
     const perHour = Array.from({ length: 24 }, () => 0);
     counted.forEach((record) => {
       const hour = new Date(Number(record.endedAt || record.startedAt || Date.now())).getHours();
@@ -14626,8 +14659,10 @@
       automaticCount,
       adjustment,
       count,
+      // TMA = Tempo Médio de Atendimento.
       tmaMs: avg("totalDurationMs"),
-      tmeMs: avg("activeDurationMs"),
+      // TME = Tempo Médio de Espera.
+      tmeMs: avgWait,
       perHour
     };
   };
@@ -15725,7 +15760,7 @@
       base.interactionId = base.interactionId || incoming.interactionId || "";
       base.sessionKey = base.sessionKey || incoming.sessionKey || "";
       base.fingerprint = base.fingerprint || incoming.fingerprint || "";
-      base.excluded = Boolean(base.excluded && incoming.excluded);
+      base.excluded = Boolean(base.excluded || incoming.excluded);
       const threshold = (base.channel === "call" ? this.productivitySettings?.call?.checkSeconds : this.productivitySettings?.chat?.checkSeconds) || 70;
       base.qualified = base.totalDurationMs >= threshold * 1000;
       return base;
@@ -15994,8 +16029,9 @@
     if (!timer.bubbles || !timer.timerEl || !timer.checkEl || !timer.channelEl) return;
     const activeMs = this.getProductivityActiveDuration(timer, now);
     const thresholdMs = this.getProductivityThreshold(timer) * 1000;
-    // O check visual acompanha o cronômetro efetivamente exibido (tempo em foco),
-    // como no userscript Genesys de referência. A contagem diária usa TMA total.
+    // O check visual acompanha o cronômetro efetivamente exibido (tempo ativo da linha).
+    // Esse valor interno não é o TME. TME significa Tempo Médio de Espera.
+    // A contagem diária usa a duração total do atendimento (TMA).
     const visualQualified = activeMs >= thresholdMs;
     timer.channelEl.textContent = timer.channel === "call" ? "☎" : "💬";
     timer.timerEl.textContent = this.formatProductivityTime(activeMs);
@@ -16048,7 +16084,7 @@
     existing.interactionId = existing.interactionId || record.interactionId;
     existing.link = existing.link || record.link;
     existing.fingerprint = existing.fingerprint || record.fingerprint;
-    existing.excluded = Boolean(existing.excluded && record.excluded);
+    existing.excluded = Boolean(existing.excluded || record.excluded);
     const thresholdMs = (existing.channel === "call" ? this.productivitySettings.call.checkSeconds : this.productivitySettings.chat.checkSeconds) * 1000;
     existing.qualified = existing.totalDurationMs >= thresholdMs;
     return existing;
@@ -16076,8 +16112,8 @@
       endedAt: now,
       totalDurationMs,
       activeDurationMs,
-      // Igual ao script Genesys de referência: os 70 s que contam para a meta
-      // são avaliados sobre a duração total (TMA), não só sobre o tempo em foco.
+      // Os 70 s que contam para a meta são avaliados sobre a duração total do
+      // atendimento (TMA), não sobre o tempo ativo/selecionado da linha.
       qualified: totalDurationMs >= thresholdMs,
       excluded: Boolean(timer.excluded),
       link: timer.link || this.getGenesysInteractionLink(timer.element, timer.interactionId, false) || ""
@@ -16276,6 +16312,447 @@
       this.productivityNativeCopyCaptureHandler = null;
     }
     return teProductivityV284Destroy.call(this);
+  };
+
+  /* ==========================================================
+   * Text Express 28.6.0 — consolidação das correções acordadas
+   * - Produtividade: visual desacoplado do estado, reconciliação após rerender,
+   *   pills à direita e status X vermelho / check verde pela regra oficial;
+   * - Protocolo: o Aguardar é acionado somente após abrir o Externo;
+   * - Persistência: baralho existente nunca é apagado por migração automática,
+   *   com duas cópias locais rotativas para recuperação de corrupção/reset.
+   * ========================================================== */
+  const TE_V286_DECK_BACKUP_PRIMARY = "text_express_deck_autobackup_v286_primary";
+  const TE_V286_DECK_BACKUP_SECONDARY = "text_express_deck_autobackup_v286_secondary";
+
+  const teV286ConsolidatedOriginal = Object.freeze({
+    saveSnippets: TextExpressApp.prototype.saveSnippets,
+    saveCategories: TextExpressApp.prototype.saveCategories,
+    loadCategories: TextExpressApp.prototype.loadCategories,
+    loadSnippets: TextExpressApp.prototype.loadSnippets,
+    initProductivity: TextExpressApp.prototype.initProductivity,
+    destroyProductivity: TextExpressApp.prototype.destroyProductivity
+  });
+
+  TextExpressApp.prototype.isValidDeckPayloadV286 = function (raw, field) {
+    if (!raw) return false;
+    try {
+      const parsed = JSON.parse(raw);
+      const list = Array.isArray(parsed) ? parsed : parsed?.[field];
+      return Array.isArray(list) && list.length > 0;
+    } catch { return false; }
+  };
+
+  TextExpressApp.prototype.createDeckSnapshotV286 = function () {
+    if (!this.storageAvailable || !Array.isArray(this.snippets) || !this.snippets.length || !Array.isArray(this.categories) || !this.categories.length) return false;
+    const snippetsPayload = this.storageGet(STORAGE_KEYS.snippets);
+    const categoriesPayload = this.storageGet(STORAGE_KEYS.categories);
+    if (!this.isValidDeckPayloadV286(snippetsPayload, "snippets") || !this.isValidDeckPayloadV286(categoriesPayload, "categories")) return false;
+    try {
+      const storage = window.localStorage;
+      const currentPrimary = storage.getItem(TE_V286_DECK_BACKUP_PRIMARY);
+      if (currentPrimary) {
+        try {
+          const previous = JSON.parse(currentPrimary);
+          if (previous?.snippetsPayload === snippetsPayload && previous?.categoriesPayload === categoriesPayload) return true;
+        } catch {}
+      }
+      const next = JSON.stringify({
+        app: "Text Express",
+        backupType: "automatic-deck-snapshot",
+        createdAt: new Date().toISOString(),
+        appVersion: APP_VERSION,
+        snippetsPayload,
+        categoriesPayload
+      });
+      if (currentPrimary) storage.setItem(TE_V286_DECK_BACKUP_SECONDARY, currentPrimary);
+      storage.setItem(TE_V286_DECK_BACKUP_PRIMARY, next);
+      return true;
+    } catch { return false; }
+  };
+
+  TextExpressApp.prototype.restoreDeckSnapshotV286 = function () {
+    if (!this.storageAvailable) return false;
+    const snippetsPayload = this.storageGet(STORAGE_KEYS.snippets);
+    const categoriesPayload = this.storageGet(STORAGE_KEYS.categories);
+    const snippetsValid = this.isValidDeckPayloadV286(snippetsPayload, "snippets");
+    const categoriesValid = this.isValidDeckPayloadV286(categoriesPayload, "categories");
+    if (snippetsValid && categoriesValid) return false;
+
+    const candidates = [TE_V286_DECK_BACKUP_PRIMARY, TE_V286_DECK_BACKUP_SECONDARY, TE_V273_PREVIOUS_DECK_BACKUP_KEY];
+    for (const key of candidates) {
+      try {
+        const backup = JSON.parse(window.localStorage.getItem(key) || "null");
+        if (!backup) continue;
+        const backupSnippets = backup.snippetsPayload;
+        const backupCategories = backup.categoriesPayload;
+        const canRestoreSnippets = this.isValidDeckPayloadV286(backupSnippets, "snippets");
+        const canRestoreCategories = this.isValidDeckPayloadV286(backupCategories, "categories");
+        if (!canRestoreSnippets && !canRestoreCategories) continue;
+        if (!snippetsValid && canRestoreSnippets) window.localStorage.setItem(STORAGE_KEYS.snippets, backupSnippets);
+        if (!categoriesValid && canRestoreCategories) window.localStorage.setItem(STORAGE_KEYS.categories, backupCategories);
+        return true;
+      } catch {}
+    }
+    return false;
+  };
+
+  TextExpressApp.prototype.loadCategories = function () {
+    this.restoreDeckSnapshotV286();
+    return teV286ConsolidatedOriginal.loadCategories.call(this);
+  };
+
+  TextExpressApp.prototype.loadSnippets = function () {
+    this.restoreDeckSnapshotV286();
+    const result = teV286ConsolidatedOriginal.loadSnippets.call(this);
+    this.createDeckSnapshotV286();
+    return result;
+  };
+
+  TextExpressApp.prototype.saveCategories = function () {
+    const result = teV286ConsolidatedOriginal.saveCategories.call(this);
+    this.createDeckSnapshotV286();
+    return result;
+  };
+
+  TextExpressApp.prototype.saveSnippets = function () {
+    const result = teV286ConsolidatedOriginal.saveSnippets.call(this);
+    if (result !== false) this.createDeckSnapshotV286();
+    return result;
+  };
+
+  TextExpressApp.prototype.isProductivityVisualAnchorValid = function (element) {
+    if (!element?.isConnected) return false;
+    try {
+      const rect = element.getBoundingClientRect?.();
+      if (!rect) return true;
+      // jsdom e alguns WebViews retornam 0x0; nesse caso deixamos a validação
+      // estrutural prevalecer. No Genesys real, caixa colapsada não recebe pill.
+      if (rect.width === 0 && rect.height === 0) return true;
+      return rect.width >= 40 && rect.height >= 18;
+    } catch { return true; }
+  };
+
+  TextExpressApp.prototype.detachProductivityVisual = function (timer) {
+    if (!timer) return;
+    const oldElement = timer.element;
+    try { timer.bubbles?.remove?.(); } catch {}
+    timer.bubbles = null;
+    timer.channelEl = null;
+    timer.timerEl = null;
+    timer.checkEl = null;
+    if (oldElement?.isConnected) {
+      try {
+        const stillHasBubble = [...oldElement.children].some((child) => child?.classList?.contains("te-gx-bubbles"));
+        if (!stillHasBubble) oldElement.classList.remove("te-gx-host");
+      } catch {}
+    }
+  };
+
+  TextExpressApp.prototype.ensureGenesysProductivityStyles = function () {
+    let style = document.getElementById("te-productivity-genesys-style");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "te-productivity-genesys-style";
+      (document.head || document.documentElement).appendChild(style);
+    }
+    style.textContent = `
+      .te-gx-host{position:relative!important}
+      .te-gx-host>.interaction-content,.te-gx-host>[data-qa-id="interaction-content"]{padding-bottom:25px!important}
+      .te-gx-host .duration,.te-gx-host span[data-bind*="elapsedTimeString"]{display:none!important}
+      .te-gx-bubbles{position:absolute!important;right:10px!important;left:auto!important;bottom:4px!important;top:auto!important;transform:none!important;margin:0!important;z-index:10!important;display:flex;align-items:center;justify-content:flex-end;gap:4px;pointer-events:none;user-select:none;width:auto!important;max-width:calc(100% - 20px);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:11px;line-height:1;box-sizing:border-box}
+      .te-gx-pill{display:inline-flex;align-items:center;justify-content:center;min-height:18px;height:18px;padding:2px 5px;border:1px solid var(--te-gx-border,#dce3ed);border-radius:999px;background:var(--te-gx-bg,#fff);color:var(--te-gx-text,#172033);box-shadow:0 1px 3px rgba(15,32,61,.10);font-variant-numeric:tabular-nums;font-weight:800;white-space:nowrap}
+      .te-gx-channel{min-width:20px;padding:2px 4px;font-size:11px}
+      .te-gx-timer.te-gx-paused{color:var(--te-gx-muted,#65728a)}
+      .te-gx-timer.te-gx-client-inactive{color:#b77900;border-color:#e4bd5e}
+      .te-gx-timer.te-gx-operator-inactive{color:var(--te-gx-primary,#2563eb);border-color:var(--te-gx-primary,#2563eb)}
+      .te-gx-timer.te-gx-long{color:var(--te-gx-danger,#d52b2b);border-color:var(--te-gx-danger,#d52b2b)}
+      .te-gx-status{min-width:20px;padding:2px 5px;font-weight:950;color:#fff!important}
+      .te-gx-status.te-gx-status-no{background:#c62828!important;border-color:#c62828!important}
+      .te-gx-status.te-gx-status-yes{background:#218838!important;border-color:#218838!important}
+      .te-gx-bubbles.te-gx-excluded{opacity:.55}
+    `;
+  };
+
+  TextExpressApp.prototype.attachProductivityBubbles = function (timer) {
+    const conversation = this.getCanonicalGenesysConversation(timer?.element);
+    if (!this.isProductivityVisualAnchorValid(conversation)) {
+      this.detachProductivityVisual(timer);
+      return null;
+    }
+
+    // O estado lógico pode sobreviver ao rerender, o elemento visual não.
+    // Nunca reutilizamos um pill pertencente a outro timer/Interaction ID.
+    if (timer.bubbles?.isConnected && timer.bubbles.parentElement !== conversation) {
+      try { timer.bubbles.remove(); } catch {}
+      timer.bubbles = null;
+    }
+    timer.element = conversation;
+    conversation.classList.add("te-gx-host");
+
+    let container = null;
+    try {
+      const directBubbles = [...conversation.children].filter((child) => child?.classList?.contains("te-gx-bubbles"));
+      for (const bubble of directBubbles) {
+        if (!container && bubble.dataset.teProductivityOwner === timer.key) container = bubble;
+        else {
+          try { bubble.remove(); } catch {}
+        }
+      }
+    } catch {}
+
+    if (!container) {
+      container = document.createElement("div");
+      container.className = "te-gx-bubbles";
+      container.innerHTML = '<span class="te-gx-pill te-gx-channel"></span><span class="te-gx-pill te-gx-timer">00:00</span><span class="te-gx-pill te-gx-status te-gx-status-no" aria-label="Ainda não contabilizada">✕</span>';
+      conversation.appendChild(container);
+    }
+
+    container.dataset.teProductivityOwner = timer.key;
+    timer.bubbles = container;
+    timer.channelEl = container.querySelector(".te-gx-channel");
+    timer.timerEl = container.querySelector(".te-gx-timer");
+    timer.checkEl = container.querySelector(".te-gx-status");
+    this.applyGenesysProductivityTheme(container);
+    return container;
+  };
+
+  TextExpressApp.prototype.findProductivityTimerForConversation = function (conversation, keyInfo, assignedKeys = new Set()) {
+    let timer = this.productivityTimers.get(keyInfo.key);
+    if (timer && !assignedKeys.has(timer.key)) return timer;
+
+    // Interaction ID confiável tem prioridade sobre a identidade do nó DOM.
+    // O Angular do Genesys pode reutilizar a mesma linha para outra interação.
+    if (keyInfo.interactionId) {
+      for (const candidate of this.productivityTimers.values()) {
+        if (assignedKeys.has(candidate.key)) continue;
+        if (candidate.interactionId && candidate.interactionId === keyInfo.interactionId) return candidate;
+      }
+    }
+
+    // Permite apenas a promoção segura de um timer DOM/fallback para um ID que
+    // apareceu depois, desde que o fingerprint da mesma linha continue igual.
+    if (keyInfo.interactionId) {
+      for (const candidate of this.productivityTimers.values()) {
+        if (assignedKeys.has(candidate.key)) continue;
+        if (!candidate.interactionId && candidate.element === conversation && candidate.fingerprint === keyInfo.fingerprint) return candidate;
+      }
+    } else {
+      // Sem ID confiável, identidade do nó só vale para timers que também não
+      // possuíam ID; nunca deixa um DOM reutilizado sequestrar timer confiável.
+      for (const candidate of this.productivityTimers.values()) {
+        if (assignedKeys.has(candidate.key)) continue;
+        if (!candidate.interactionId && candidate.element === conversation) return candidate;
+      }
+    }
+
+    if (keyInfo.fingerprint) {
+      const candidates = [...this.productivityTimers.values()].filter((candidate) =>
+        !assignedKeys.has(candidate.key)
+        && candidate.fingerprint === keyInfo.fingerprint
+        && (candidate.missingSince || candidate.element?.isConnected === false)
+        && (!keyInfo.interactionId || !candidate.interactionId || candidate.interactionId === keyInfo.interactionId)
+      );
+      if (candidates.length === 1) return candidates[0];
+    }
+    return null;
+  };
+
+  TextExpressApp.prototype.updateProductivityTimerVisual = function (timer, now = Date.now()) {
+    if (!timer?.element?.isConnected || !this.isProductivityVisualAnchorValid(timer.element)) {
+      this.detachProductivityVisual(timer);
+      return;
+    }
+    if (!timer.bubbles?.isConnected || timer.bubbles?.parentElement !== timer.element || timer.bubbles?.dataset?.teProductivityOwner !== timer.key) {
+      this.attachProductivityBubbles(timer);
+    }
+    if (!timer.bubbles || !timer.timerEl || !timer.checkEl || !timer.channelEl) return;
+
+    const activeMs = this.getProductivityActiveDuration(timer, now);
+    const totalMs = this.getProductivityTotalDuration(timer, now);
+    const thresholdMs = this.getProductivityThreshold(timer) * 1000;
+    // Status visual = regra oficial de contabilização: até 69 s X vermelho;
+    // a partir de 70 s (ou limite configurado) check verde.
+    const counted = totalMs >= thresholdMs;
+    timer.channelEl.textContent = timer.channel === "call" ? "☎" : "💬";
+    timer.timerEl.textContent = this.formatProductivityTime(activeMs);
+    timer.checkEl.textContent = counted ? "✓" : "✕";
+    timer.checkEl.dataset.teQualified = counted ? "true" : "false";
+    timer.checkEl.classList.toggle("te-gx-status-yes", counted);
+    timer.checkEl.classList.toggle("te-gx-status-no", !counted);
+    timer.checkEl.setAttribute("aria-label", counted ? "Interação contabilizada" : "Interação ainda não contabilizada");
+    timer.bubbles.classList.toggle("te-gx-excluded", Boolean(timer.excluded));
+
+    timer.timerEl.classList.remove("te-gx-paused", "te-gx-client-inactive", "te-gx-operator-inactive", "te-gx-long");
+    if (timer.manualPaused || !timer.isSelected) {
+      timer.timerEl.classList.add("te-gx-paused");
+      return;
+    }
+    const channelSettings = timer.channel === "call" ? this.productivitySettings.call : this.productivitySettings.chat;
+    const longMs = Number(channelSettings.longMinutes || 15) * 60000;
+    if (activeMs >= longMs) {
+      timer.timerEl.classList.add("te-gx-long");
+      if (!timer.longNotified && this.productivitySettings.alertsEnabled) {
+        timer.longNotified = true;
+        this.showToast(`${timer.channel === "call" ? "Ligação" : "Conversa"} com ${timer.participantName || "cliente"} ultrapassou ${channelSettings.longMinutes} min.`, "error", 4800);
+      }
+      return;
+    }
+    if (timer.channel === "chat") {
+      const operatorInactive = (now - Number(timer.lastOperatorActivityTimestamp || now)) / 1000;
+      const clientInactive = (now - Number(timer.lastCustomerReplyTimestamp || now)) / 1000;
+      if (operatorInactive >= this.productivitySettings.chat.operatorInactivitySeconds) timer.timerEl.classList.add("te-gx-operator-inactive");
+      else if (clientInactive >= this.productivitySettings.chat.clientInactivitySeconds) timer.timerEl.classList.add("te-gx-client-inactive");
+    }
+  };
+
+  TextExpressApp.prototype.getProductivityObservationTarget = function (conversations = null) {
+    const list = Array.isArray(conversations) ? conversations : this.getGenesysConversationElements();
+    if (list.length) {
+      const parent = list[0]?.parentElement;
+      if (parent && list.every((item) => item.parentElement === parent)) return parent;
+      if (parent) return parent;
+    }
+    return document.body || document.documentElement;
+  };
+
+  TextExpressApp.prototype.ensureProductivityDomObserver = function (conversations = null) {
+    if (typeof MutationObserver === "undefined") return;
+    const target = this.getProductivityObservationTarget(conversations);
+    if (!target) return;
+    if (this.productivityDomObserver && this.productivityDomObserverTarget === target && target.isConnected !== false) return;
+    try { this.productivityDomObserver?.disconnect?.(); } catch {}
+    this.productivityDomObserverTarget = target;
+    this.productivityDomObserver = new MutationObserver((mutations) => {
+      const isTextExpressVisual = (node) => {
+        if (!node || node.nodeType !== 1) return false;
+        try {
+          return node.matches?.(".te-gx-bubbles,#te-productivity-genesys-style,#text-express-app")
+            || Boolean(node.closest?.(".te-gx-bubbles,#text-express-app"));
+        } catch { return false; }
+      };
+      const relevant = mutations.some((mutation) => {
+        if (isTextExpressVisual(mutation.target)) return false;
+        const changed = [...(mutation.addedNodes || []), ...(mutation.removedNodes || [])];
+        return changed.some((node) => !isTextExpressVisual(node));
+      });
+      if (!relevant) return;
+      try { window.clearTimeout(this.productivityDomReconcileTimeout); } catch {}
+      this.productivityDomReconcileTimeout = window.setTimeout(() => {
+        if (this.productivityInitialized) this.monitorGenesysProductivity();
+      }, 40);
+    });
+    this.productivityDomObserver.observe(target, { childList: true, subtree: true });
+  };
+
+  TextExpressApp.prototype.monitorGenesysProductivity = function () {
+    if (!this.productivityInitialized || !this.productivitySettings.enabled) return;
+    const now = Date.now();
+    const conversations = this.getGenesysConversationElements();
+    this.ensureProductivityDomObserver(conversations);
+    const assignedKeys = new Set();
+    let selectedTimer = null;
+
+    conversations.forEach((conversation, index) => {
+      const selected = this.isGenesysConversationSelected(conversation);
+      const keyInfo = this.getProductivityConversationKey(conversation, index, selected);
+      let timer = this.findProductivityTimerForConversation(conversation, keyInfo, assignedKeys);
+      if (!timer) {
+        timer = this.createProductivityTimer(conversation, index, keyInfo, selected);
+      } else {
+        if (keyInfo.interactionId && timer.key !== keyInfo.key) timer = this.rekeyProductivityTimer(timer, keyInfo.key);
+        if (timer.element !== conversation) {
+          this.detachProductivityVisual(timer);
+          timer.element = conversation;
+        }
+        timer.interactionId = keyInfo.interactionId || timer.interactionId || "";
+        timer.fingerprint = keyInfo.fingerprint || timer.fingerprint || "";
+        timer.participantName = this.getGenesysParticipantName(conversation) || timer.participantName;
+        timer.channel = this.detectGenesysChannel(conversation, selected) || timer.channel;
+        if (!timer.link) timer.link = this.getGenesysInteractionLink(conversation, timer.interactionId, selected);
+        timer.missingSince = 0;
+        timer.lastSeenAt = now;
+        timer.finalized = false;
+        this.updateProductivitySelection(timer, selected, now);
+      }
+      assignedKeys.add(timer.key);
+      this.attachProductivityBubbles(timer);
+      this.updateProductivityTimerVisual(timer, now);
+      if (selected) selectedTimer = timer;
+    });
+
+    for (const timer of [...this.productivityTimers.values()]) {
+      if (assignedKeys.has(timer.key)) continue;
+      // Remove o DOM imediatamente para impedir pills órfãos/acumulados, mas
+      // preserva o estado lógico por 15 s para suportar rerender do Genesys.
+      this.detachProductivityVisual(timer);
+      if (!timer.missingSince) timer.missingSince = now;
+      if (now - timer.missingSince >= 15000) this.finalizeProductivityTimer(timer);
+    }
+
+    this.bindSelectedProductivityActivity(selectedTimer);
+    const dateKey = this.getProductivityDateKey();
+    const open = conversations.length;
+    const currentPeak = Number(this.productivityState.peakOpenByDate[dateKey] || 0);
+    if (open > currentPeak) {
+      this.productivityState.peakOpenByDate[dateKey] = open;
+      this.saveProductivityState();
+    }
+    if (now - Number(this.productivityLastPersistAt || 0) >= 3000) {
+      this.productivityLastPersistAt = now;
+      this.saveProductivityState();
+    }
+    if (now - Number(this.productivityLastRenderAt || 0) >= 1000) {
+      this.productivityLastRenderAt = now;
+      this.renderProductivityCounter();
+      if (this.activeType === "produtividade") this.renderProductivity();
+    }
+  };
+
+  TextExpressApp.prototype.renderProductivityCurrent = function (current) {
+    const container = this.root.querySelector("#te-productivity-current-list");
+    const alerts = this.root.querySelector("#te-productivity-alert-summary");
+    if (!container) return;
+    if (!current.length) {
+      container.innerHTML = '<div class="te-productivity-empty">Nenhuma interação aberta detectada no momento.</div>';
+      if (alerts) { alerts.textContent = "Nenhum alerta ativo."; alerts.classList.remove("te-has-alert"); }
+      return;
+    }
+    const now = Date.now();
+    const sorted = [...current].sort((a, b) => Number(b.isSelected) - Number(a.isSelected) || a.startedAt - b.startedAt);
+    const alertLabels = [];
+    container.innerHTML = sorted.map((timer) => {
+      const active = this.getProductivityActiveDuration(timer, now);
+      const counted = this.getProductivityTotalDuration(timer, now) >= this.getProductivityThreshold(timer) * 1000;
+      const alert = this.getTimerAlertLabel(timer, now);
+      if (!["Normal", "Em espera", "Pausado"].includes(alert)) alertLabels.push(`${timer.participantName}: ${alert}`);
+      return `<div class="te-productivity-current-row ${timer.excluded ? "te-excluded" : ""}">
+        <span class="te-productivity-row-channel">${timer.channel === "call" ? "☎" : "💬"}</span>
+        <div class="te-productivity-row-main"><strong>${this.escapeHtml(timer.participantName || "Cliente")}</strong><small>${this.escapeHtml(alert)}${timer.interactionId ? ` · ${this.escapeHtml(timer.interactionId)}` : ""}${timer.excluded ? " · fora das métricas" : ""}</small></div>
+        <span class="te-productivity-row-time">${this.formatProductivityTime(active)}</span>
+        <span class="te-productivity-row-check ${counted ? "te-counted" : "te-not-counted"}">${counted ? "✓" : "✕"}</span>
+      </div>`;
+    }).join("");
+    if (alerts) {
+      alerts.textContent = alertLabels.length ? alertLabels.join(" · ") : "Nenhum alerta ativo.";
+      alerts.classList.toggle("te-has-alert", alertLabels.length > 0);
+    }
+  };
+
+  TextExpressApp.prototype.initProductivity = function () {
+    const result = teV286ConsolidatedOriginal.initProductivity.call(this);
+    this.ensureGenesysProductivityStyles();
+    this.ensureProductivityDomObserver();
+    return result;
+  };
+
+  TextExpressApp.prototype.destroyProductivity = function () {
+    try { this.productivityDomObserver?.disconnect?.(); } catch {}
+    this.productivityDomObserver = null;
+    this.productivityDomObserverTarget = null;
+    try { window.clearTimeout(this.productivityDomReconcileTimeout); } catch {}
+    this.productivityDomReconcileTimeout = null;
+    return teV286ConsolidatedOriginal.destroyProductivity.call(this);
   };
 
   TextExpressApp.prototype.init = function () {
